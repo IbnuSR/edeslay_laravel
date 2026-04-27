@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desa Banjardowo - E-Deslay</title>
+    <style>
+        /* ===== CSS ASLI KAMU (PASTE DI SINI) ===== */
+        /* Reset & Global Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(90deg, #002a9e, #0062ff);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .header-logo { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; }
+        .header-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .header-title { font-size: 0.9rem; text-align: left; }
+        .header-title h1 { font-size: 1rem; font-weight: bold; margin-bottom: 0.2rem; }
+        .header-title p { font-size: 0.85rem; margin: 0; }
+        .header-nav { display: flex; gap: 1.5rem; align-items: center; }
+        .header-nav a {
+            color: white; text-decoration: none; font-weight: 500;
+            padding: 0.5rem 1rem; border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .header-nav a:hover { background-color: rgba(255,255,255,0.2); }
+        .login-btn {
+            background-color: #0624d3; color: #5c6bc0; border: none;
+            padding: 0.5rem 1rem; border-radius: 20px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .login-btn:hover { background-color: #f0f0f0; }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none; flex-direction: column; justify-content: space-between;
+            width: 24px; height: 18px; cursor: pointer;
+        }
+        .mobile-menu-btn span {
+            display: block; height: 2px; width: 100%;
+            background-color: white; transition: all 0.3s ease;
+        }
+        .mobile-menu {
+            position: fixed; top: 0; right: -300px; width: 300px;
+            height: 100vh; background: linear-gradient(90deg, #002a9e, #0062ff);
+            z-index: 1000; transition: right 0.3s ease;
+            padding: 2rem 1rem; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .mobile-menu.active { right: 0; }
+        .mobile-menu-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: none; font-size: 1.5rem;
+            color: white; cursor: pointer;
+        }
+        .mobile-menu ul { list-style: none; margin-top: 2rem; }
+        .mobile-menu li { margin-bottom: 1rem; }
+        .mobile-menu a {
+            color: white; text-decoration: none; font-weight: 500;
+            padding: 0.75rem 1rem; border-radius: 5px; display: block;
+            transition: background-color 0.3s ease;
+        }
+        .mobile-menu a:hover { background-color: rgba(255,255,255,0.2); }
+
+        /* Main Content */
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .hero { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .hero-img { flex: 0 0 300px; }
+        .hero-img img { width: 100%; height: auto; }
+        .hero-text { flex: 1; min-width: 300px; }
+        .hero-text h1 { font-size: 1.5rem; margin-bottom: 1rem; color: #333; }
+        .hero-text p { margin-bottom: 1rem; text-align: justify; }
+
+        /* Section Styles */
+        .section { margin: 3rem 0; }
+        .section-title { text-align: center; font-size: 1.8rem; margin-bottom: 2rem; color: #333; }
+
+        /* Slider */
+        .kegiatan-slider-container, .prestasi-slider-container {
+            position: relative; margin: 0 auto; max-width: 1200px;
+        }
+        .kegiatan-slider, .prestasi-slider {
+            display: flex; overflow-x: hidden; scroll-behavior: smooth;
+        }
+        .kegiatan-slide, .prestasi-slide {
+            min-width: 100%; padding: 1rem; box-sizing: border-box;
+            display: flex; gap: 2rem; justify-content: center; align-items: stretch;
+        }
+        .kegiatan-card, .prestasi-card {
+            background: white; border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden;
+            transition: transform 0.3s ease; flex: 1; min-width: 300px;
+            display: flex; flex-direction: column;
+        }
+        .kegiatan-card:hover, .prestasi-card:hover { transform: translateY(-5px); }
+        .kegiatan-img, .prestasi-img { width: 100%; height: 200px; overflow: hidden; }
+        .kegiatan-img img, .prestasi-img img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .kegiatan-card:hover .kegiatan-img img,
+        .prestasi-card:hover .prestasi-img img { transform: scale(1.05); }
+        .kegiatan-content, .prestasi-content {
+            padding: 1.5rem; flex: 1; display: flex;
+            flex-direction: column; justify-content: space-between;
+        }
+        .kegiatan-content h3, .prestasi-content h3,
+        .kegiatan-content h4, .prestasi-content h4 {
+            font-size: 1.1rem; margin-bottom: 0.5rem; color: #333;
+            cursor: pointer; transition: color 0.3s ease;
+        }
+        .kegiatan-content h3:hover, .prestasi-content h3:hover,
+        .kegiatan-content h4:hover, .prestasi-content h4:hover {
+            color: #5c6bc0; text-decoration: underline;
+        }
+        .kegiatan-content p, .prestasi-content p {
+            font-size: 0.9rem; color: #666; margin-bottom: 1rem;
+            text-align: justify; flex: 1;
+        }
+        .kegiatan-date, .prestasi-date {
+            font-size: 0.85rem; color: #999; margin-bottom: 1rem;
+        }
+        .kegiatan-actions, .prestasi-actions {
+            display: flex; gap: 0.5rem; justify-content: center;
+        }
+        .btn {
+            padding: 0.5rem 1rem; border: none; border-radius: 5px;
+            cursor: pointer; font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .btn-prev, .btn-next { background-color: #3B82F6; color: white; }
+        .btn-prev:hover, .btn-next:hover { background-color: #1E3A8A; }
+
+        /* Struktur */
+        .struktur-container { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+        .struktur-title { font-size: 1.5rem; margin-bottom: 1rem; color: #333; }
+        .struktur-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem; width: 100%;
+        }
+        .struktur-card {
+            background: white; border: 2px solid #ddd; border-radius: 10px;
+            padding: 1.5rem; text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        .struktur-card:hover {
+            transform: translateY(-5px); border-color: #5c6bc0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .struktur-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%;
+            height: 4px; background: linear-gradient(90deg, #5c6bc0, #7e57c2);
+            transition: all 0.3s ease;
+        }
+        .struktur-card:hover::before { height: 6px; }
+        .struktur-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #333; font-weight: 600; }
+        .struktur-card p { font-size: 1rem; color: #555; font-weight: 500; }
+
+        /* Download */
+        .download-section {
+            text-align: center; padding: 3rem 1rem;
+            background-color: #f5f5f5; border-radius: 10px; margin-top: 2rem;
+        }
+        .download-section h2 { font-size: 1.8rem; margin-bottom: 1rem; color: #333; }
+        .download-section p { font-size: 1.1rem; margin-bottom: 2rem; color: #555; }
+        .download-btn {
+            background-color: #0062ff; color: white; padding: 0.75rem 2rem;
+            border-radius: 30px; font-size: 1.1rem; font-weight: bold;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            text-decoration: none; transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .download-btn:hover { background-color: #3f51b5; transform: translateY(-2px); }
+
+        /* Footer */
+        .footer {
+            width: 100%; background: linear-gradient(90deg, #002a9e, #0062ff);
+            color: #fff; padding: 60px 8% 30px; margin-top: 60px;
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .footer-content {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; flex-wrap: wrap; gap: 40px;
+        }
+        .footer-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 280px; }
+        .footer-left img { height: 120px; width: auto; }
+        .footer-left .desa-info h3 { font-size: 1.4rem; margin: 0; font-weight: 700; }
+        .footer-left .desa-info p { font-size: 0.95rem; margin: 6px 0 0; color: #dbeafe; }
+        .footer-right { flex: 1; min-width: 280px; }
+        .footer-right h4 { font-size: 1.1rem; margin-bottom: 8px; color: #bfdbfe; }
+        .footer-right p { font-size: 0.95rem; margin: 4px 0; line-height: 1.6; }
+        .footer-right a { color: #fff; text-decoration: none; }
+        .footer-right a:hover { text-decoration: underline; }
+        .footer-bottom {
+            margin-top: 40px; text-align: center; font-size: 0.9rem;
+            color: #dbeafe; border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { padding: 1rem; flex-direction: row; justify-content: space-between; }
+            .header-left { width: auto; margin-right: 1rem; }
+            .header-nav { display: none; }
+            .mobile-menu-btn { display: flex; }
+            .mobile-menu { right: -300px; }
+            .mobile-menu.active { right: 0; }
+            .hero { flex-direction: column; gap: 1rem; }
+            .hero-img { flex: 0 0 100%; max-width: 300px; }
+            .hero-text { flex: 1; min-width: auto; }
+            .section-title { font-size: 1.5rem; }
+            .kegiatan-slide, .prestasi-slide {
+                flex-direction: row; flex-wrap: wrap;
+                justify-content: center; gap: 1rem; padding: 0.5rem;
+            }
+            .kegiatan-card, .prestasi-card {
+                flex: 1 1 calc(50% - 0.75rem); min-width: 140px;
+                max-width: 200px; max-height: 350px;
+            }
+            .kegiatan-img, .prestasi-img { height: 120px; }
+            .kegiatan-img img, .prestasi-img img { object-fit: cover; }
+            .kegiatan-content h3, .prestasi-content h3,
+            .kegiatan-content h4, .prestasi-content h4 { font-size: 0.95rem; }
+            .kegiatan-content p, .prestasi-content p { font-size: 0.8rem; }
+            .kegiatan-date, .prestasi-date { font-size: 0.75rem; }
+            .kegiatan-actions, .prestasi-actions { flex-direction: row; gap: 0.5rem; }
+            .btn { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+            .struktur-grid { grid-template-columns: 1fr; }
+            .download-section { padding: 2rem 1rem; }
+            .download-btn { padding: 0.75rem 1.5rem; font-size: 1rem; }
+            .footer { padding: 40px 6% 20px; text-align: center; }
+            .footer-content { flex-direction: column; align-items: center; }
+            .footer-left, .footer-right { text-align: center; }
+            .footer-left img { height: 70px; }
+        }
+        @media (max-width: 480px) {
+            .header-title h1 { font-size: 0.9rem; }
+            .header-title p { font-size: 0.8rem; }
+            .section-title { font-size: 1.3rem; }
+            .hero-text h1 { font-size: 1.2rem; }
+            .kegiatan-content h3, .prestasi-content h3,
+            .kegiatan-content h4, .prestasi-content h4 { font-size: 1rem; }
+            .struktur-card h3 { font-size: 1rem; }
+            .struktur-card p { font-size: 0.9rem; }
+            .download-section h2 { font-size: 1.5rem; }
+            .download-section p { font-size: 1rem; }
+            .footer-column h3 { font-size: 1rem; }
+            .footer-logo img { width: 120px; }
+        }
+
+        /* Smooth Scroll */
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="header-logo">
+                <img src="{{ asset('assets/images/logo-nganjuk.png') }}" alt="Logo Desa">
+            </div>
+            <div class="header-title">
+                <h1>Desa Banjardowo</h1>
+                <p>Kec.Lengkong, Kab.Nganjuk</p>
+            </div>
+        </div>
+        <nav class="header-nav">
+            <a href="#visimisi">Visi-Misi</a>
+            <a href="#kegiatan">Kegiatan Desa</a>
+            <a href="#prestasi">Prestasi</a>
+            <a href="#struktur">Struktur Organisasi</a>
+            <a href="{{ route('login') }}" class="login-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.1c1.11.35 2 1.22 2 2.22v1H2v-1c0-1.01.89-1.88 2-2.22.51-.14 1.02-.25 1.53-.33C7.04 9.28 8 9.18 9 9.18c.6.01 1.2.12 1.73.33zM6 12.5a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                </svg>
+                LOGIN ADMIN
+            </a>
+        </nav>
+        <button class="mobile-menu-btn">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <button class="mobile-menu-close">&times;</button>
+        <ul>
+            <li><a href="#visimisi">Visi-Misi</a></li>
+            <li><a href="#kegiatan">Kegiatan Desa</a></li>
+            <li><a href="#prestasi">Prestasi</a></li>
+            <li><a href="#struktur">Struktur Organisasi</a></li>
+            <li><a href="{{ route('login') }}">LOGIN ADMIN</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-img">
+                <img src="{{ asset('assets/images/logo-big.png') }}" alt="E-Deslay Logo">
+            </div>
+            <div class="hero-text">
+                <h1>Selamat datang di E-Deslay, Layanan Digital Desa yang Lebih Mudah dan Cepat.</h1>
+                <p>E-Deslay hadir sebagai wujud inovasi pelayanan masyarakat di desa. Melalui platform ini, warga dapat memperoleh panduan pembuatan surat, menyampaikan saran, serta mengakses informasi terkini mengenai kegiatan desa. Mari bersama mewujudkan pelayanan publik yang transparan, efisien, dan berorientasi pada kemudahan masyarakat.</p>
+            </div>
+        </section>
+
+        <!-- Visi Misi -->
+        <section id="visimisi" class="section">
+            <h2 class="section-title">Visi-Misi</h2>
+            <div class="hero-text">
+                <p><strong>Pemerintah Desa berkomitmen mewujudkan pelayanan yang transparan, efisien, dan berbasis digital untuk meningkatkan kesejahteraan masyarakat, dengan menyediakan akses informasi yang cepat dan jelas, panduan tata cara pengurusan administrasi yang terstruktur, transparansi kegiatan serta pengumuman resmi, serta mendorong partisipasi masyarakat dalam pembangunan desa melalui keterbukaan informasi.</strong></p>
+            </div>
+        </section>
+
+        <!-- Kegiatan Desa -->
+        <section id="kegiatan" class="section">
+            <h2 class="section-title">Kegiatan Desa</h2>
+            <div class="kegiatan-slider-container">
+                <div class="kegiatan-slider" id="kegiatanSlider">
+                    @php
+                        $slideCount = ceil(count($kegiatanList) / 2);
+                    @endphp
+                    @for ($i = 0; $i < $slideCount; $i++)
+                        @php $startIndex = $i * 2; @endphp
+                        <div class="kegiatan-slide">
+                            @for ($j = $startIndex; $j < $startIndex + 2 && $j < count($kegiatanList); $j++)
+                                <div class="kegiatan-card">
+                                    <div class="kegiatan-img">
+                                        <img src="{{ $kegiatanList[$j]->image_url }}" 
+                                             alt="{{ $kegiatanList[$j]->judul }}">
+                                    </div>
+                                    <div class="kegiatan-content">
+                                        <h4 onclick="window.location.href='{{ route('kegiatan.detail', $kegiatanList[$j]->id) }}'">
+                                            {{ $kegiatanList[$j]->judul }}
+                                        </h4>
+                                        <p>{{ Str::limit($kegiatanList[$j]->deskripsi, 50) }}...</p>
+                                        <div class="kegiatan-date">
+                                            {{ \Carbon\Carbon::parse($kegiatanList[$j]->tanggal)->isoFormat('D MMMM Y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
+                    @endfor
+                </div>
+                <div class="kegiatan-actions">
+                    <button class="btn btn-prev" onclick="moveSlide('kegiatan', -1)">PREV</button>
+                    <button class="btn btn-next" onclick="moveSlide('kegiatan', 1)">NEXT</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prestasi -->
+        <section id="prestasi" class="section">
+            <h2 class="section-title">Prestasi</h2>
+            <div class="prestasi-slider-container">
+                <div class="prestasi-slider" id="prestasiSlider">
+                    @php
+                        $slideCount = ceil(count($prestasiList) / 2);
+                    @endphp
+                    @for ($i = 0; $i < $slideCount; $i++)
+                        @php $startIndex = $i * 2; @endphp
+                        <div class="prestasi-slide">
+                            @for ($j = $startIndex; $j < $startIndex + 2 && $j < count($prestasiList); $j++)
+                                <div class="prestasi-card">
+                                    <div class="prestasi-img">
+                                        <img src="{{ $prestasiList[$j]->image_url }}" 
+                                             alt="{{ $prestasiList[$j]->judul }}">
+                                    </div>
+                                    <div class="prestasi-content">
+                                        <h4 onclick="window.location.href='{{ route('prestasi.detail', $prestasiList[$j]->id) }}'">
+                                            {{ $prestasiList[$j]->judul }}
+                                        </h4>
+                                        <p>{{ Str::limit($prestasiList[$j]->deskripsi, 50) }}...</p>
+                                        <div class="prestasi-date">
+                                            {{ \Carbon\Carbon::parse($prestasiList[$j]->tanggal)->isoFormat('D MMMM Y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
+                    @endfor
+                </div>
+                <div class="kegiatan-actions">
+                    <button class="btn btn-prev" onclick="moveSlide('prestasi', -1)">PREV</button>
+                    <button class="btn btn-next" onclick="moveSlide('prestasi', 1)">NEXT</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Struktur Perangkat Desa -->
+        <section id="struktur" class="section">
+            <h2 class="section-title">Struktur Perangkat Desa</h2>
+            <div class="struktur-container">
+                <div class="struktur-grid">
+                    @foreach($strukturDesa as $item)
+                        <div class="struktur-card">
+                            <h3>{{ $item->jabatan }}</h3>
+                            <p>{{ $item->nama }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Aplikasi -->
+        <section class="download-section">
+            <h2>Download Aplikasi</h2>
+            <p>Nikmati kemudahan layanan desa dari aplikasi resmi kami.</p>
+            <a href="https://www.mediafire.com/file/pwagazsqup9t87d/E-Deslay.apk/file" class="download-btn" target="_blank" rel="noopener">
+                <img src="{{ asset('assets/icons/Downloads.png') }}" alt="Download" width="25" height="25">
+                DOWNLOAD APK
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <img src="{{ asset('assets/images/logo-big.png') }}" alt="Logo Team">
+                <div class="desa-info">
+                    <h3>Desa Banjardowo</h3>
+                    <p>Kecamatan Lengkong, Kabupaten Nganjuk</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <h4>Kontak Kami</h4>
+                <p>📍 JL. Gondang Timur No.41A Banjardowo, Kec. Lengkong, Kab. Nganjuk</p>
+                <p>📧 <a href="mailto:banjardowolengkong@gmail.com">banjardowolengkong@gmail.com</a></p>
+                <p>📞 0857-4664-1970</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © {{ date("Y") }} Desa Banjardowo. All Rights Reserved.  
+            | Website Resmi E-DESLAY — Layanan Digital Desa.
+        </div>
+    </footer>
+
+    {{-- JAVASCRIPT (TETAP SAMA) --}}
+    <script>
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    function moveSlide(sectionId, direction) {
+        const slider = document.getElementById(sectionId + 'Slider');
+        if (!slider) return;
+        const slideWidth = slider.parentElement.offsetWidth;
+        const currentScroll = slider.scrollLeft;
+        const newScroll = currentScroll + (direction * slideWidth);
+        slider.scrollTo({ left: newScroll, behavior: 'smooth' });
+    }
+    
+    function handleTouchStart(e) { touchStartX = e.touches[0].clientX; }
+    function handleTouchEnd(e) {
+        touchEndX = e.changedTouches[0].clientX;
+        const slider = e.currentTarget;
+        const dx = touchStartX - touchEndX;
+        const threshold = 50;
+        if (Math.abs(dx) > threshold) {
+            const sectionId = slider.id.replace('Slider', '');
+            moveSlide(sectionId, dx > 0 ? 1 : -1);
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const kegiatanSlider = document.getElementById('kegiatanSlider');
+        const prestasiSlider = document.getElementById('prestasiSlider');
+        if (kegiatanSlider) {
+            kegiatanSlider.addEventListener('touchstart', handleTouchStart, { passive: true });
+            kegiatanSlider.addEventListener('touchend', handleTouchEnd, { passive: true });
+        }
+        if (prestasiSlider) {
+            prestasiSlider.addEventListener('touchstart', handleTouchStart, { passive: true });
+            prestasiSlider.addEventListener('touchend', handleTouchEnd, { passive: true });
+        }
+        document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+            document.querySelector('.mobile-menu').classList.toggle('active');
+        });
+        document.querySelector('.mobile-menu-close')?.addEventListener('click', function() {
+            document.querySelector('.mobile-menu').classList.remove('active');
+        });
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            if (mobileMenu && mobileMenu.classList.contains('active') &&
+                !mobileMenu.contains(event.target) && !mobileMenuBtn?.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+    });
+    </script>
+
+</body>
+</html>
