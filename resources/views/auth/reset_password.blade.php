@@ -1,283 +1,252 @@
-<?php
-session_start();
-include "config/db.php";
-
-// Proteksi: hanya bisa akses jika sudah verifikasi OTP
-if (!isset($_SESSION['reset_user'])) {
-    header("Location: lupa_password.php");
-    exit;
-}
-
-$message = '';
-
-if (isset($_POST['reset'])) {
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    // Validasi: password minimal 8 karakter
-    if (strlen($password) < 8) {
-        $message = "<div class='alert alert-error'>Password minimal 8 karakter.</div>";
-    }
-    // Validasi: konfirmasi password harus sama
-    elseif ($password !== $confirm_password) {
-        $message = "<div class='alert alert-error'>Konfirmasi password tidak cocok.</div>";
-    }
-    else {
-        $new_pass = md5($password); 
-        $user = $_SESSION['reset_user'];
-
-        $result = mysqli_query($conn, "UPDATE users SET password='{$new_pass}' WHERE username='{$user}'");
-
-        if ($result) {
-            session_unset();
-            session_destroy();
-            header("Location: login.php?pesan=reset_sukses");
-            exit;
-        } else {
-            $message = "<div class='alert alert-error'>Gagal mereset password. Silakan coba lagi.</div>";
-        }
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - E-Deslay</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password</title>
 
-        body {
-            background: url('assets/images/bg-bulu.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-            background-color: #f0f5fa;
-            position: relative;
-        }
+<style>
+/* ===== BODY ===== */
+body {
+    min-height: 100vh;
+    margin: 0;
 
-        /* Header Logo Desa di Pojok Kiri Atas */
-        .header-logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 10;
-        }
+    background: url('assets/images/bg_login.svg') no-repeat center;
+    background-size: cover;
 
-        .header-logo img {
-            width: 50px;
-        }
+    font-family: 'Segoe UI', Arial, sans-serif;
 
-        .header-logo h1 {
-            font-size: 16px;
-            color: #2c3e50;
-            line-height: 1.4;
-        }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        .header-logo p {
-            font-size: 14px;
-            color: #7f8c8d;
-        }
+/* ===== HEADER (SAMA SEMUA) ===== */
+.header-logo {
+    position: absolute;
+    top: 20px;
+    left: 25px;
 
-        /* Form Card di Tengah */
-        .form-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        .form-card img.logo-e-deslay {
-            height: 40px;
-            margin-bottom: 20px;
-        }
+.header-logo img {
+    width: 45px;
+}
 
-        .form-card h2 {
-            font-size: 20px;
-            color: #2c3e50;
-            margin: 15px 0;
-            line-height: 1.4;
-        }
+.header-logo h1 {
+    font-size: 16px;
+    margin: 0;
+}
 
-        .form-card p.subtitle {
-            font-size: 12px;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-        }
+.header-logo p {
+    font-size: 12px;
+    margin: 0;
+}
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 15px 0;
-            position: relative;
-        }
+/* ===== CARD ===== */
+.form-card {
+    width: 100%;
+    max-width: 360px;
 
-        .form-group label {
-            font-size: 14px;
-            color: #34495e;
-            font-weight: 500;
-            text-align: left;
-        }
+    background: rgba(255,255,255,0.7); /* 🔥 transparan */
+    border-radius: 16px;
 
-        .form-group input {
-            padding: 12px 40px 12px 16px;
-            border: 1px solid #bdc3c7;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-            position: relative;
-        }
+    padding: 30px 25px;
+    text-align: center;
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    backdrop-filter: blur(8px);
 
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 65%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #7f8c8d;
-            font-size: 16px;
-            z-index: 2;
-        }
+    margin-top: 40px;
+}
 
-        .eye-icon {
-            width: 22px;
-            height: 22px;
-            opacity: 0.9;
-        }
+/* ===== LOGO ===== */
+.logo-e-deslay {
+    height: 65px;
+    margin-bottom: 10px;
+}
 
-        .btn-primary {
-            padding: 12px 20px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            width: 100%;
-            margin: 20px 0;
-        }
+/* ===== TITLE ===== */
+.form-card h2 {
+    font-size: 22px;
+    color: #174087;
+    margin-bottom: 5px;
+}
 
-        .btn-primary:hover {
-            background: #2980b9;
-        }
+.subtitle {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 20px;
+}
 
-        .back-link {
-            font-size: 14px;
-        }
+/* ===== FORM ===== */
+.form-group {
+    width: 100%;
+    margin-bottom: 10px;
+    text-align: left;
+    position: relative;
+}
 
-        .back-link a {
-            color: #3498db;
-            text-decoration: none;
-        }
+.form-group label {
+    font-size: 13px;
+    margin-bottom: 5px;
+    display: block;
+    font-weight: 500;
+}
 
-        .back-link a:hover {
-            text-decoration: underline;
-        }
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
 
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            text-align: center;
-        }
+/* ===== EYE ICON ===== */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 70%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6da;
-        }
+.eye-icon {
+    width: 20px;
+}
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+/* ===== BUTTON (SAMA KAYAK LOGIN) ===== */
+.btn-primary {
+    width: 50%;
+    padding: 7px;
 
-        @media (max-width: 768px) {
-            .form-card {
-                padding: 30px 20px;
-            }
-            .header-logo {
-                top: 15px;
-                left: 15px;
-            }
-        }
-    </style>
+    background: #79A6F2;
+    color: #fff;
+
+    border: none;
+    border-radius: 10px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 
+        0 1px 0 #000000,
+        0 5px 5px #79A6F2;
+
+    transition: 0.2s;
+
+    display: block;
+    margin: 10px auto 0;
+}
+
+.btn-primary:active {
+    transform: translateY(2px);
+    box-shadow: 
+        0 0px 0 #000000,
+        0 3px 3px #79A6F2;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* ===== LINK ===== */
+.back-link {
+    margin-top: 15px;
+    font-size: 12px;
+}
+
+.back-link a {
+    color: #0a77e4;
+    text-decoration: none;
+}
+
+/* ===== ALERT ===== */
+.alert {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .form-card {
+        max-width: 300px;
+        padding: 25px 20px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <!-- Header Logo Desa di Pojok Kiri Atas -->
-    <div class="header-logo">
-        <img src="assets/images/logo-nganjuk.png" alt="Logo Desa">
-        <div>
-            <h1>Desa Banjardowo</h1>
-            <p>Kecamatan Lengkong</p>
-        </div>
+<!-- HEADER -->
+<div class="header-logo">
+    <img src="assets/images/logo-nganjuk.png">
+    <div>
+        <h1>Desa Banjardowo</h1>
+        <p>Kecamatan Lengkong, Kabupaten Nganjuk</p>
     </div>
+</div>
 
-    <!-- Form Card di Tengah -->
-    <div class="form-card">
-        <img src="assets/images/logo-big.png" alt="E-Deslay Logo" class="logo-e-deslay">
-        <h2>Reset Password</h2>
-        <p class="subtitle">Password harus minimal 8 karakter</p>
+<!-- CARD -->
+<div class="form-card">
 
-        <?php if ($message): ?>
-            <?= $message ?>
-        <?php endif; ?>
+    <img src="assets/images/logo-big.png" class="logo-e-deslay">
 
-        <form method="POST">
-            <div class="form-group">
-                <label for="password">New Password</label>
-                <input type="password" name="password" id="password" required placeholder="Masukkan new password">
-                <span class="toggle-password" onclick="togglePassword('password', this)">
-                <img src="assets/icons/mata_buka.png" class="eye-icon">
-                </span>
-            </div>
+    <h2>RESET PASSWORD</h2>
+    <p class="subtitle">Password minimal 8 karakter</p>
 
-            <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
-                <input type="password" name="confirm_password" id="confirm_password" required placeholder="Konfirmasi new password">
-                <span class="toggle-password" onclick="togglePassword('confirm_password', this)">
+    <?php if ($message): ?>
+        <?= $message ?>
+    <?php endif; ?>
+
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Password Baru</label>
+            <input type="password" name="password" id="password" required>
+            <span class="toggle-password" onclick="togglePassword('password', this)">
                 <img src="assets/icons/mata_buka.png" class="eye-icon">
             </span>
-            </div>
+        </div>
 
-            <button type="submit" name="reset" class="btn-primary">Simpan new password</button>
+        <div class="form-group">
+            <label>Konfirmasi Password</label>
+            <input type="password" name="confirm_password" id="confirm_password" required>
+            <span class="toggle-password" onclick="togglePassword('confirm_password', this)">
+                <img src="assets/icons/mata_buka.png" class="eye-icon">
+            </span>
+        </div>
 
-            <div class="back-link">
-                <a href="lupa_password.php">Kembali ke Halaman Kode OTP</a>
-            </div>
-        </form>
-    </div>
+        <button type="submit" name="reset" class="btn-primary">
+            SIMPAN
+        </button>
 
-    <script>
+        <div class="back-link">
+            <a href="lupa_password.php">← Kembali ke OTP</a>
+        </div>
+
+    </form>
+</div>
+
+<script>
 function togglePassword(id, el) {
     const input = document.getElementById(id);
-    const img   = el.querySelector("img");
+    const img = el.querySelector("img");
 
     if (input.type === "password") {
         input.type = "text";
@@ -288,5 +257,6 @@ function togglePassword(id, el) {
     }
 }
 </script>
+
 </body>
 </html>

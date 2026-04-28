@@ -1,112 +1,245 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lupa Password - E-Deslay</title>
-    <style>
-        /* ===== PASTE CSS ASLI KAMU DI SINI ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body {
-            background: url('{{ asset("assets/images/bg-bulu.jpeg") }}') no-repeat center center fixed;
-            background-size: cover;
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh; padding: 20px; background-color: #f0f5fa; position: relative;
-        }
-        .header-logo {
-            position: absolute; top: 20px; left: 20px;
-            display: flex; align-items: center; gap: 10px; z-index: 10;
-        }
-        .header-logo img { width: 50px; }
-        .header-logo h1 { font-size: 16px; color: #2c3e50; line-height: 1.4; }
-        .header-logo p { font-size: 14px; color: #7f8c8d; }
-        .form-card {
-            background: white; padding: 40px; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); max-width: 400px;
-            width: 100%; text-align: center;
-        }
-        .form-card img.logo-e-deslay { height: 40px; margin-bottom: 20px; }
-        .form-card h2 { font-size: 20px; color: #2c3e50; margin: 15px 0; line-height: 1.4; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; }
-        .form-group label { font-size: 14px; color: #34495e; font-weight: 500; text-align: left; }
-        .form-group input {
-            padding: 12px 16px; border: 1px solid #bdc3c7; border-radius: 8px;
-            font-size: 14px; transition: border-color 0.2s;
-        }
-        .form-group input:focus { outline: none; border-color: #3498db; }
-        .send-code-btn {
-            background: none; border: none; color: #0531f8ff; font-size: 15px;
-            cursor: pointer; text-align: right; display: block;
-            width: fit-content; margin-left: auto; margin-top: 10px;
-        }
-        .btn-primary {
-            padding: 12px 20px; background: #3498db; color: white;
-            border: none; border-radius: 8px; font-size: 16px;
-            cursor: pointer; transition: background-color 0.2s ease;
-            width: 100%; margin: 10px 0;
-        }
-        .btn-primary:hover { background: #2980b9; }
-        .back-link { font-size: 14px; }
-        .back-link a { color: #3498db; text-decoration: none; }
-        .back-link a:hover { text-decoration: underline; }
-        .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; text-align: center; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6da; }
-        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        @media (max-width: 768px) {
-            .form-card { padding: 30px 20px; }
-            .header-logo { top: 15px; left: 15px; }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header Logo -->
-    <div class="header-logo">
-        <img src="{{ asset('assets/images/logo-nganjuk.png') }}" alt="Logo Desa">
-        <div>
-            <h1>Desa Banjardowo</h1>
-            <p>Kecamatan Lengkong</p>
+@extends('layouts.app')
+
+@section('content')
+<style>
+/* ===== BODY ===== */
+body.forgot-body {
+    min-height: 100vh;
+    margin: 0;
+
+    background: url('{{ asset("assets/images/bg_login.svg") }}') no-repeat center;
+    background-size: cover;
+
+    font-family: 'Segoe UI', Arial, sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== HEADER ===== */
+.header-logo {
+    position: absolute;
+    top: 20px;
+    left: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logo img {
+    width: 45px;
+}
+
+.header-logo h1 {
+    font-size: 16px;
+    margin: 0;
+}
+
+.header-logo p {
+    font-size: 12px;
+    margin: 0;
+}
+
+/* ===== CARD ===== */
+.form-card {
+    width: 100%;
+    max-width: 350px;
+
+    background: rgba(255,255,255,0.7); /* 🔥 transparan 70% */
+    border-radius: 16px;
+
+    padding: 30px 25px;
+    text-align: center;
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    backdrop-filter: blur(8px);
+}
+
+/* ===== TITLE ===== */
+.form-card h2 {
+    font-size: 15px;
+    color: #174087;
+    margin-bottom: 30px;
+    line-height: 1.4;
+}
+
+/* ===== LOGO ===== */
+.logo-e-deslay {
+    height: 70px;   /* 🔥 dari 40 → 60 */
+    margin-bottom: 5px;
+}
+
+/* ===== FORM ===== */
+.form-group {
+    width: 100%;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.form-group label {
+    font-size: 13px;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* ===== BUTTON ===== */
+/* ===== BUTTON (SAMA KAYAK LOGIN) ===== */
+.btn-primary {
+    width: 50%;
+    padding: 7px;
+
+    background: #79A6F2;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 10px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 
+        0 1px 0 #000000,
+        0 5px 5px #79A6F2;
+
+    transition: 0.2s;
+
+    display: block;
+    margin: 10px auto 0; /* 🔥 biar center */
+}
+
+.btn-primary:active {
+    transform: translateY(2px);
+    box-shadow: 
+        0 0px 0 #000000,
+        0 3px 3px #79A6F2;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* BUTTON LANJUT OTP */
+.btn-success {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+
+    background: #28a745;
+    color: #fff;
+
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* ===== ALERT ===== */
+.alert {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ===== LINK ===== */
+.back-link {
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.back-link a {
+    color: #0a77e4;
+    text-decoration: none;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .form-card {
+        max-width: 300px;
+        padding: 25px 20px;
+    }
+}
+</style>
+
+<body class="forgot-body">
+
+<!-- HEADER -->
+<div class="header-logo">
+    <img src="{{ asset('assets/images/logo-nganjuk.png') }}">
+    <div>
+        <h1>Desa Banjardowo</h1>
+        <p>Kecamatan Lengkong, Kabupaten Nganjuk</p>
+    </div>
+</div>
+
+<!-- CARD -->
+<div class="form-card">
+
+    <img src="{{ asset('assets/images/logo-big.png') }}" class="logo-e-deslay">
+
+    <h2>KODE OTP AKAN DIKIRIM KE EMAIL ANDA</h2>
+
+    {{-- ALERT --}}
+    @if(session('status'))
+        <div class="alert alert-success">{{ session('status') }}</div>
+    @endif
+
+    @if(session('debug_otp'))
+        <div class="alert alert-success">OTP: {{ session('debug_otp') }}</div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-error">{{ $errors->first() }}</div>
+    @endif
+
+    {{-- FORM --}}
+    <form method="POST" action="{{ route('password.email') }}">
+        @csrf
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Masukkan Email" required value="{{ old('email') }}">
         </div>
+
+        <button type="submit" class="btn-primary">Kirim Kode OTP</button>
+    </form>
+
+    {{-- LANJUT OTP --}}
+    @if(session('status'))
+        <a href="{{ route('password.verify') }}" class="btn-success">
+            Lanjut Verifikasi OTP →
+        </a>
+    @endif
+
+    <div class="back-link">
+        <a href="{{ route('login') }}">← Kembali ke Login</a>
     </div>
 
-    <!-- Form Card -->
-    <div class="form-card">
-        <img src="{{ asset('assets/images/logo-big.png') }}" alt="E-Deslay Logo" class="logo-e-deslay">
-        <h2>Kode OTP akan dikirimkan ke email Anda</h2>
+</div>
 
-        {{-- Tampilkan pesan status --}}
-        @if(session('status'))
-            <div class="alert alert-success">{{ session('status') }}</div>
-        @endif
-        @if(session('debug_otp'))
-            <div class="alert alert-success">🔧 Development Mode: OTP = {{ session('debug_otp') }}</div>
-        @endif
-        @if($errors->any())
-            <div class="alert alert-error">{{ $errors->first() }}</div>
-        @endif
-
-        {{-- Form kirim OTP --}}
-        <form method="POST" action="{{ route('password.email') }}">
-            @csrf
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" placeholder="Masukkan Email" required
-                       value="{{ old('email') }}">
-            </div>
-            <button type="submit" name="kirim_otp" class="btn-primary">Kirim Kode OTP</button>
-        </form>
-
-        {{-- Link jika sudah dapat OTP, lanjut verifikasi --}}
-        @if(session('status'))
-            <div class="mt-4">
-                <a href="{{ route('password.verify') }}" class="btn-primary" style="background:#28a745">
-                    Lanjut Verifikasi OTP →
-                </a>
-            </div>
-        @endif
-
-        <div class="back-link">
-            <a href="{{ route('login') }}">Kembali ke Halaman Login</a>
-        </div>
-    </div>
 </body>
-</html>
+@endsection
