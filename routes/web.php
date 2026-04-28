@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\PrestasiController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SaranController;
 use App\Http\Controllers\Admin\StrukturController;
+use App\Http\Controllers\DashboardUmumController;
 
 // ============================================================================
 // 🔧 DEBUG ROUTES (Hapus setelah login berhasil)
@@ -50,7 +51,7 @@ Route::get('/login-otomatis', function() {
 // 🌐 PUBLIC ROUTES
 // ============================================================================
 
-Route::get('/', [HomeController::class, '__invoke'])->name('home');
+Route::get('/', [DashboardUmumController::class, '__invoke'])->name('home');
 Route::get('/kegiatan/{id}', [KegiatanDetailController::class, 'show'])->name('kegiatan.detail');
 Route::get('/prestasi/{id}', [PrestasiDetailController::class, 'show'])->name('prestasi.detail');
 
@@ -78,7 +79,6 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->mid
 // ============================================================================
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
