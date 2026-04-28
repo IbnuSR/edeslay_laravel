@@ -338,16 +338,16 @@
             <a href="{{ route('admin.dashboard') }}" class="menu-item active">
                 <img src="{{ asset('assets/icons/dashboard1.png') }}" alt=""> Dashboard
             </a>
-            <a href="{{ route('admin.kegiatan') }}" class="menu-item">
+            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kegiatandesa.png') }}" alt=""> Kegiatan Desa
             </a>
-            <a href="{{ route('admin.prestasi') }}" class="menu-item">
+            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/prestasi.png') }}" alt=""> Prestasi
             </a>
-            <a href="{{ route('admin.saran') }}" class="menu-item">
+            <a href="{{ route('admin.saran.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kotaksaran1.png') }}" alt=""> Kotak Saran
             </a>
-            <a href="{{ route('admin.pelayanan') }}" class="menu-item">
+            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/pelayanan1.png') }}" alt=""> Pelayanan
             </a>
         </div>

@@ -217,16 +217,16 @@
             <a href="{{ route('admin.dashboard') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/dashboard1.png') }}" alt="">Dashboard
             </a>
-            <a href="{{ route('admin.kegiatan') }}" class="menu-item">
+            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kegiatandesa.png') }}" alt="">Kegiatan Desa
             </a>
-            <a href="{{ route('admin.prestasi') }}" class="menu-item">
+            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/prestasi.png') }}" alt="">Prestasi
             </a>
-            <a href="{{ route('admin.saran') }}" class="menu-item active">
+            <a href="{{ route('admin.saran.index') }}" class="menu-item active">
                 <img src="{{ asset('assets/icons/kotaksaran1.png') }}" alt="">Kotak Saran
             </a>
-            <a href="{{ route('admin.pelayanan') }}" class="menu-item">
+            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/pelayanan1.png') }}" alt="">Pelayanan
             </a>
         </div>
@@ -247,7 +247,7 @@
         {{-- TOP BAR - HANYA MUNCUL DI MODE LIST --}}
         @if($action === 'list')
         <div class="top-bar">
-            <form method="get" action="{{ route('admin.saran') }}" class="search-input-wrapper">
+            <form method="get" action="{{ route('admin.saran.index') }}" class="search-input-wrapper">
                 <input type="hidden" name="action" value="list">
                 <input type="hidden" name="sort" value="{{ $sort ?? 'desc' }}">
                 <span class="search-icon">🔍</span>
@@ -299,7 +299,7 @@
                         <th style="width:22%;">Judul</th>
                         <th style="width:18%;">
                             Tanggal Dikirim
-                            <a href="{{ route('admin.saran', ['action' => 'list', 'search' => $search ?? '', 'sort' => ($sort === 'asc' ? 'desc' : 'asc')]) }}">
+                            <a href="{{ route('admin.saran.index', ['action' => 'list', 'search' => $search ?? '', 'sort' => ($sort === 'asc' ? 'desc' : 'asc')]) }}">
                                 <img src="{{ asset('assets/icons/sort.png') }}" alt="Urutkan"
                                      style="width:14px;margin-left:4px;vertical-align:middle;{{ $sort === 'asc' ? 'transform:rotate(180deg);' : '' }}">
                             </a>
@@ -340,7 +340,7 @@
 
                             <!-- JUDUL -->
                             <td class="text-judul">
-                                <a href="{{ route('admin.saran', ['action' => 'view', 'id' => $row->id]) }}">
+                                <a href="{{ route('admin.saran.index', ['action' => 'view', 'id' => $row->id]) }}">
                                     {{ $row->judul }}
                                 </a>
                             </td>
@@ -378,7 +378,7 @@
         @if($action === 'view')
             <div class="detail-wrapper detail-page">
                 <div class="detail-inner">
-                    <div class="detail-back" onclick="window.location.href='{{ route('admin.saran') }}'">⟵</div>
+                    <div class="detail-back" onclick="window.location.href='{{ route('admin.saran.index') }}'">⟵</div>
 
                     @if(isset($detail) && $detail)
                         @php
@@ -409,7 +409,7 @@
                             <i class="fa-solid fa-exclamation-circle" style="font-size:48px; color:#f59e0b; margin-bottom:16px;"></i>
                             <h3 style="font-size:18px; color:#1e293b; margin-bottom:8px;">Data Tidak Ditemukan</h3>
                             <p style="color:#64748b; margin-bottom:20px;">Saran dengan ID ini tidak ada atau telah dihapus.</p>
-                            <a href="{{ route('admin.saran') }}" style="background:#3b82f6; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:500;">
+                            <a href="{{ route('admin.saran.index') }}" style="background:#3b82f6; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:500;">
                                 ← Kembali ke Daftar
                             </a>
                         </div>
@@ -440,7 +440,7 @@
     let deleteId = null;
     function openDeleteModal(id){ deleteId = id; document.getElementById('deleteModal').style.display = 'flex'; }
     function closeDeleteModal(){ deleteId = null; document.getElementById('deleteModal').style.display = 'none'; }
-    function confirmDelete(){ if(deleteId) window.location.href = '{{ route("admin.saran") }}?action=delete&id=' + deleteId; }
+    function confirmDelete(){ if(deleteId) window.location.href = '{{ route("admin.saran.index") }}?action=delete&id=' + deleteId; }
 
     function confirmLogout() {
         Swal.fire({

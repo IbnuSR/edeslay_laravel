@@ -107,16 +107,16 @@
             <a href="{{ route('admin.dashboard') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/dashboard1.png') }}" alt="">Dashboard
             </a>
-            <a href="{{ route('admin.kegiatan') }}" class="menu-item">
+            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kegiatandesa.png') }}" alt="">Kegiatan Desa
             </a>
-            <a href="{{ route('admin.prestasi') }}" class="menu-item active">
+            <a href="{{ route('admin.prestasi.index') }}" class="menu-item active">
                 <img src="{{ asset('assets/icons/prestasi.png') }}" alt="">Prestasi
             </a>
-            <a href="{{ route('admin.saran') }}" class="menu-item">
+            <a href="{{ route('admin.saran.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kotaksaran1.png') }}" alt="">Kotak Saran
             </a>
-            <a href="{{ route('admin.pelayanan') }}" class="menu-item">
+            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/pelayanan1.png') }}" alt="">Pelayanan
             </a>
         </div>
@@ -135,7 +135,7 @@
     <div class="main">
         @if($action === 'list')
         <div class="top-bar">
-            <form method="get" action="{{ route('admin.prestasi') }}" class="search-input-wrapper">
+            <form method="get" action="{{ route('admin.prestasi.index') }}" class="search-input-wrapper">
                 <input type="hidden" name="action" value="list">
                 <span class="search-icon">🔍</span>
                 <input type="text" name="search" placeholder="Search Prestasi" value="{{ old('search', $search ?? '') }}">
@@ -179,7 +179,7 @@
                         <h2 class="page-title">{{ $page_title ?? 'Daftar Prestasi' }}</h2>
                         <div class="breadcrumb">Dashboard / Prestasi / Daftar Prestasi</div>
                     </div>
-                    <a href="{{ route('admin.prestasi', ['action' => 'tambah']) }}">
+                    <a href="{{ route('admin.prestasi.index', ['action' => 'tambah']) }}">
                         <button class="btn-tambah">
                             <span style="font-size:16px; margin-bottom:1px;">+</span> Tambah
                         </button>
@@ -223,7 +223,7 @@
                             </td>
                             <td>{{ $loop->iteration }}</td>
                             <td class="text-judul">
-                                <a href="{{ route('admin.prestasi', ['action' => 'view', 'id' => $row->id]) }}">
+                                <a href="{{ route('admin.prestasi.index', ['action' => 'view', 'id' => $row->id]) }}">
                                     {{ $row->judul }}
                                 </a>
                             </td>
@@ -232,7 +232,7 @@
                             </td>
                             <td>{!! nl2br(e($shortDesc)) !!}</td>
                             <td class="aksi-col" style="display:flex; justify-content:center; align-items:center; gap:6px;">
-                                <a href="{{ route('admin.prestasi', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
+                                <a href="{{ route('admin.prestasi.index', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
                                     <button class="icon-btn">✏️</button>
                                 </a>
                                 <button class="icon-btn delete" title="Hapus" onclick="openDeleteModal({{ $row->id }})">
@@ -259,7 +259,7 @@
                         <h2 class="page-title">Detail Prestasi</h2>
                         <div class="breadcrumb">Dashboard / Prestasi / Detail Prestasi</div>
                     </div>
-                    <a href="{{ route('admin.prestasi') }}" class="btn-tambah" style="padding:8px 16px; font-size:12px;">
+                    <a href="{{ route('admin.prestasi.index') }}" class="btn-tambah" style="padding:8px 16px; font-size:12px;">
                         <span style="font-size:14px;">←</span> Kembali
                     </a>
                 </div>
@@ -290,7 +290,7 @@
                             <p><strong>Deskripsi:</strong><br>{!! nl2br(e($detail->deskripsi)) !!}</p>
                         </div>
                         <div class="detail-actions">
-                            <a href="{{ route('admin.prestasi', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-edit">
+                            <a href="{{ route('admin.prestasi.index', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-edit">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <button class="btn-delete" onclick="openDeleteModal({{ $detail->id }})">
@@ -303,7 +303,7 @@
                         <i class="fa-solid fa-exclamation-circle" style="font-size:48px; color:#f59e0b; margin-bottom:16px;"></i>
                         <h3 style="font-size:18px; color:#1e293b; margin-bottom:8px;">Data Tidak Ditemukan</h3>
                         <p style="color:#64748b; margin-bottom:20px;">Prestasi dengan ID ini tidak ada atau telah dihapus.</p>
-                        <a href="{{ route('admin.prestasi') }}" style="background:#3b82f6; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:500;">
+                        <a href="{{ route('admin.prestasi.index') }}" style="background:#3b82f6; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:500;">
                             ← Kembali ke Daftar
                         </a>
                     </div>
@@ -322,7 +322,7 @@
                         </div>
                     </div>
                 </div>
-                <form method="POST" action="{{ route('admin.prestasi') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('admin.prestasi.index') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="action" value="{{ $action }}">
                     @if(isset($edit) && $edit)
@@ -369,7 +369,7 @@
                         <i class="fas fa-save"></i>
                         {{ $action === 'edit' ? 'Update Data' : 'Simpan Data' }}
                     </button>
-                    <a href="{{ route('admin.prestasi') }}" class="back-btn">&larr; Kembali ke Daftar</a>
+                    <a href="{{ route('admin.prestasi.index') }}" class="back-btn">&larr; Kembali ke Daftar</a>
                 </form>
             </div>
         @endif
@@ -405,7 +405,7 @@
     }
     function confirmDelete(){
         if (deleteId) {
-            window.location.href = '{{ route("admin.prestasi") }}?action=delete&id=' + deleteId;
+            window.location.href = '{{ route("admin.prestasi.index") }}?action=delete&id=' + deleteId;
         }
     }
     document.addEventListener('DOMContentLoaded', function () {

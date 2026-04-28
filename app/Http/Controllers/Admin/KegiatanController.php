@@ -29,7 +29,7 @@ class KegiatanController extends Controller
         // Handle DELETE
         if ($action === 'delete' && $id) {
             DB::table('kegiatan')->where('id', intval($id))->delete();
-            return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil dihapus');
+            return redirect()->route('admin.kegiatan.index')->with('success', 'Kegiatan berhasil dihapus');
         }
 
         // Handle SAVE (Tambah/Edit)
@@ -65,7 +65,7 @@ class KegiatanController extends Controller
                     $updateData['foto_type'] = $foto_type;
                 }
                 DB::table('kegiatan')->where('id', intval($request->input('id')))->update($updateData);
-                return redirect()->route('admin.kegiatan')->with('success', 'Data kegiatan berhasil diupdate');
+                return redirect()->route('admin.kegiatan.index')->with('success', 'Data kegiatan berhasil diupdate');
             } else {
                 // INSERT
                 DB::table('kegiatan')->insert([
@@ -78,7 +78,7 @@ class KegiatanController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-                return redirect()->route('admin.kegiatan')->with('success', 'Data kegiatan berhasil ditambahkan');
+                return redirect()->route('admin.kegiatan.index')->with('success', 'Data kegiatan berhasil ditambahkan');
             }
         }
 
@@ -104,7 +104,7 @@ class KegiatanController extends Controller
         if ($action === 'edit' && $id) {
             $edit = DB::table('kegiatan')->where('id', intval($id))->first();
             if (!$edit) {
-                return redirect()->route('admin.kegiatan')->with('error', 'Data tidak ditemukan');
+                return redirect()->route('admin.kegiatan.index')->with('error', 'Data tidak ditemukan');
             }
             $page_title = 'Edit Kegiatan Desa';
         }

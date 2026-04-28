@@ -36,7 +36,7 @@ class SaranController extends Controller
         // Handle DELETE
         if ($action === 'delete' && $id) {
             DB::table('saran')->where('id', intval($id))->delete();
-            return redirect()->route('admin.saran')->with('success', 'Saran berhasil dihapus');
+            return redirect()->route('admin.saran,index')->with('success', 'Saran berhasil dihapus');
         }
 
         // Fetch data based on action
@@ -58,7 +58,7 @@ class SaranController extends Controller
         if ($action === 'view' && $id) {
             $detail = DB::table('saran')->where('id', intval($id))->first();
             if (!$detail) {
-                return redirect()->route('admin.saran')->with('error', 'Data saran tidak ditemukan');
+                return redirect()->route('admin.saran.index')->with('error', 'Data saran tidak ditemukan');
             }
         }
 

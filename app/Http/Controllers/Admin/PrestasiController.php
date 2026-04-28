@@ -27,7 +27,7 @@ class PrestasiController extends Controller
         // Handle DELETE
         if ($action === 'delete' && $id) {
             DB::table('prestasi')->where('id', intval($id))->delete();
-            return redirect()->route('admin.prestasi')->with('success', 'Prestasi berhasil dihapus');
+            return redirect()->route('admin.prestasi,index')->with('success', 'Prestasi berhasil dihapus');
         }
 
         // Handle SAVE (Tambah/Edit)
@@ -66,7 +66,7 @@ class PrestasiController extends Controller
                     'created_at' => now(), 'updated_at' => now(),
                 ]);
             }
-            return redirect()->route('admin.prestasi')->with('success', 'Data prestasi berhasil disimpan');
+            return redirect()->route('admin.prestasi.index')->with('success', 'Data prestasi berhasil disimpan');
         }
 
         // Fetch data
@@ -79,7 +79,7 @@ class PrestasiController extends Controller
         }
         if (($action === 'edit_form' || $action === 'view') && $id) {
             $detail = DB::table('prestasi')->where('id', intval($id))->first();
-            if (!$detail) return redirect()->route('admin.prestasi')->with('error', 'Data tidak ditemukan');
+            if (!$detail) return redirect()->route('admin.prestasi.index')->with('error', 'Data tidak ditemukan');
             $page_title = $action === 'edit_form' ? 'Edit Prestasi' : 'Detail Prestasi';
         }
         if ($action === 'add_form') $page_title = 'Tambah Prestasi';

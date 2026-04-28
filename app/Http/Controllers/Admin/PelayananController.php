@@ -36,7 +36,7 @@ class PelayananController extends Controller
         // Handle DELETE
         if ($action === 'delete' && $id) {
             DB::table('panduan_surat')->where('id', intval($id))->delete();
-            return redirect()->route('admin.pelayanan')->with('success', 'Panduan surat berhasil dihapus');
+            return redirect()->route('admin.pelayanan.index')->with('success', 'Panduan surat berhasil dihapus');
         }
 
         // Handle ADD
@@ -71,7 +71,7 @@ class PelayananController extends Controller
                 'updated_at' => now(),
             ]);
 
-            return redirect()->route('admin.pelayanan')->with('success', 'Panduan surat berhasil ditambahkan');
+            return redirect()->route('admin.pelayanan.index')->with('success', 'Panduan surat berhasil ditambahkan');
         }
 
         // Handle EDIT
@@ -99,7 +99,7 @@ class PelayananController extends Controller
 
             DB::table('panduan_surat')->where('id', intval($validated['id']))->update($updateData);
 
-            return redirect()->route('admin.pelayanan')->with('success', 'Panduan surat berhasil diupdate');
+            return redirect()->route('admin.pelayanan.index')->with('success', 'Panduan surat berhasil diupdate');
         }
 
         // Fetch data based on action
@@ -119,7 +119,7 @@ class PelayananController extends Controller
         if (($action === 'edit_form' || $action === 'view') && $id) {
             $detail = DB::table('panduan_surat')->where('id', intval($id))->first();
             if (!$detail) {
-                return redirect()->route('admin.pelayanan')->with('error', 'Data tidak ditemukan');
+                return redirect()->route('admin.pelayanan.index')->with('error', 'Data tidak ditemukan');
             }
             $page_title = $action === 'edit_form' ? 'Edit Pelayanan' : 'Detail Pelayanan';
         }

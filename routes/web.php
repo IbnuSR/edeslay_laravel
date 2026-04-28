@@ -8,7 +8,6 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KegiatanDetailController;        
 use App\Http\Controllers\PrestasiDetailController; 
 use App\Http\Controllers\Admin\KegiatanController;
@@ -23,7 +22,6 @@ use App\Http\Controllers\DashboardUmumController;
 // 🔧 DEBUG ROUTES (Hapus setelah login berhasil)
 // ============================================================================
 
-// Debug: Cek session & auth status
 Route::get('/debug-check', function() {
     echo "<h2>DEBUG INFO</h2>";
     echo "<p><strong>Auth Check:</strong> " . (Auth::check() ? '✅ LOGGED IN' : '❌ NOT LOGGED IN') . "</p>";
@@ -51,6 +49,7 @@ Route::get('/login-otomatis', function() {
 // 🌐 PUBLIC ROUTES
 // ============================================================================
 
+<<<<<<< Updated upstream
 Route::get('/', [DashboardUmumController::class, '__invoke'])->name('home');
 Route::get('/kegiatan/{id}', [KegiatanDetailController::class, 'show'])->name('kegiatan.detail');
 Route::get('/prestasi/{id}', [PrestasiDetailController::class, 'show'])->name('prestasi.detail');
@@ -60,9 +59,9 @@ Route::get('/prestasi/{id}', [PrestasiDetailController::class, 'show'])->name('p
 // ============================================================================
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
-    
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+
     // Forgot Password Flow
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
@@ -72,40 +71,50 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
+// Logout admin
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('auth');
 
 // ============================================================================
-// 👨‍💼 ADMIN ROUTES (HANYA PAKAI 'auth' MIDDLEWARE)
+// 👨‍💼 ADMIN ROUTES (HANYA UNTUK USER LOGIN)
 // ============================================================================
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+<<<<<<< Updated upstream
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+=======
     
+    // Dashboard admin
+>>>>>>> Stashed changes
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     
     // CRUD Kegiatan
-    Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan');
-    Route::post('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.store');
-    
+    Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+    Route::post('/kegiatan', [KegiatanController::class, 'store'])->name('kegiatan.store');
+
     // CRUD Prestasi
-    Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi');
-    Route::post('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.store');
+    Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
+    Route::post('/prestasi', [PrestasiController::class, 'store'])->name('prestasi.store');
     
     // CRUD Pelayanan
-    Route::get('/pelayanan', [PelayananController::class, 'index'])->name('pelayanan');
-    Route::post('/pelayanan', [PelayananController::class, 'index'])->name('pelayanan.store');
+    Route::get('/pelayanan', [PelayananController::class, 'index'])->name('pelayanan.index');
+    Route::post('/pelayanan', [PelayananController::class, 'store'])->name('pelayanan.store');
     
     // CRUD Saran
-    Route::get('/saran', [SaranController::class, 'index'])->name('saran');
-    Route::post('/saran', [SaranController::class, 'index'])->name('saran.store');
+    Route::get('/saran', [SaranController::class, 'index'])->name('saran.index');
+    Route::post('/saran', [SaranController::class, 'store'])->name('saran.store');
     
     // CRUD Struktur
-    Route::get('/struktur', [StrukturController::class, 'index'])->name('struktur');
-    Route::post('/struktur', [StrukturController::class, 'index'])->name('struktur.store');
-    
-    // ✅ TIDAK ADA LAGI ROUTE CLOSURE YANG MENIMPA DI SINI!
+    Route::get('/struktur', [StrukturController::class, 'index'])->name('struktur.index');
+    Route::post('/struktur', [StrukturController::class, 'store'])->name('struktur.store');
+});
+Route::get('/force-logout', function() {
+    Auth::logout();
+    session()->invalidate();
+    session()->regenerateToken();
+    return redirect('/login');
 });

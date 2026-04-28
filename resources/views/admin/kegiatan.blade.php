@@ -613,6 +613,7 @@
                 <i class="fas fa-th-large" style="font-size: 18px;"></i>
                 Dashboard
             </a>
+<<<<<<< Updated upstream
             <a href="{{ route('admin.kegiatan') }}" class="menu-item active">
                 <i class="fas fa-calendar-alt" style="font-size: 18px;"></i>
                 Kegiatan Desa
@@ -628,6 +629,19 @@
             <a href="{{ route('admin.pelayanan') }}" class="menu-item">
                 <i class="fas fa-concierge-bell" style="font-size: 18px;"></i>
                 Pelayanan
+=======
+            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item active">
+                <img src="{{ asset('assets/icons/kegiatandesa.png') }}" alt="">Kegiatan Desa
+            </a>
+            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
+                <img src="{{ asset('assets/icons/prestasi.png') }}" alt="">Prestasi
+            </a>
+            <a href="{{ route('admin.saran.index') }}" class="menu-item">
+                <img src="{{ asset('assets/icons/kotaksaran1.png') }}" alt="">Kotak Saran
+            </a>
+            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item">
+                <img src="{{ asset('assets/icons/pelayanan1.png') }}" alt="">Pelayanan
+>>>>>>> Stashed changes
             </a>
         </div>
         <div class="sidebar-footer">
@@ -645,6 +659,7 @@
     <div class="main">
         @if($action === 'list')
         <div class="top-bar">
+<<<<<<< Updated upstream
             <div class="page-header">
                 <h1>Kegiatan Desa</h1>
                 <div class="breadcrumb">Dashboard / Kegiatan Desa / Daftar Kegiatan</div>
@@ -667,6 +682,17 @@
                             {{ substr($namaAdmin ?? 'A', 0, 1) }}
                         @endif
                     </a>
+=======
+            <form method="get" action="{{ route('admin.kegiatan.index') }}" class="search-input-wrapper">
+                <input type="hidden" name="action" value="list">
+                <span class="search-icon">🔍</span>
+                <input type="text" name="search" placeholder="Search Kegiatan" value="{{ old('search', $search ?? '') }}">
+            </form>
+            <div class="profile-wrapper">
+                <div class="profile-text">
+                    <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
+                    <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
+>>>>>>> Stashed changes
                 </div>
             </div>
         </div>
@@ -681,14 +707,24 @@
 
         @if($action === 'list')
             <div class="content-card">
+<<<<<<< Updated upstream
                 <div class="card-header">
                     <h2 style="font-size: 20px; font-weight: 700; color: #1e293b;">Daftar Kegiatan Desa</h2>
                     <a href="{{ route('admin.kegiatan', ['action' => 'tambah']) }}">
+=======
+                <div class="header-row">
+                    <div>
+                        <h2 class="page-title">{{ $page_title ?? 'Daftar Kegiatan Desa' }}</h2>
+                        <div class="breadcrumb">Dashboard / Kegiatan Desa / Daftar Kegiatan</div>
+                    </div>
+                    <a href="{{ route('admin.kegiatan.index', ['action' => 'tambah']) }}">
+>>>>>>> Stashed changes
                         <button class="btn-tambah">
                             <i class="fas fa-plus"></i> Tambah
                         </button>
                     </a>
                 </div>
+<<<<<<< Updated upstream
                 
                 <div class="table-container">
                     <table>
@@ -771,10 +807,79 @@
                         </tbody>
                     </table>
                 </div>
+=======
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="width:10%"></th>
+                        <th style="width:6%">No</th>
+                        <th style="width:25%">Nama Kegiatan Desa</th>
+                        <th style="width:20%">Lokasi</th>
+                        <th style="width:25%">Deskripsi</th>
+                        <th style="width:14%">Tanggal Perolehan</th>
+                        <th class="aksi-col">Aksi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse($kegiatanList as $row)
+                        @php
+                            $fotoSrc = '';
+                            if (!empty($row->foto)) {
+                                $mime = $row->foto_type ?? 'image/jpeg';
+                                $raw = $row->foto;
+                                $isBase64 = preg_match('/^[A-Za-z0-9+\/=]+$/', $raw);
+                                $fotoSrc = $mime . ';base64,' . ($isBase64 ? $raw : base64_encode($raw));
+                            }
+                            
+                            $maxLength = 250;
+                            $desc = strip_tags($row->deskripsi);
+                            $shortDesc = strlen($desc) > $maxLength 
+                                ? substr($desc, 0, $maxLength) . '...' 
+                                : $desc;
+                        @endphp
+                        <tr>
+                            <td>
+                                @if(!empty($fotoSrc))
+                                    <img src="{{ $fotoSrc }}" alt="Foto" class="foto-bulat">
+                                @else
+                                    <span class="foto-bulat"></span>
+                                @endif
+                            </td>
+                            <td>{{ $loop->iteration }}</td>
+                            <td class="text-judul">
+                                <a href="{{ route('admin.kegiatan.index', ['action' => 'view', 'id' => $row->id]) }}">
+                                    {{ $row->judul }}
+                                </a>
+                            </td>
+                            <td>{{ $row->lokasi }}</td>
+                            <td>{!! nl2br(e($shortDesc)) !!}</td>
+                            <td class="text-tanggal">
+                                {{ \Carbon\Carbon::parse($row->tanggal)->isoFormat('D MMMM Y') }}
+                            </td>
+                            <td class="aksi-col" style="display:flex; justify-content:center; align-items:center; gap:6px;">
+                                <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
+                                    <button class="icon-btn">✏️</button>
+                                </a>
+                                <button class="icon-btn delete" title="Hapus" onclick="openDeleteModal({{ $row->id }})">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" style="text-align:center;padding:20px;color:#9ca3af;">
+                                Belum ada data kegiatan.
+                            </td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+>>>>>>> Stashed changes
             </div>
         @endif
 
         @if($action === 'view')
+<<<<<<< Updated upstream
             <div class="content-card">
                 <div class="card-header">
                     <h2 style="font-size: 20px; font-weight: 700; color: #1e293b;">Detail Kegiatan</h2>
@@ -782,6 +887,16 @@
                         <button class="btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </button>
+=======
+            <div class="content-card content-card-form">
+                <div class="header-row">
+                    <div>
+                        <h2 class="page-title">Detail Kegiatan</h2>
+                        <div class="breadcrumb">Dashboard / Kegiatan Desa / Detail Kegiatan</div>
+                    </div>
+                    <a href="{{ route('admin.kegiatan.index') }}" class="btn-tambah" style="padding:8px 16px; font-size:12px;">
+                        <span style="font-size:14px;">←</span> Kembali
+>>>>>>> Stashed changes
                     </a>
                 </div>
 
@@ -820,7 +935,11 @@
                         </div>
 
                         <div class="detail-actions">
+<<<<<<< Updated upstream
                             <a href="{{ route('admin.kegiatan', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-detail-edit">
+=======
+                            <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-edit">
+>>>>>>> Stashed changes
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <button class="btn-detail-delete" onclick="openDeleteModal({{ $detail->id }})">
@@ -829,12 +948,21 @@
                         </div>
                     </div>
                 @else
+<<<<<<< Updated upstream
                     <div style="text-align: center; padding: 60px 20px; background: #f8fafc; border-radius: 16px;">
                         <i class="fas fa-exclamation-circle" style="font-size: 64px; color: #f59e0b; margin-bottom: 20px;"></i>
                         <h3 style="font-size: 20px; color: #1e293b; margin-bottom: 12px;">Data Tidak Ditemukan</h3>
                         <p style="color: #64748b; margin-bottom: 24px;">Kegiatan dengan ID ini tidak ada atau telah dihapus.</p>
                         <a href="{{ route('admin.kegiatan') }}" class="btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+=======
+                    <div class="detail-page" style="text-align:center; padding:40px 20px; background:#f9fafb; border-radius:12px;">
+                        <i class="fa-solid fa-exclamation-circle" style="font-size:48px; color:#f59e0b; margin-bottom:16px;"></i>
+                        <h3 style="font-size:18px; color:#1e293b; margin-bottom:8px;">Data Tidak Ditemukan</h3>
+                        <p style="color:#64748b; margin-bottom:20px;">Kegiatan dengan ID ini tidak ada atau telah dihapus.</p>
+                        <a href="{{ route('admin.kegiatan.index') }}" style="background:#3b82f6; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:500;">
+                            ← Kembali ke Daftar
+>>>>>>> Stashed changes
                         </a>
                     </div>
                 @endif
@@ -851,8 +979,12 @@
                         Dashboard / Kegiatan Desa / {{ $action === 'tambah' ? 'Tambah' : 'Edit' }} Kegiatan
                     </div>
                 </div>
+<<<<<<< Updated upstream
 
                 <form method="POST" action="{{ route('admin.kegiatan') }}" enctype="multipart/form-data">
+=======
+                <form method="POST" action="{{ route('admin.kegiatan.index') }}" enctype="multipart/form-data">
+>>>>>>> Stashed changes
                     @csrf
                     <input type="hidden" name="action" value="{{ $action }}">
                     @if(isset($edit) && $edit)
@@ -917,6 +1049,14 @@
                             </button>
                         </div>
                     </div>
+<<<<<<< Updated upstream
+=======
+                    <button type="submit" name="save_kegiatan" class="btn-simpan">
+                        <i class="fas fa-save"></i>
+                        {{ $action === 'edit' ? 'Update Data' : 'Simpan Data' }}
+                    </button>
+                    <a href="{{ route('admin.kegiatan.index') }}" class="back-btn">&larr; Kembali ke Daftar</a>
+>>>>>>> Stashed changes
                 </form>
             </div>
         @endif
@@ -956,7 +1096,7 @@
     }
     function confirmDelete(){
         if (deleteId) {
-            window.location.href = '{{ route("admin.kegiatan") }}?action=delete&id=' + deleteId;
+            window.location.href = '{{ route("admin.kegiatan.index") }}?action=delete&id=' + deleteId;
         }
     }
     

@@ -55,16 +55,16 @@
             <a href="{{ route('admin.dashboard') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/dashboard1.png') }}"> Dashboard
             </a>
-            <a href="{{ route('admin.kegiatan') }}" class="menu-item">
+            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kegiatandesa.png') }}"> Kegiatan Desa
             </a>
-            <a href="{{ route('admin.prestasi') }}" class="menu-item">
+            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/prestasi.png') }}"> Prestasi
             </a>
-            <a href="{{ route('admin.saran') }}" class="menu-item">
+            <a href="{{ route('admin.saran.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kotaksaran1.png') }}"> Kotak Saran
             </a>
-            <a href="{{ route('admin.pelayanan') }}" class="menu-item active">
+            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item active">
                 <img src="{{ asset('assets/icons/pelayanan1.png') }}"> Pelayanan
             </a>
         </div>
@@ -152,7 +152,7 @@
                         </td>
                         <td>{{ \Carbon\Carbon::parse($panduan->created_at)->isoFormat('D MMM Y') }}</td>
                         <td>
-                            <form method="POST" action="{{ route('admin.pelayanan.destroy', $panduan->id) }}" style="display:inline;" onsubmit="return confirm('Hapus panduan ini?')">
+                            <form method="POST" action="{{ route('admin.pelayanan.index', $panduan->id) }}" style="display:inline;" onsubmit="return confirm('Hapus panduan ini?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn-danger">Hapus</button>
                             </form>
@@ -168,7 +168,7 @@
         <!-- Form Tambah Panduan (Hidden by default) -->
         <div class="content-card" id="formPanduan" style="display:none;">
             <h3 style="margin-bottom:16px;">Tambah Panduan Baru</h3>
-            <form method="POST" action="{{ route('admin.pelayanan.store') }}">
+            <form method="POST" action="{{ route('admin.pelayanan.index') }}">
                 @csrf
                 <div style="margin-bottom:12px;">
                     <label style="display:block;margin-bottom:4px;font-weight:500;">Judul Panduan</label>

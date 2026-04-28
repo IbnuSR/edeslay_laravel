@@ -17,7 +17,7 @@
         {{-- FORM TAMBAH/EDIT --}}
         <div class="form">
             <h3>{{ $edit ? 'Edit' : 'Tambah' }} Struktur</h3>
-            <form method="post" action="{{ route('admin.struktur') }}">
+            <form method="post" action="{{ route('admin.struktur.index') }}">
                 @csrf
                 <input type="hidden" name="id" value="{{ $edit->id ?? '' }}">
                 
@@ -31,7 +31,7 @@
                     {{ $edit ? 'Update' : 'Simpan' }}
                 </button>
                 @if($edit)
-                    <a href="{{ route('admin.struktur') }}" class="btn">Batal</a>
+                    <a href="{{ route('admin.struktur.index') }}" class="btn">Batal</a>
                 @endif
             </form>
         </div>

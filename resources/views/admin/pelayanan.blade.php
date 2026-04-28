@@ -397,16 +397,16 @@
             <a href="{{ route('admin.dashboard') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/dashboard1.png') }}" alt="">Dashboard
             </a>
-            <a href="{{ route('admin.kegiatan') }}" class="menu-item">
+            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kegiatandesa.png') }}" alt="">Kegiatan Desa
             </a>
-            <a href="{{ route('admin.prestasi') }}" class="menu-item">
+            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/prestasi.png') }}" alt="">Prestasi
             </a>
-            <a href="{{ route('admin.saran') }}" class="menu-item">
+            <a href="{{ route('admin.saran.index') }}" class="menu-item">
                 <img src="{{ asset('assets/icons/kotaksaran1.png') }}" alt="">Kotak Saran
             </a>
-            <a href="{{ route('admin.pelayanan') }}" class="menu-item active">
+            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item active">
                 <img src="{{ asset('assets/icons/pelayanan1.png') }}" alt="">Pelayanan
             </a>
         </div>
@@ -427,7 +427,7 @@
         {{-- TOP BAR HANYA UNTUK LIST --}}
         @if($action === 'list')
         <div class="top-bar">
-            <form method="get" action="{{ route('admin.pelayanan') }}" class="search-input-wrapper">
+            <form method="get" action="{{ route('admin.pelayanan.index') }}" class="search-input-wrapper">
                 <input type="hidden" name="action" value="list">
                 <span class="search-icon">🔍</span>
                 <input type="text" name="search" placeholder="Search Pelayanan" value="{{ old('search', $search ?? '') }}">
@@ -471,7 +471,7 @@
                     </div>
                 </div>
                 @if($action === 'list')
-                    <button class="btn-primary" onclick="window.location.href='{{ route('admin.pelayanan', ['action' => 'add_form']) }}'">+ Tambah</button>
+                    <button class="btn-primary" onclick="window.location.href='{{ route('admin.pelayanan.index', ['action' => 'add_form']) }}'">+ Tambah</button>
                 @endif
             </div>
 
@@ -508,7 +508,7 @@
                         @foreach($pelayananList as $i => $row)
                             <tr>
                                 <td>
-                                    <a href="{{ route('admin.pelayanan', ['action' => 'view', 'id' => $row->id]) }}">
+                                    <a href="{{ route('admin.pelayanan.index', ['action' => 'view', 'id' => $row->id]) }}">
                                         @php
                                             $src = '';
                                             if (!empty($row->foto_pendukung)) {
@@ -529,7 +529,7 @@
                                 </td>
                                 <td>{{ $i + 1 }}</td>
                                 <td>
-                                    <a href="{{ route('admin.pelayanan', ['action' => 'view', 'id' => $row->id]) }}" class="link-judul">
+                                    <a href="{{ route('admin.pelayanan.index', ['action' => 'view', 'id' => $row->id]) }}" class="link-judul">
                                         {{ $row->judul }}
                                     </a>
                                 </td>
@@ -545,7 +545,7 @@
                                     @endphp
                                 </td>
                                 <td class="aksi-col">
-                                    <button class="icon-btn edit" title="Edit" onclick="window.location.href='{{ route('admin.pelayanan', ['action' => 'edit_form', 'id' => $row->id]) }}'">✏️</button>
+                                    <button class="icon-btn edit" title="Edit" onclick="window.location.href='{{ route('admin.pelayanan.index', ['action' => 'edit_form', 'id' => $row->id]) }}'">✏️</button>
                                     <button class="icon-btn delete" title="Hapus" onclick="openDeleteModal({{ $row->id }})">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
@@ -571,7 +571,7 @@
                     </div>
 
                     <form method="post"
-                          action="{{ route('admin.pelayanan', ['action' => $action === 'add_form' ? 'add' : 'edit']) }}"
+                          action="{{ route('admin.pelayanan.index', ['action' => $action === 'add_form' ? 'add' : 'edit']) }}"
                           enctype="multipart/form-data">
                         @csrf
                         
@@ -633,7 +633,7 @@
 
                         <div class="form-actions">
                             <button type="button" class="btn-secondary"
-                                    onclick="window.location.href='{{ route('admin.pelayanan') }}'">← Kembali</button>
+                                    onclick="window.location.href='{{ route('admin.pelayanan.index') }}'">← Kembali</button>
                             <button type="submit" class="btn-primary">
                                 {{ $action === 'add_form' ? 'Simpan Data' : 'Update Data' }}
                             </button>
@@ -676,9 +676,9 @@
 
                         <div class="form-actions" style="margin-top:18px;">
                             <button type="button" class="btn-secondary"
-                                    onclick="window.location.href='{{ route('admin.pelayanan') }}'">← Kembali</button>
+                                    onclick="window.location.href='{{ route('admin.pelayanan.index') }}'">← Kembali</button>
                             <button type="button" class="btn-primary"
-                                    onclick="window.location.href='{{ route('admin.pelayanan', ['action' => 'edit_form', 'id' => $detail->id]) }}'">
+                                    onclick="window.location.href='{{ route('admin.pelayanan.index', ['action' => 'edit_form', 'id' => $detail->id]) }}'">
                                 Edit
                             </button>
                         </div>
@@ -709,7 +709,7 @@
     let deleteId = null;
     function openDeleteModal(id){ deleteId = id; document.getElementById('deleteModal').style.display = 'flex'; }
     function closeDeleteModal(){ deleteId = null; document.getElementById('deleteModal').style.display = 'none'; }
-    function confirmDelete(){ if(deleteId) window.location.href = '{{ route("admin.pelayanan", ["action" => "delete"]) }}&id=' + deleteId; }
+    function confirmDelete(){ if(deleteId) window.location.href = '{{ route("admin.pelayanan.index", ["action" => "delete"]) }}&id=' + deleteId; }
 
     // Preview gambar upload
     document.addEventListener('DOMContentLoaded', function () {

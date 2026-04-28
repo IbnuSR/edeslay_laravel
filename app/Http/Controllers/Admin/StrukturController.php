@@ -26,7 +26,7 @@ class StrukturController extends Controller
         // Handle DELETE
         if ($action === 'delete' && $id) {
             DB::table('struktur_desa')->where('id', intval($id))->delete();
-            return redirect()->route('admin.struktur')->with('success', 'Data struktur berhasil dihapus');
+            return redirect()->route('admin.struktur.index')->with('success', 'Data struktur berhasil dihapus');
         }
 
         // Handle SAVE (Tambah/Edit)
@@ -52,7 +52,7 @@ class StrukturController extends Controller
                     'updated_at' => now(),
                 ]);
             }
-            return redirect()->route('admin.struktur')->with('success', 'Data struktur berhasil disimpan');
+            return redirect()->route('admin.struktur.index')->with('success', 'Data struktur berhasil disimpan');
         }
 
         // Fetch data
