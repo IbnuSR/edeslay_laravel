@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class KegiatanController extends Controller
 {
-    /**
-     * Handle all kegiatan actions (list, view, add, edit, delete, save).
-     */
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -19,20 +16,19 @@ class KegiatanController extends Controller
 
         $action = $request->get('action', 'list');
         $id = $request->get('id');
-        $search = $request->get('search', '');
-
-        // Data profil untuk top-bar
+        $search = trim($request->get('search', ''));
+        
+        // Data profil user
         $namaAdmin = $user->nama_lengkap ?? 'Administrator';
         $roleAdmin = $user->role ?? 'admin';
         $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
-        $fotoProfilSrc = null;
-        if (!empty($user->foto)) {
-            $fotoProfilSrc = 'image/jpeg;base64,' . base64_encode($user->foto);
-        }
+        $fotoProfilSrc = !empty($user->foto) 
+            ? 'image/jpeg;base64,' . base64_encode($user->foto) 
+            : null;
 
         // Handle DELETE
-        if ($request->get('del')) {
-            DB::table('kegiatan')->where('id', intval($request->get('del')))->delete();
+        if ($action === 'delete' && $id) {
+            DB::table('kegiatan')->where('id', intval($id))->delete();
             return redirect()->route('admin.kegiatan')->with('success', 'Kegiatan berhasil dihapus');
         }
 
@@ -69,6 +65,7 @@ class KegiatanController extends Controller
                     $updateData['foto_type'] = $foto_type;
                 }
                 DB::table('kegiatan')->where('id', intval($request->input('id')))->update($updateData);
+                return redirect()->route('admin.kegiatan')->with('success', 'Data kegiatan berhasil diupdate');
             } else {
                 // INSERT
                 DB::table('kegiatan')->insert([
@@ -81,15 +78,16 @@ class KegiatanController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                return redirect()->route('admin.kegiatan')->with('success', 'Data kegiatan berhasil ditambahkan');
             }
-            return redirect()->route('admin.kegiatan')->with('success', 'Data kegiatan berhasil disimpan');
         }
 
         // Fetch data based on action
-        $kegiatanList = [];
-        $edit = null;
+        $kegiatanList = collect([]);
         $detail = null;
+        $edit = null;
         $page_title = 'Daftar Kegiatan Desa';
+        $message = null;
 
         if ($action === 'list') {
             $query = DB::table('kegiatan');
@@ -105,17 +103,20 @@ class KegiatanController extends Controller
         
         if ($action === 'edit' && $id) {
             $edit = DB::table('kegiatan')->where('id', intval($id))->first();
-            if (!$edit) return redirect()->route('admin.kegiatan')->with('error', 'Data tidak ditemukan');
+            if (!$edit) {
+                return redirect()->route('admin.kegiatan')->with('error', 'Data tidak ditemukan');
+            }
             $page_title = 'Edit Kegiatan Desa';
         }
         
         if ($action === 'view' && $id) {
             $detail = DB::table('kegiatan')->where('id', intval($id))->first();
             if (!$detail) {
-                $detail = null;
+                $message = "Data kegiatan tidak ditemukan.";
                 $action = 'list';
+            } else {
+                $page_title = 'Detail Kegiatan Desa';
             }
-            $page_title = 'Detail Kegiatan Desa';
         }
         
         if ($action === 'tambah') {
@@ -124,7 +125,7 @@ class KegiatanController extends Controller
 
         return view('admin.kegiatan', compact(
             'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin', 'fotoProfilSrc',
-            'action', 'kegiatanList', 'edit', 'detail', 'page_title', 'search'
+            'action', 'kegiatanList', 'edit', 'detail', 'page_title', 'search', 'message'
         ));
     }
 }
