@@ -3,31 +3,34 @@
 @section('content')
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #f0f7ff; color: #333; }
+    body { font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f9ff; color: #333; }
     a { text-decoration: none; color: inherit; }
     .app { display: flex; min-height: 100vh; }
     
     /* ===== SIDEBAR ===== */
     .sidebar { 
         width: 280px; 
-        background: linear-gradient(180deg, #1c3f9fff, #3B82F6); 
-        padding: 30px 20px; 
-        color: white; 
+        background: white; 
+        padding: 24px 20px; 
         position: fixed;
         height: 100vh;
         overflow-y: auto;
+        border-right: 1px solid #e3f2fd;
     }
     .sidebar-header { 
         display: flex; 
         align-items: center; 
         gap: 12px; 
-        margin-bottom: 40px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.2);
+        margin-bottom: 32px;
+        padding: 0 8px;
     }
-    .sidebar-header img { height: 48px; width: auto; }
-    .sidebar-header div { font-weight: 600; font-size: 16px; color: white; }
-    .menu { display: flex; flex-direction: column; gap: 8px; }
+    .sidebar-header img { height: 42px; width: auto; }
+    .sidebar-header div { 
+        font-weight: 600; 
+        font-size: 16px; 
+        color: #1e293b;
+    }
+    .menu { display: flex; flex-direction: column; gap: 4px; }
     .menu-item { 
         display: flex; 
         align-items: center; 
@@ -37,11 +40,18 @@
         font-size: 14px; 
         font-weight: 500;
         transition: all 0.3s;
-        color: rgba(255,255,255,0.85);
+        color: #64748b;
     }
-    .menu-item:hover { background: rgba(255,255,255,0.15); color: white; }
-    .menu-item.active { background: #0ea5e9; color: white; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
-    .menu-item img { width: 20px; height: 20px; }
+    .menu-item:hover { 
+        background: #f1f5f9; 
+        color: #1976d2;
+    }
+    .menu-item.active { 
+        background: #1976d2; 
+        color: white;
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    }
+    .menu-item i { font-size: 20px; width: 24px; text-align: center; }
     .sidebar-footer { 
         position: absolute; 
         bottom: 30px; 
@@ -53,20 +63,24 @@
         align-items: center; 
         gap: 12px; 
         padding: 12px 16px; 
-        color: rgba(255,255,255,0.85);
+        color: #64748b;
         border-radius: 12px;
         transition: all 0.3s;
         cursor: pointer;
+        font-weight: 500;
     }
-    .sidebar-footer .logout:hover { background: rgba(255,255,255,0.15); color: white; }
-    .sidebar-footer .logout img { width: 20px; height: 20px; }
+    .sidebar-footer .logout:hover { 
+        background: #fee2e2; 
+        color: #ef4444;
+    }
+    .sidebar-footer .logout i { font-size: 20px; }
     
     /* ===== MAIN CONTENT ===== */
     .main { 
         margin-left: 280px; 
         padding: 30px 40px; 
         flex: 1; 
-        background: #f0f7ff;
+        background: #f5f9ff;
         min-height: 100vh;
     }
     
@@ -76,13 +90,12 @@
         align-items: center; 
         justify-content: space-between; 
         margin-bottom: 30px;
-        background: white;
+        background: #e3f2fd;
         padding: 20px 30px;
         border-radius: 16px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
     }
     .page-header h1 { 
-        font-size: 24px; 
+        font-size: 26px; 
         font-weight: 700; 
         color: #1e293b;
         margin-bottom: 4px;
@@ -97,20 +110,14 @@
         gap: 20px;
     }
     .search-box { 
-        background: #f8fafc; 
+        background: white; 
         border-radius: 999px; 
         padding: 12px 24px; 
         display: flex; 
         align-items: center; 
         gap: 12px;
         width: 350px;
-        border: 2px solid transparent;
-        transition: all 0.3s;
-    }
-    .search-box:focus-within { 
-        border-color: #3B82F6; 
-        background: white;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .search-box input { 
         border: none; 
@@ -120,13 +127,17 @@
         font-size: 14px;
         color: #334155;
     }
+    .search-box input::placeholder {
+        color: #94a3b8;
+    }
     .profile-wrapper { 
         display: flex; 
         align-items: center; 
         gap: 12px;
         padding: 8px 16px;
-        background: #f8fafc;
+        background: white;
         border-radius: 999px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .profile-avatar { 
         width: 40px; 
@@ -160,7 +171,7 @@
         margin-bottom: 24px;
     }
     .btn-tambah { 
-        background: linear-gradient(135deg, #0ea5e9, #3B82F6); 
+        background: #1976d2; 
         color: white; 
         border-radius: 12px; 
         padding: 12px 24px; 
@@ -172,11 +183,12 @@
         align-items: center; 
         gap: 8px;
         transition: all 0.3s;
-        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
     }
     .btn-tambah:hover { 
+        background: #1565c0;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
     }
     
     /* ===== TABLE ===== */
@@ -188,9 +200,7 @@
         font-weight: 600; 
         color: #64748b;
         font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 2px solid #e3f2fd;
     }
     td { 
         padding: 20px 16px; 
@@ -208,14 +218,13 @@
         border-radius: 12px; 
         object-fit: cover; 
         background: #f1f5f9;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     .judul-link { 
         color: #1e293b; 
         font-weight: 600;
         transition: color 0.3s;
     }
-    .judul-link:hover { color: #3B82F6; }
+    .judul-link:hover { color: #1976d2; }
     .deskripsi-text { 
         color: #64748b; 
         font-size: 13px;
@@ -247,21 +256,20 @@
         align-items: center;
         justify-content: center;
         transition: all 0.3s;
+        background: transparent;
     }
     .btn-edit { 
-        background: #fef3c7; 
         color: #f59e0b;
     }
     .btn-edit:hover { 
-        background: #fde68a; 
+        background: #fef3c7; 
         transform: scale(1.1);
     }
     .btn-delete { 
-        background: #fee2e2; 
         color: #ef4444;
     }
     .btn-delete:hover { 
-        background: #fecaca; 
+        background: #fee2e2; 
         transform: scale(1.1);
     }
     
@@ -300,9 +308,9 @@
     }
     .form-group input:focus,
     .form-group textarea:focus { 
-        border-color: #3B82F6;
+        border-color: #1976d2;
         outline: none;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
     }
     .form-group textarea { min-height: 120px; resize: vertical; }
     
@@ -322,8 +330,8 @@
         transition: all 0.3s;
     }
     .upload-container:hover { 
-        border-color: #3B82F6; 
-        background: #f8fafc;
+        border-color: #1976d2; 
+        background: #f0f7ff;
     }
     .upload-preview { 
         position: absolute; 
@@ -350,7 +358,7 @@
     }
     .upload-placeholder i { 
         font-size: 48px; 
-        color: #3B82F6; 
+        color: #1976d2; 
         margin-bottom: 12px;
     }
     .upload-placeholder span { 
@@ -393,7 +401,7 @@
         transform: translateY(-2px);
     }
     .btn-primary { 
-        background: linear-gradient(135deg, #10b981, #34d399); 
+        background: #10b981; 
         color: white; 
         border-radius: 10px; 
         padding: 12px 24px; 
@@ -408,6 +416,7 @@
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
     .btn-primary:hover { 
+        background: #059669;
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     }
@@ -428,7 +437,6 @@
         border-radius: 16px; 
         margin-bottom: 24px;
         background: #f1f5f9;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
     .detail-header { margin-bottom: 24px; }
     .detail-date { 
@@ -460,7 +468,7 @@
         border-top: 2px solid #e2e8f0;
     }
     .btn-detail-edit { 
-        background: linear-gradient(135deg, #0ea5e9, #3B82F6); 
+        background: #1976d2; 
         color: white;
         padding: 12px 24px; 
         border-radius: 10px; 
@@ -610,45 +618,35 @@
         </div>
         <div class="menu">
             <a href="{{ route('admin.dashboard') }}" class="menu-item">
-                <i class="fas fa-th-large" style="font-size: 18px;"></i>
+                <i class="fas fa-th-large"></i>
                 Dashboard
             </a>
-<<<<<<< Updated upstream
-            <a href="{{ route('admin.kegiatan') }}" class="menu-item active">
-                <i class="fas fa-calendar-alt" style="font-size: 18px;"></i>
+            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item active">
+                <i class="fas fa-calendar-alt"></i>
                 Kegiatan Desa
             </a>
-            <a href="{{ route('admin.prestasi') }}" class="menu-item">
-                <i class="fas fa-trophy" style="font-size: 18px;"></i>
+            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
+                <i class="fas fa-trophy"></i>
                 Prestasi
             </a>
-            <a href="{{ route('admin.saran') }}" class="menu-item">
-                <i class="fas fa-envelope" style="font-size: 18px;"></i>
-                Kotak Saran
-            </a>
-            <a href="{{ route('admin.pelayanan') }}" class="menu-item">
-                <i class="fas fa-concierge-bell" style="font-size: 18px;"></i>
+            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item">
+                <i class="fas fa-briefcase"></i>
                 Pelayanan
-=======
-            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item active">
-                <img src="{{ asset('assets/icons/kegiatandesa.png') }}" alt="">Kegiatan Desa
-            </a>
-            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
-                <img src="{{ asset('assets/icons/prestasi.png') }}" alt="">Prestasi
             </a>
             <a href="{{ route('admin.saran.index') }}" class="menu-item">
-                <img src="{{ asset('assets/icons/kotaksaran1.png') }}" alt="">Kotak Saran
+                <i class="fas fa-envelope"></i>
+                Kotak Saran
             </a>
-            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item">
-                <img src="{{ asset('assets/icons/pelayanan1.png') }}" alt="">Pelayanan
->>>>>>> Stashed changes
+            <a href="{{ route('admin.infografis.index') }}" class="menu-item">
+                <i class="fas fa-users"></i>
+                Infografis
             </a>
         </div>
         <div class="sidebar-footer">
             <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: inline;">
                 @csrf
                 <div class="logout" onclick="event.preventDefault(); confirmLogout();">
-                    <i class="fas fa-sign-out-alt" style="font-size: 18px;"></i>
+                    <i class="fas fa-sign-out-alt"></i>
                     <span>Keluar</span>
                 </div>
             </form>
@@ -659,13 +657,12 @@
     <div class="main">
         @if($action === 'list')
         <div class="top-bar">
-<<<<<<< Updated upstream
             <div class="page-header">
                 <h1>Kegiatan Desa</h1>
                 <div class="breadcrumb">Dashboard / Kegiatan Desa / Daftar Kegiatan</div>
             </div>
             <div class="search-wrapper">
-                <form method="get" action="{{ route('admin.kegiatan') }}" class="search-box">
+                <form method="get" action="{{ route('admin.kegiatan.index') }}" class="search-box">
                     <input type="hidden" name="action" value="list">
                     <i class="fas fa-search" style="color: #94a3b8;"></i>
                     <input type="text" name="search" placeholder="Cari Kegiatan" value="{{ old('search', $search ?? '') }}">
@@ -682,17 +679,6 @@
                             {{ substr($namaAdmin ?? 'A', 0, 1) }}
                         @endif
                     </a>
-=======
-            <form method="get" action="{{ route('admin.kegiatan.index') }}" class="search-input-wrapper">
-                <input type="hidden" name="action" value="list">
-                <span class="search-icon">🔍</span>
-                <input type="text" name="search" placeholder="Search Kegiatan" value="{{ old('search', $search ?? '') }}">
-            </form>
-            <div class="profile-wrapper">
-                <div class="profile-text">
-                    <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
-                    <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
->>>>>>> Stashed changes
                 </div>
             </div>
         </div>
@@ -707,24 +693,14 @@
 
         @if($action === 'list')
             <div class="content-card">
-<<<<<<< Updated upstream
                 <div class="card-header">
                     <h2 style="font-size: 20px; font-weight: 700; color: #1e293b;">Daftar Kegiatan Desa</h2>
-                    <a href="{{ route('admin.kegiatan', ['action' => 'tambah']) }}">
-=======
-                <div class="header-row">
-                    <div>
-                        <h2 class="page-title">{{ $page_title ?? 'Daftar Kegiatan Desa' }}</h2>
-                        <div class="breadcrumb">Dashboard / Kegiatan Desa / Daftar Kegiatan</div>
-                    </div>
                     <a href="{{ route('admin.kegiatan.index', ['action' => 'tambah']) }}">
->>>>>>> Stashed changes
                         <button class="btn-tambah">
                             <i class="fas fa-plus"></i> Tambah
                         </button>
                     </a>
                 </div>
-<<<<<<< Updated upstream
                 
                 <div class="table-container">
                     <table>
@@ -735,7 +711,7 @@
                                 <th>Nama Kegiatan Desa</th>
                                 <th>Lokasi</th>
                                 <th>Deskripsi</th>
-                                <th>Tanggal Perolehan</th>
+                                <th>Tanggal</th>
                                 <th class="aksi-col">Aksi</th>
                             </tr>
                         </thead>
@@ -762,13 +738,13 @@
                                         @if(!empty($fotoSrc))
                                             <img src="{{ $fotoSrc }}" alt="Foto" class="foto-item">
                                         @else
-                                            <div class="foto-item" style="display: flex; align-items: center; justify-content: center; color: #94a3b8;">
-                                                <i class="fas fa-image" style="font-size: 24px;"></i>
+                                            <div class="foto-item" style="display: flex; align-items: center; justify-content: center; background: #e3f2fd;">
+                                                <i class="fas fa-image" style="color: #94a3b8;"></i>
                                             </div>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.kegiatan', ['action' => 'view', 'id' => $row->id]) }}" class="judul-link">
+                                        <a href="{{ route('admin.kegiatan.index', ['action' => 'view', 'id' => $row->id]) }}" class="judul-link">
                                             {{ $row->judul }}
                                         </a>
                                     </td>
@@ -785,7 +761,7 @@
                                     </td>
                                     <td class="aksi-col">
                                         <div class="aksi-buttons">
-                                            <a href="{{ route('admin.kegiatan', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
+                                            <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
                                                 <button class="btn-icon btn-edit">
                                                     <i class="fas fa-pencil-alt"></i>
                                                 </button>
@@ -807,96 +783,17 @@
                         </tbody>
                     </table>
                 </div>
-=======
-                <table>
-                    <thead>
-                    <tr>
-                        <th style="width:10%"></th>
-                        <th style="width:6%">No</th>
-                        <th style="width:25%">Nama Kegiatan Desa</th>
-                        <th style="width:20%">Lokasi</th>
-                        <th style="width:25%">Deskripsi</th>
-                        <th style="width:14%">Tanggal Perolehan</th>
-                        <th class="aksi-col">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @forelse($kegiatanList as $row)
-                        @php
-                            $fotoSrc = '';
-                            if (!empty($row->foto)) {
-                                $mime = $row->foto_type ?? 'image/jpeg';
-                                $raw = $row->foto;
-                                $isBase64 = preg_match('/^[A-Za-z0-9+\/=]+$/', $raw);
-                                $fotoSrc = $mime . ';base64,' . ($isBase64 ? $raw : base64_encode($raw));
-                            }
-                            
-                            $maxLength = 250;
-                            $desc = strip_tags($row->deskripsi);
-                            $shortDesc = strlen($desc) > $maxLength 
-                                ? substr($desc, 0, $maxLength) . '...' 
-                                : $desc;
-                        @endphp
-                        <tr>
-                            <td>
-                                @if(!empty($fotoSrc))
-                                    <img src="{{ $fotoSrc }}" alt="Foto" class="foto-bulat">
-                                @else
-                                    <span class="foto-bulat"></span>
-                                @endif
-                            </td>
-                            <td>{{ $loop->iteration }}</td>
-                            <td class="text-judul">
-                                <a href="{{ route('admin.kegiatan.index', ['action' => 'view', 'id' => $row->id]) }}">
-                                    {{ $row->judul }}
-                                </a>
-                            </td>
-                            <td>{{ $row->lokasi }}</td>
-                            <td>{!! nl2br(e($shortDesc)) !!}</td>
-                            <td class="text-tanggal">
-                                {{ \Carbon\Carbon::parse($row->tanggal)->isoFormat('D MMMM Y') }}
-                            </td>
-                            <td class="aksi-col" style="display:flex; justify-content:center; align-items:center; gap:6px;">
-                                <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
-                                    <button class="icon-btn">✏️</button>
-                                </a>
-                                <button class="icon-btn delete" title="Hapus" onclick="openDeleteModal({{ $row->id }})">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" style="text-align:center;padding:20px;color:#9ca3af;">
-                                Belum ada data kegiatan.
-                            </td>
-                        </tr>
-                    @endforelse
-                    </tbody>
-                </table>
->>>>>>> Stashed changes
             </div>
         @endif
 
         @if($action === 'view')
-<<<<<<< Updated upstream
             <div class="content-card">
                 <div class="card-header">
                     <h2 style="font-size: 20px; font-weight: 700; color: #1e293b;">Detail Kegiatan</h2>
-                    <a href="{{ route('admin.kegiatan') }}">
+                    <a href="{{ route('admin.kegiatan.index') }}">
                         <button class="btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </button>
-=======
-            <div class="content-card content-card-form">
-                <div class="header-row">
-                    <div>
-                        <h2 class="page-title">Detail Kegiatan</h2>
-                        <div class="breadcrumb">Dashboard / Kegiatan Desa / Detail Kegiatan</div>
-                    </div>
-                    <a href="{{ route('admin.kegiatan.index') }}" class="btn-tambah" style="padding:8px 16px; font-size:12px;">
-                        <span style="font-size:14px;">←</span> Kembali
->>>>>>> Stashed changes
                     </a>
                 </div>
 
@@ -935,11 +832,7 @@
                         </div>
 
                         <div class="detail-actions">
-<<<<<<< Updated upstream
-                            <a href="{{ route('admin.kegiatan', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-detail-edit">
-=======
-                            <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-edit">
->>>>>>> Stashed changes
+                            <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-detail-edit">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <button class="btn-detail-delete" onclick="openDeleteModal({{ $detail->id }})">
@@ -948,21 +841,12 @@
                         </div>
                     </div>
                 @else
-<<<<<<< Updated upstream
                     <div style="text-align: center; padding: 60px 20px; background: #f8fafc; border-radius: 16px;">
                         <i class="fas fa-exclamation-circle" style="font-size: 64px; color: #f59e0b; margin-bottom: 20px;"></i>
                         <h3 style="font-size: 20px; color: #1e293b; margin-bottom: 12px;">Data Tidak Ditemukan</h3>
                         <p style="color: #64748b; margin-bottom: 24px;">Kegiatan dengan ID ini tidak ada atau telah dihapus.</p>
-                        <a href="{{ route('admin.kegiatan') }}" class="btn-secondary">
+                        <a href="{{ route('admin.kegiatan.index') }}" class="btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali ke Daftar
-=======
-                    <div class="detail-page" style="text-align:center; padding:40px 20px; background:#f9fafb; border-radius:12px;">
-                        <i class="fa-solid fa-exclamation-circle" style="font-size:48px; color:#f59e0b; margin-bottom:16px;"></i>
-                        <h3 style="font-size:18px; color:#1e293b; margin-bottom:8px;">Data Tidak Ditemukan</h3>
-                        <p style="color:#64748b; margin-bottom:20px;">Kegiatan dengan ID ini tidak ada atau telah dihapus.</p>
-                        <a href="{{ route('admin.kegiatan.index') }}" style="background:#3b82f6; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:500;">
-                            ← Kembali ke Daftar
->>>>>>> Stashed changes
                         </a>
                     </div>
                 @endif
@@ -979,12 +863,8 @@
                         Dashboard / Kegiatan Desa / {{ $action === 'tambah' ? 'Tambah' : 'Edit' }} Kegiatan
                     </div>
                 </div>
-<<<<<<< Updated upstream
 
-                <form method="POST" action="{{ route('admin.kegiatan') }}" enctype="multipart/form-data">
-=======
                 <form method="POST" action="{{ route('admin.kegiatan.index') }}" enctype="multipart/form-data">
->>>>>>> Stashed changes
                     @csrf
                     <input type="hidden" name="action" value="{{ $action }}">
                     @if(isset($edit) && $edit)
@@ -1040,7 +920,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <a href="{{ route('admin.kegiatan') }}" class="btn-secondary">
+                            <a href="{{ route('admin.kegiatan.index') }}" class="btn-secondary">
                                 <i class="fas fa-times"></i> Batal
                             </a>
                             <button type="submit" name="save_kegiatan" class="btn-primary">
@@ -1049,14 +929,6 @@
                             </button>
                         </div>
                     </div>
-<<<<<<< Updated upstream
-=======
-                    <button type="submit" name="save_kegiatan" class="btn-simpan">
-                        <i class="fas fa-save"></i>
-                        {{ $action === 'edit' ? 'Update Data' : 'Simpan Data' }}
-                    </button>
-                    <a href="{{ route('admin.kegiatan.index') }}" class="back-btn">&larr; Kembali ke Daftar</a>
->>>>>>> Stashed changes
                 </form>
             </div>
         @endif

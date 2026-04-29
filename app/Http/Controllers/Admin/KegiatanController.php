@@ -9,123 +9,134 @@ use Illuminate\Support\Facades\DB;
 
 class KegiatanController extends Controller
 {
+    // ================= MAIN HANDLER =================
     public function index(Request $request)
     {
         $user = Auth::user();
         if (!$user) return redirect()->route('login');
 
-        $action = $request->get('action', 'list');
-        $id = $request->get('id');
-        $search = trim($request->get('search', ''));
-        
-        // Data profil user
-        $namaAdmin = $user->nama_lengkap ?? 'Administrator';
-        $roleAdmin = $user->role ?? 'admin';
-        $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
-        $fotoProfilSrc = !empty($user->foto) 
-            ? 'image/jpeg;base64,' . base64_encode($user->foto) 
-            : null;
+        $action = $request->action ?? 'list';
+        $id = $request->id;
 
-        // Handle DELETE
-        if ($action === 'delete' && $id) {
-            DB::table('kegiatan')->where('id', intval($id))->delete();
-            return redirect()->route('admin.kegiatan.index')->with('success', 'Kegiatan berhasil dihapus');
-        }
+        $data = [
+            'action' => $action,
+            'namaAdmin' => $user->nama_lengkap,
+            'roleAdmin' => $user->role,
+            'inisialAdmin' => strtoupper(substr($user->nama_lengkap, 0, 1)),
+        ];
 
-        // Handle SAVE (Tambah/Edit)
-        if ($request->isMethod('post') && $request->has('save_kegiatan')) {
-            $validated = $request->validate([
-                'judul' => 'required|string|max:255',
-                'lokasi' => 'required|string|max:255',
-                'deskripsi' => 'required|string',
-                'tanggal' => 'required|date',
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            ]);
+        // ================= LIST =================
+        if ($action == 'list') {
+            $search = $request->search;
 
-            $foto = null;
-            $foto_type = null;
-            
-            if ($request->hasFile('foto') && $request->file('foto')->isValid()) {
-                $file = $request->file('foto');
-                $foto = file_get_contents($file->getRealPath());
-                $foto_type = $file->getMimeType();
-            }
-
-            if (!empty($request->input('id'))) {
-                // UPDATE
-                $updateData = [
-                    'judul' => $validated['judul'],
-                    'lokasi' => $validated['lokasi'],
-                    'deskripsi' => $validated['deskripsi'],
-                    'tanggal' => $validated['tanggal'],
-                    'updated_at' => now(),
-                ];
-                if ($foto !== null) {
-                    $updateData['foto'] = $foto;
-                    $updateData['foto_type'] = $foto_type;
-                }
-                DB::table('kegiatan')->where('id', intval($request->input('id')))->update($updateData);
-                return redirect()->route('admin.kegiatan.index')->with('success', 'Data kegiatan berhasil diupdate');
-            } else {
-                // INSERT
-                DB::table('kegiatan')->insert([
-                    'judul' => $validated['judul'],
-                    'lokasi' => $validated['lokasi'],
-                    'deskripsi' => $validated['deskripsi'],
-                    'tanggal' => $validated['tanggal'],
-                    'foto' => $foto,
-                    'foto_type' => $foto_type,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-                return redirect()->route('admin.kegiatan.index')->with('success', 'Data kegiatan berhasil ditambahkan');
-            }
-        }
-
-        // Fetch data based on action
-        $kegiatanList = collect([]);
-        $detail = null;
-        $edit = null;
-        $page_title = 'Daftar Kegiatan Desa';
-        $message = null;
-
-        if ($action === 'list') {
             $query = DB::table('kegiatan');
+
             if ($search) {
-                $query->where(function($q) use ($search) {
-                    $q->where('judul', 'like', "%{$search}%")
-                      ->orWhere('lokasi', 'like', "%{$search}%");
+                $query->where(function ($q) use ($search) {
+                    $q->where('judul', 'like', "%$search%")
+                      ->orWhere('lokasi', 'like', "%$search%");
                 });
             }
-            $kegiatanList = $query->orderBy('tanggal', 'desc')->orderBy('id', 'desc')->get();
-            $page_title = 'Daftar Kegiatan Desa';
-        }
-        
-        if ($action === 'edit' && $id) {
-            $edit = DB::table('kegiatan')->where('id', intval($id))->first();
-            if (!$edit) {
-                return redirect()->route('admin.kegiatan.index')->with('error', 'Data tidak ditemukan');
-            }
-            $page_title = 'Edit Kegiatan Desa';
-        }
-        
-        if ($action === 'view' && $id) {
-            $detail = DB::table('kegiatan')->where('id', intval($id))->first();
-            if (!$detail) {
-                $message = "Data kegiatan tidak ditemukan.";
-                $action = 'list';
-            } else {
-                $page_title = 'Detail Kegiatan Desa';
-            }
-        }
-        
-        if ($action === 'tambah') {
-            $page_title = 'Tambah Kegiatan Desa';
+
+            $data['kegiatanList'] = $query->orderBy('id', 'desc')->get();
+            $data['search'] = $search;
+
+            return view('admin.kegiatan', $data);
         }
 
-        return view('admin.kegiatan', compact(
-            'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin', 'fotoProfilSrc',
-            'action', 'kegiatanList', 'edit', 'detail', 'page_title', 'search', 'message'
-        ));
+        // ================= TAMBAH =================
+        if ($action == 'tambah') {
+            $data['page_title'] = 'Tambah Kegiatan';
+            return view('admin.kegiatan', $data);
+        }
+
+        // ================= VIEW =================
+        if ($action == 'view') {
+            $data['detail'] = DB::table('kegiatan')->where('id', $id)->first();
+            return view('admin.kegiatan', $data);
+        }
+
+        // ================= EDIT =================
+        if ($action == 'edit') {
+            $data['edit'] = DB::table('kegiatan')->where('id', $id)->first();
+            return view('admin.kegiatan', $data);
+        }
+
+        // ================= DELETE (GET) =================
+        if ($action == 'delete') {
+            DB::table('kegiatan')->where('id', $id)->delete();
+
+            return redirect()->route('admin.kegiatan.index')
+                ->with('success', 'Kegiatan berhasil dihapus');
+        }
+
+        return redirect()->route('admin.kegiatan.index', ['action' => 'list']);
+    }
+
+    // ================= STORE =================
+    public function store(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required',
+            'lokasi' => 'required',
+            'deskripsi' => 'required',
+            'tanggal' => 'required',
+            'foto' => 'nullable|image|max:5120'
+        ]);
+
+        $foto = null;
+        $type = null;
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $foto = file_get_contents($file->getRealPath());
+            $type = $file->getMimeType();
+        }
+
+        DB::table('kegiatan')->insert([
+            'judul' => $request->judul,
+            'lokasi' => $request->lokasi,
+            'deskripsi' => $request->deskripsi,
+            'tanggal' => $request->tanggal,
+            'foto' => $foto,
+            'foto_type' => $type,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('admin.kegiatan.index', ['action' => 'list'])
+            ->with('success', 'Kegiatan berhasil ditambahkan');
+    }
+
+    // ================= UPDATE =================
+    public function update(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'judul' => 'required',
+            'lokasi' => 'required',
+            'deskripsi' => 'required',
+            'tanggal' => 'required',
+            'foto' => 'nullable|image|max:5120'
+        ]);
+
+        $data = [
+            'judul' => $request->judul,
+            'lokasi' => $request->lokasi,
+            'deskripsi' => $request->deskripsi,
+            'tanggal' => $request->tanggal,
+            'updated_at' => now(),
+        ];
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $data['foto'] = file_get_contents($file->getRealPath());
+            $data['foto_type'] = $file->getMimeType();
+        }
+
+        DB::table('kegiatan')->where('id', $request->id)->update($data);
+
+        return redirect()->route('admin.kegiatan.index', ['action' => 'list'])
+            ->with('success', 'Kegiatan berhasil diupdate');
     }
 }

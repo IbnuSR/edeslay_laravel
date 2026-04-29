@@ -311,7 +311,7 @@
             </div>
         @endif
 
-        @if($action === 'tambah' || $action === 'edit')
+        @if($action === 'add_form' || $action === 'edit')
             <div class="content-card content-card-form">
                 <div class="header-row">
                     <div>

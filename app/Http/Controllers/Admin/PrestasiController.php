@@ -9,84 +9,144 @@ use Illuminate\Support\Facades\DB;
 
 class PrestasiController extends Controller
 {
+    // ================= INDEX =================
     public function index(Request $request)
     {
         $user = Auth::user();
         if (!$user) return redirect()->route('login');
 
+        // ================= ACTION HANDLER =================
         $action = $request->get('action', 'list');
         $id = $request->get('id');
-        $search = $request->get('search', '');
+        $search = $request->get('search');
 
-        // Data profil
-        $namaAdmin = $user->nama_lengkap ?? 'Administrator';
+        // mapping action dari URL
+        if ($action == 'tambah') $action = 'add_form';
+
+        // ================= DATA USER =================
+        $namaAdmin = $user->nama_lengkap ?? 'Admin';
         $roleAdmin = $user->role ?? 'admin';
         $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
-        $fotoProfilSrc = !empty($user->foto) ? 'image/jpeg;base64,' . base64_encode($user->foto) : null;
 
-        // Handle DELETE
-        if ($action === 'delete' && $id) {
-            DB::table('prestasi')->where('id', intval($id))->delete();
-            return redirect()->route('admin.prestasi,index')->with('success', 'Prestasi berhasil dihapus');
+        // ================= DELETE =================
+        if ($action == 'delete' && $id) {
+            DB::table('prestasi')->where('id', $id)->delete();
+            return redirect()->route('admin.prestasi.index')
+                ->with('success', 'Prestasi berhasil dihapus');
         }
 
-        // Handle SAVE (Tambah/Edit)
-        if ($request->isMethod('post') && $request->has('save_prestasi')) {
-            $validated = $request->validate([
-                'judul' => 'required|string|max:255',
-                'deskripsi' => 'required|string',
-                'tanggal' => 'required|date',
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            ]);
+        // ================= FETCH DATA =================
+        $query = DB::table('prestasi');
 
-            $foto = null; $foto_type = null;
-            if ($request->hasFile('foto') && $request->file('foto')->isValid()) {
-                $file = $request->file('foto');
-                $foto = file_get_contents($file->getRealPath());
-                $foto_type = $file->getMimeType();
-            }
-
-            if (!empty($request->input('id'))) {
-                // UPDATE
-                $updateData = [
-                    'judul' => $validated['judul'],
-                    'deskripsi' => $validated['deskripsi'],
-                    'tanggal' => $validated['tanggal'],
-                    'updated_at' => now(),
-                ];
-                if ($foto !== null) { $updateData['foto'] = $foto; $updateData['foto_type'] = $foto_type; }
-                DB::table('prestasi')->where('id', intval($request->input('id')))->update($updateData);
-            } else {
-                // INSERT
-                DB::table('prestasi')->insert([
-                    'judul' => $validated['judul'],
-                    'deskripsi' => $validated['deskripsi'],
-                    'tanggal' => $validated['tanggal'],
-                    'foto' => $foto, 'foto_type' => $foto_type,
-                    'created_at' => now(), 'updated_at' => now(),
-                ]);
-            }
-            return redirect()->route('admin.prestasi.index')->with('success', 'Data prestasi berhasil disimpan');
+        if ($search) {
+            $query->where('judul', 'like', "%{$search}%");
         }
 
-        // Fetch data
-        $prestasiList = []; $edit = null; $detail = null; $page_title = 'Daftar Prestasi';
+        $prestasiList = $query->orderBy('tanggal', 'desc')->get();
 
-        if ($action === 'list') {
-            $query = DB::table('prestasi');
-            if ($search) $query->where('judul', 'like', "%{$search}%");
-            $prestasiList = $query->orderBy('tanggal', 'desc')->get();
-        }
-        if (($action === 'edit_form' || $action === 'view') && $id) {
-            $detail = DB::table('prestasi')->where('id', intval($id))->first();
-            if (!$detail) return redirect()->route('admin.prestasi.index')->with('error', 'Data tidak ditemukan');
-            $page_title = $action === 'edit_form' ? 'Edit Prestasi' : 'Detail Prestasi';
-        }
-        if ($action === 'add_form') $page_title = 'Tambah Prestasi';
+        // ================= DETAIL / EDIT =================
+        $detail = null;
+        $edit = null;
+        $page_title = 'Daftar Prestasi';
 
-        return view('admin.prestasi', compact(
-            'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin', 'fotoProfilSrc',
-            'action', 'prestasiList', 'edit', 'detail', 'page_title', 'search'
-        ));
+        if ($action == 'view' && $id) {
+            $detail = DB::table('prestasi')->where('id', $id)->first();
+            $page_title = 'Detail Prestasi';
+        }
+
+        if ($action == 'edit' && $id) {
+            $edit = DB::table('prestasi')->where('id', $id)->first();
+            $page_title = 'Edit Prestasi';
+        }
+
+        if ($action == 'add_form') {
+            $page_title = 'Tambah Prestasi';
+        }
+
+        // ================= RETURN VIEW (FIX UTAMA) =================
+        return view('admin.prestasi', [
+            'action' => $action,
+            'prestasiList' => $prestasiList,
+            'search' => $search,
+
+            'detail' => $detail,
+            'edit' => $edit,
+            'page_title' => $page_title,
+
+            'namaAdmin' => $namaAdmin,
+            'roleAdmin' => $roleAdmin,
+            'inisialAdmin' => $inisialAdmin,
+        ]);
+    }
+
+    // ================= STORE =================
+    public function store(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required',
+            'deskripsi' => 'required',
+            'tanggal' => 'required',
+            'foto' => 'nullable|image|max:5120',
+        ]);
+
+        $foto = null;
+        $foto_type = null;
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $foto = file_get_contents($file->getRealPath());
+            $foto_type = $file->getMimeType();
+        }
+
+        DB::table('prestasi')->insert([
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi,
+            'tanggal' => $request->tanggal,
+            'foto' => $foto,
+            'foto_type' => $foto_type,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('admin.prestasi.index')
+            ->with('success', 'Prestasi berhasil ditambahkan');
+    }
+
+    // ================= UPDATE =================
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'judul' => 'required',
+            'deskripsi' => 'required',
+            'tanggal' => 'required',
+            'foto' => 'nullable|image|max:5120',
+        ]);
+
+        $data = [
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi,
+            'tanggal' => $request->tanggal,
+            'updated_at' => now(),
+        ];
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $data['foto'] = file_get_contents($file->getRealPath());
+            $data['foto_type'] = $file->getMimeType();
+        }
+
+        DB::table('prestasi')->where('id', $id)->update($data);
+
+        return redirect()->route('admin.prestasi.index')
+            ->with('success', 'Prestasi berhasil diupdate');
+    }
+
+    // ================= DESTROY =================
+    public function destroy($id)
+    {
+        DB::table('prestasi')->where('id', $id)->delete();
+
+        return redirect()->route('admin.prestasi.index')
+            ->with('success', 'Prestasi berhasil dihapus');
     }
 }
