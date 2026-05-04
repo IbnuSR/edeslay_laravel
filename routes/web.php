@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
+//use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\KegiatanDetailController;
 use App\Http\Controllers\PrestasiDetailController;
@@ -18,6 +18,8 @@ use App\Http\Controllers\Admin\SaranController;
 use App\Http\Controllers\Admin\StrukturController;
 use App\Http\Controllers\DashboardUmumController;
 use App\Http\Controllers\Admin\InfografisController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpMail; 
 
 /*
 |--------------------------------------------------------------------------
@@ -69,8 +71,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
     Route::get('/verify-otp', [ForgotPasswordController::class, 'showOtpForm'])->name('password.verify');
     Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.otp.verify');
-    Route::get('/reset-password', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+    //Route::get('/reset-password', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    //Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout')->middleware('auth');
@@ -212,3 +214,22 @@ Route::get('/force-logout', function () {
     session()->regenerateToken();
     return redirect('/login');
 });
+
+/*
+|--------------------------------------------------------------------------
+| API MOBILE
+|--------------------------------------------------------------------------
+*/
+Route::get('/test-email', function () {
+    try {
+        Mail::raw('TES EMAIL LARAVEL', function ($message) {
+            $message->to('edeslayapp@gmail.com')
+                    ->subject('TES SMTP');
+        });
+
+        return "EMAIL TERKIRIM";
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
+});
+
