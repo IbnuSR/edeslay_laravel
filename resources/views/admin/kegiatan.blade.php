@@ -2,86 +2,19 @@
 
 @section('content')
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f9ff; color: #333; }
-    a { text-decoration: none; color: inherit; }
-    .app { display: flex; min-height: 100vh; }
-    
-    /* ===== SIDEBAR ===== */
-    .sidebar { 
-        width: 280px; 
-        background: white; 
-        padding: 24px 20px; 
-        position: fixed;
-        height: 100vh;
-        overflow-y: auto;
-        border-right: 1px solid #e3f2fd;
+    /* ===== RESET LINK DEFAULT ===== */
+    a {
+        text-decoration: none !important;
+        color: inherit;
     }
-    .sidebar-header { 
-        display: flex; 
-        align-items: center; 
-        gap: 12px; 
-        margin-bottom: 32px;
-        padding: 0 8px;
-    }
-    .sidebar-header img { height: 42px; width: auto; }
-    .sidebar-header div { 
-        font-weight: 600; 
-        font-size: 16px; 
-        color: #1e293b;
-    }
-    .menu { display: flex; flex-direction: column; gap: 4px; }
-    .menu-item { 
-        display: flex; 
-        align-items: center; 
-        gap: 12px; 
-        padding: 12px 16px; 
-        border-radius: 12px; 
-        font-size: 14px; 
-        font-weight: 500;
-        transition: all 0.3s;
-        color: #64748b;
-    }
-    .menu-item:hover { 
-        background: #f1f5f9; 
-        color: #1976d2;
-    }
-    .menu-item.active { 
-        background: #1976d2; 
-        color: white;
-        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-    }
-    .menu-item i { font-size: 20px; width: 24px; text-align: center; }
-    .sidebar-footer { 
-        position: absolute; 
-        bottom: 30px; 
-        left: 20px; 
-        right: 20px; 
-    }
-    .sidebar-footer .logout { 
-        display: flex; 
-        align-items: center; 
-        gap: 12px; 
-        padding: 12px 16px; 
-        color: #64748b;
-        border-radius: 12px;
-        transition: all 0.3s;
-        cursor: pointer;
-        font-weight: 500;
-    }
-    .sidebar-footer .logout:hover { 
-        background: #fee2e2; 
-        color: #ef4444;
-    }
-    .sidebar-footer .logout i { font-size: 20px; }
     
     /* ===== MAIN CONTENT ===== */
-    .main { 
-        margin-left: 280px; 
-        padding: 30px 40px; 
-        flex: 1; 
+    .main-container { 
+        padding: 20px 30px; 
+        width: 100%;
+        max-width: 100%;
         background: #f5f9ff;
-        min-height: 100vh;
+        box-sizing: border-box;
     }
     
     /* ===== TOP BAR ===== */
@@ -93,12 +26,15 @@
         background: #e3f2fd;
         padding: 20px 30px;
         border-radius: 16px;
+        flex-wrap: wrap;
+        gap: 20px;
     }
     .page-header h1 { 
         font-size: 26px; 
         font-weight: 700; 
         color: #1e293b;
         margin-bottom: 4px;
+        margin-top: 0;
     }
     .breadcrumb { 
         font-size: 13px; 
@@ -108,6 +44,8 @@
         display: flex; 
         align-items: center; 
         gap: 20px;
+        flex: 1;
+        justify-content: flex-end;
     }
     .search-box { 
         background: white; 
@@ -116,7 +54,8 @@
         display: flex; 
         align-items: center; 
         gap: 12px;
-        width: 350px;
+        width: 270px;
+        max-width: 100%;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .search-box input { 
@@ -126,6 +65,7 @@
         flex: 1; 
         font-size: 14px;
         color: #334155;
+        min-width: 0;
     }
     .search-box input::placeholder {
         color: #94a3b8;
@@ -138,6 +78,7 @@
         background: white;
         border-radius: 999px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        white-space: nowrap;
     }
     .profile-avatar { 
         width: 40px; 
@@ -151,6 +92,13 @@
         font-size: 16px; 
         color: white;
         overflow: hidden;
+        flex-shrink: 0;
+        text-decoration: none !important;
+        border: none !important;
+        outline: none !important;
+    }
+    .profile-avatar:hover {
+        opacity: 0.9;
     }
     .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .profile-info { text-align: right; }
@@ -163,12 +111,19 @@
         border-radius: 20px; 
         padding: 30px; 
         box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        width: 100%;
+        box-sizing: border-box;
     }
     .card-header { 
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
         margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .card-header h2 {
+        margin: 0;
     }
     .btn-tambah { 
         background: #1976d2; 
@@ -184,6 +139,8 @@
         gap: 8px;
         transition: all 0.3s;
         box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        white-space: nowrap;
+        text-decoration: none !important;
     }
     .btn-tambah:hover { 
         background: #1565c0;
@@ -192,8 +149,15 @@
     }
     
     /* ===== TABLE ===== */
-    .table-container { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
+    .table-container { 
+        overflow-x: auto; 
+        width: 100%;
+    }
+    table { 
+        width: 100%; 
+        border-collapse: collapse;
+        min-width: 800px;
+    }
     th { 
         padding: 16px; 
         text-align: left; 
@@ -201,6 +165,7 @@
         color: #64748b;
         font-size: 13px;
         border-bottom: 2px solid #e3f2fd;
+        white-space: nowrap;
     }
     td { 
         padding: 20px 16px; 
@@ -223,18 +188,29 @@
         color: #1e293b; 
         font-weight: 600;
         transition: color 0.3s;
+        text-decoration: none !important;
+        border: none !important;
     }
-    .judul-link:hover { color: #1976d2; }
+    .judul-link:hover { 
+        color: #1976d2;
+        text-decoration: none !important;
+    }
     .deskripsi-text { 
         color: #64748b; 
         font-size: 13px;
         line-height: 1.6;
-        max-width: 400px;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
     .tanggal-text { 
         font-size: 13px; 
         color: #94a3b8;
         font-weight: 500;
+        white-space: nowrap;
     }
     .aksi-col { 
         width: 100px; 
@@ -250,27 +226,38 @@
         width: 36px; 
         height: 36px; 
         border-radius: 8px; 
-        border: none; 
+        border: none !important; 
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.3s;
         background: transparent;
+        text-decoration: none !important;
+        outline: none !important;
+        padding: 0;
+        margin: 0;
+    }
+    .btn-icon:focus {
+        outline: none !important;
     }
     .btn-edit { 
         color: #f59e0b;
+        text-decoration: none !important;
     }
     .btn-edit:hover { 
         background: #fef3c7; 
         transform: scale(1.1);
+        text-decoration: none !important;
     }
     .btn-delete { 
         color: #ef4444;
+        text-decoration: none !important;
     }
     .btn-delete:hover { 
         background: #fee2e2; 
         transform: scale(1.1);
+        text-decoration: none !important;
     }
     
     /* ===== FORM ===== */
@@ -305,6 +292,7 @@
         font-size: 14px;
         transition: all 0.3s;
         font-family: inherit;
+        box-sizing: border-box;
     }
     .form-group input:focus,
     .form-group textarea:focus { 
@@ -384,6 +372,7 @@
         margin-top: 24px;
         padding-top: 24px;
         border-top: 2px solid #e2e8f0;
+        flex-wrap: wrap;
     }
     .btn-secondary { 
         border-radius: 10px; 
@@ -395,10 +384,15 @@
         cursor: pointer;
         transition: all 0.3s;
         color: #475569;
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
     .btn-secondary:hover { 
         background: #cbd5e1;
         transform: translateY(-2px);
+        text-decoration: none !important;
     }
     .btn-primary { 
         background: #10b981; 
@@ -414,11 +408,13 @@
         gap: 8px;
         transition: all 0.3s;
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        text-decoration: none !important;
     }
     .btn-primary:hover { 
         background: #059669;
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        text-decoration: none !important;
     }
     
     /* ===== DETAIL VIEW ===== */
@@ -426,8 +422,7 @@
         background: white; 
         border-radius: 16px; 
         padding: 30px; 
-        max-width: 800px;
-        margin: 0 auto;
+        max-width: 100%;
         box-shadow: 0 2px 12px rgba(0,0,0,0.04);
     }
     .detail-image { 
@@ -453,6 +448,7 @@
         font-weight: 700; 
         color: #1e293b;
         line-height: 1.3;
+        margin: 0;
     }
     .detail-content { 
         font-size: 15px; 
@@ -460,12 +456,14 @@
         color: #475569;
     }
     .detail-content strong { color: #1e293b; font-weight: 600; }
+    .detail-content p { margin: 8px 0; }
     .detail-actions { 
         display: flex; 
         gap: 12px; 
         margin-top: 30px;
         padding-top: 24px;
         border-top: 2px solid #e2e8f0;
+        flex-wrap: wrap;
     }
     .btn-detail-edit { 
         background: #1976d2; 
@@ -479,6 +477,11 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s;
+        text-decoration: none !important;
+    }
+    .btn-detail-edit:hover {
+        transform: translateY(-2px);
+        text-decoration: none !important;
     }
     .btn-detail-delete { 
         background: #fee2e2; 
@@ -492,9 +495,11 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s;
+        text-decoration: none !important;
     }
-    .btn-detail-edit:hover, .btn-detail-delete:hover {
+    .btn-detail-delete:hover {
         transform: translateY(-2px);
+        text-decoration: none !important;
     }
     
     /* ===== MODAL ===== */
@@ -539,6 +544,7 @@
         font-weight: 700; 
         margin-bottom: 12px;
         color: #1e293b;
+        margin-top: 0;
     }
     .modal-text { 
         font-size: 15px; 
@@ -550,6 +556,7 @@
         display: flex; 
         justify-content: center; 
         gap: 12px;
+        flex-wrap: wrap;
     }
     .btn-modal-cancel { 
         background: #e2e8f0; 
@@ -561,8 +568,12 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s;
+        text-decoration: none !important;
     }
-    .btn-modal-cancel:hover { background: #cbd5e1; }
+    .btn-modal-cancel:hover { 
+        background: #cbd5e1;
+        text-decoration: none !important;
+    }
     .btn-modal-delete { 
         background: #ef4444; 
         color: white; 
@@ -573,8 +584,12 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s;
+        text-decoration: none !important;
     }
-    .btn-modal-delete:hover { background: #dc2626; }
+    .btn-modal-delete:hover { 
+        background: #dc2626;
+        text-decoration: none !important;
+    }
     
     /* ===== ALERT ===== */
     .alert { 
@@ -597,342 +612,305 @@
     
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1024px) {
-        .sidebar { width: 240px; padding: 20px 16px; }
-        .main { margin-left: 240px; padding: 20px; }
         .form-grid { grid-template-columns: 1fr; }
+        .search-box { width: 250px; }
     }
     @media (max-width: 768px) {
-        .sidebar { display: none; }
-        .main { margin-left: 0; }
-        .search-box { width: 200px; }
+        .top-bar { flex-direction: column; align-items: stretch; }
+        .search-wrapper { flex-direction: column; width: 100%; }
+        .search-box { width: 100%; }
+        .profile-wrapper { justify-content: flex-end; }
         .profile-info { display: none; }
+        .card-header { flex-direction: column; align-items: flex-start; }
+        .btn-tambah { width: 100%; justify-content: center; }
     }
 </style>
 
-<div class="app">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <img src="{{ asset('assets/images/logo-nganjuk.png') }}" alt="Logo">
-            <div>Desa Banjardowo</div>
+<div class="main-container">
+    @if($action === 'list')
+    <div class="top-bar">
+        <div class="page-header">
+            <h1>Kegiatan Desa</h1>
+            <div class="breadcrumb">Dashboard / Kegiatan Desa / Daftar Kegiatan</div>
         </div>
-        <div class="menu">
-            <a href="{{ route('admin.dashboard') }}" class="menu-item">
-                <i class="fas fa-th-large"></i>
-                Dashboard
-            </a>
-            <a href="{{ route('admin.kegiatan.index') }}" class="menu-item active">
-                <i class="fas fa-calendar-alt"></i>
-                Kegiatan Desa
-            </a>
-            <a href="{{ route('admin.prestasi.index') }}" class="menu-item">
-                <i class="fas fa-trophy"></i>
-                Prestasi
-            </a>
-            <a href="{{ route('admin.pelayanan.index') }}" class="menu-item">
-                <i class="fas fa-briefcase"></i>
-                Pelayanan
-            </a>
-            <a href="{{ route('admin.saran.index') }}" class="menu-item">
-                <i class="fas fa-envelope"></i>
-                Kotak Saran
-            </a>
-            <a href="{{ route('admin.infografis.index') }}" class="menu-item">
-                <i class="fas fa-users"></i>
-                Infografis
-            </a>
-        </div>
-        <div class="sidebar-footer">
-            <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: inline;">
-                @csrf
-                <div class="logout" onclick="event.preventDefault(); confirmLogout();">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Keluar</span>
-                </div>
+        <div class="search-wrapper">
+            <form method="get" action="{{ route('admin.kegiatan.index') }}" class="search-box">
+                <input type="hidden" name="action" value="list">
+                <i class="fas fa-search" style="color: #94a3b8;"></i>
+                <input type="text" name="search" placeholder="Cari Kegiatan" value="{{ old('search', $search ?? '') }}">
             </form>
+            <div class="profile-wrapper">
+                <div class="profile-info">
+                    <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
+                    <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
+                </div>
+                <a href="{{ route('admin.profile') }}" class="profile-avatar">
+                    @if(isset($fotoProfilSrc) && $fotoProfilSrc)
+                        <img src="{{ $fotoProfilSrc }}" alt="Foto">
+                    @else
+                        {{ substr($namaAdmin ?? 'A', 0, 1) }}
+                    @endif
+                </a>
+            </div>
         </div>
     </div>
+    @endif
 
-    <!-- MAIN -->
-    <div class="main">
-        @if($action === 'list')
-        <div class="top-bar">
-            <div class="page-header">
-                <h1>Kegiatan Desa</h1>
-                <div class="breadcrumb">Dashboard / Kegiatan Desa / Daftar Kegiatan</div>
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-error">{{ session('error') }}</div>
+    @endif
+
+    @if($action === 'list')
+        <div class="content-card">
+            <div class="card-header">
+                <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">Daftar Kegiatan Desa</h2>
+                <a href="{{ route('admin.kegiatan.index', ['action' => 'tambah']) }}">
+                    <button class="btn-tambah">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                </a>
             </div>
-            <div class="search-wrapper">
-                <form method="get" action="{{ route('admin.kegiatan.index') }}" class="search-box">
-                    <input type="hidden" name="action" value="list">
-                    <i class="fas fa-search" style="color: #94a3b8;"></i>
-                    <input type="text" name="search" placeholder="Cari Kegiatan" value="{{ old('search', $search ?? '') }}">
-                </form>
-                <div class="profile-wrapper">
-                    <div class="profile-info">
-                        <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
-                        <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
-                    </div>
-                    <a href="{{ route('admin.profile') }}" class="profile-avatar">
-                        @if(isset($fotoProfilSrc) && $fotoProfilSrc)
-                            <img src="{{ $fotoProfilSrc }}" alt="Foto">
-                        @else
-                            {{ substr($namaAdmin ?? 'A', 0, 1) }}
-                        @endif
-                    </a>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="no-col">No</th>
+                            <th class="img-col">Foto</th>
+                            <th>Nama Kegiatan Desa</th>
+                            <th>Lokasi</th>
+                            <th>Deskripsi</th>
+                            <th>Tanggal</th>
+                            <th class="aksi-col">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+@forelse($kegiatanList as $row)
+    @php
+        $fotoSrc = '';
+        $fotoAlt = 'Foto kegiatan';
+        
+        // Cek apakah foto ada
+        if (!empty($row->foto)) {
+            // Metode 1: Gunakan Storage::url()
+            if (str_starts_with($row->foto, 'kegiatan/')) {
+                $fotoSrc = asset('storage/' . $row->foto);
+            } 
+            // Metode 2: Fallback untuk base64 lama
+            elseif (strlen($row->foto) > 100) {
+                $mime = $row->foto_type ?? 'image/jpeg';
+                $fotoSrc = 'data:' . $mime . ';base64,' . $row->foto;
+            }
+        }
+        
+        $maxLength = 250;
+        $desc = strip_tags($row->deskripsi);
+        $shortDesc = strlen($desc) > $maxLength 
+            ? substr($desc, 0, $maxLength) . '...' 
+            : $desc;
+    @endphp
+    <tr>
+        <td class="no-col">{{ $loop->iteration }}</td>
+        <td>
+            @if(!empty($fotoSrc))
+                <img src="{{ $fotoSrc }}" 
+                     alt="{{ $fotoAlt }}" 
+                     class="foto-item"
+                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect fill=%22%23fee2e2%22 width=%2260%22 height=%2260%22/%3E%3Ctext fill=%22%23ef4444%22 x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2224%22%3E%3C/text%3E%3C/svg%3E'; console.error('Failed to load image: {{ $fotoSrc }}');">
+            @else
+                <div class="foto-item" style="display: flex; align-items: center; justify-content: center; background: #e3f2fd;">
+                    <i class="fas fa-image" style="color: #94a3b8;"></i>
                 </div>
+            @endif
+        </td>
+        <!-- ... kolom lainnya tetap sama ... -->
+                                <td>
+                                    <a href="{{ route('admin.kegiatan.index', ['action' => 'view', 'id' => $row->id]) }}" class="judul-link">
+                                        {{ $row->judul }}
+                                    </a>
+                                </td>
+                                <td>{{ $row->lokasi }}</td>
+                                <td>
+                                    <div class="deskripsi-text">
+                                        {!! nl2br(e($shortDesc)) !!}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tanggal-text">
+                                        {{ \Carbon\Carbon::parse($row->tanggal)->isoFormat('D MMMM Y') }}
+                                    </div>
+                                </td>
+                                <td class="aksi-col">
+                                    <div class="aksi-buttons">
+                                        <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
+                                            <button class="btn-icon btn-edit">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+                                        </a>
+                                        <button class="btn-icon btn-delete" title="Hapus" onclick="openDeleteModal({{ $row->id }})">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 60px 20px; color: #94a3b8;">
+                                    <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; display: block; opacity: 0.5;"></i>
+                                    Belum ada data kegiatan.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
-        @endif
+    @endif
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="alert alert-error">{{ session('error') }}</div>
-        @endif
-
-        @if($action === 'list')
-            <div class="content-card">
-                <div class="card-header">
-                    <h2 style="font-size: 20px; font-weight: 700; color: #1e293b;">Daftar Kegiatan Desa</h2>
-                    <a href="{{ route('admin.kegiatan.index', ['action' => 'tambah']) }}">
-                        <button class="btn-tambah">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
-                    </a>
-                </div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="no-col">No</th>
-                                <th class="img-col">Foto</th>
-                                <th>Nama Kegiatan Desa</th>
-                                <th>Lokasi</th>
-                                <th>Deskripsi</th>
-                                <th>Tanggal</th>
-                                <th class="aksi-col">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($kegiatanList as $row)
-                                @php
-                                    $fotoSrc = '';
-                                    if (!empty($row->foto)) {
-                                        $mime = $row->foto_type ?? 'image/jpeg';
-                                        $raw = $row->foto;
-                                        $isBase64 = preg_match('/^[A-Za-z0-9+\/=]+$/', $raw);
-                                        $fotoSrc = $mime . ';base64,' . ($isBase64 ? $raw : base64_encode($raw));
-                                    }
-                                    
-                                    $maxLength = 250;
-                                    $desc = strip_tags($row->deskripsi);
-                                    $shortDesc = strlen($desc) > $maxLength 
-                                        ? substr($desc, 0, $maxLength) . '...' 
-                                        : $desc;
-                                @endphp
-                                <tr>
-                                    <td class="no-col">{{ $loop->iteration }}</td>
-                                    <td>
-                                        @if(!empty($fotoSrc))
-                                            <img src="{{ $fotoSrc }}" alt="Foto" class="foto-item">
-                                        @else
-                                            <div class="foto-item" style="display: flex; align-items: center; justify-content: center; background: #e3f2fd;">
-                                                <i class="fas fa-image" style="color: #94a3b8;"></i>
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.kegiatan.index', ['action' => 'view', 'id' => $row->id]) }}" class="judul-link">
-                                            {{ $row->judul }}
-                                        </a>
-                                    </td>
-                                    <td>{{ $row->lokasi }}</td>
-                                    <td>
-                                        <div class="deskripsi-text">
-                                            {!! nl2br(e($shortDesc)) !!}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="tanggal-text">
-                                            {{ \Carbon\Carbon::parse($row->tanggal)->isoFormat('D MMMM Y') }}
-                                        </div>
-                                    </td>
-                                    <td class="aksi-col">
-                                        <div class="aksi-buttons">
-                                            <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $row->id]) }}" title="Edit">
-                                                <button class="btn-icon btn-edit">
-                                                    <i class="fas fa-pencil-alt"></i>
-                                                </button>
-                                            </a>
-                                            <button class="btn-icon btn-delete" title="Hapus" onclick="openDeleteModal({{ $row->id }})">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" style="text-align: center; padding: 60px 20px; color: #94a3b8;">
-                                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; display: block; opacity: 0.5;"></i>
-                                        Belum ada data kegiatan.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+    @if($action === 'view')
+        <div class="content-card">
+            <div class="card-header">
+                <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">Detail Kegiatan</h2>
+                <a href="{{ route('admin.kegiatan.index') }}">
+                    <button class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                </a>
             </div>
-        @endif
 
-        @if($action === 'view')
-            <div class="content-card">
-                <div class="card-header">
-                    <h2 style="font-size: 20px; font-weight: 700; color: #1e293b;">Detail Kegiatan</h2>
-                    <a href="{{ route('admin.kegiatan.index') }}">
-                        <button class="btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Kembali
-                        </button>
-                    </a>
-                </div>
+            @if(isset($detail) && $detail)
+                @php
+                    // ✅ BARU: Gunakan Storage::url() untuk path file
+                    $fotoSrc = !empty($detail->foto) ? Storage::url($detail->foto) : '';
+                @endphp
 
-                @if(isset($detail) && $detail)
-                    @php
-                        $fotoSrc = '';
-                        if (!empty($detail->foto)) {
-                            $mime = $detail->foto_type ?? 'image/jpeg';
-                            $raw = $detail->foto;
-                            $isBase64 = preg_match('/^[A-Za-z0-9+\/=]+$/', $raw);
-                            $fotoSrc = $mime . ';base64,' . ($isBase64 ? $raw : base64_encode($raw));
-                        }
-                    @endphp
-
-                    <div class="detail-container">
-                        @if(!empty($fotoSrc))
-                            <img src="{{ $fotoSrc }}" alt="Foto Kegiatan" class="detail-image">
-                        @else
-                            <div class="detail-image" style="display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #94a3b8;">
-                                <i class="fas fa-image" style="font-size: 80px; opacity: 0.3;"></i>
-                            </div>
-                        @endif
-
-                        <div class="detail-header">
-                            <div class="detail-date">
-                                <i class="far fa-calendar"></i>
-                                {{ \Carbon\Carbon::parse($detail->tanggal)->isoFormat('D MMMM Y') }}
-                            </div>
-                            <h1 class="detail-title">{{ $detail->judul }}</h1>
+                <div class="detail-container">
+                    @if(!empty($fotoSrc))
+                        <img src="{{ $fotoSrc }}" alt="Foto Kegiatan" class="detail-image">
+                    @else
+                        <div class="detail-image" style="display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #94a3b8;">
+                            <i class="fas fa-image" style="font-size: 80px; opacity: 0.3;"></i>
                         </div>
+                    @endif
 
-                        <div class="detail-content">
-                            <p><strong>Lokasi:</strong> {{ $detail->lokasi }}</p>
-                            <p><strong>Deskripsi:</strong></p>
-                            <p>{!! nl2br(e($detail->deskripsi)) !!}</p>
+                    <div class="detail-header">
+                        <div class="detail-date">
+                            <i class="far fa-calendar"></i>
+                            {{ \Carbon\Carbon::parse($detail->tanggal)->isoFormat('D MMMM Y') }}
                         </div>
-
-                        <div class="detail-actions">
-                            <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-detail-edit">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <button class="btn-detail-delete" onclick="openDeleteModal({{ $detail->id }})">
-                                <i class="fas fa-trash-alt"></i> Hapus
-                            </button>
-                        </div>
+                        <h1 class="detail-title">{{ $detail->judul }}</h1>
                     </div>
-                @else
-                    <div style="text-align: center; padding: 60px 20px; background: #f8fafc; border-radius: 16px;">
-                        <i class="fas fa-exclamation-circle" style="font-size: 64px; color: #f59e0b; margin-bottom: 20px;"></i>
-                        <h3 style="font-size: 20px; color: #1e293b; margin-bottom: 12px;">Data Tidak Ditemukan</h3>
-                        <p style="color: #64748b; margin-bottom: 24px;">Kegiatan dengan ID ini tidak ada atau telah dihapus.</p>
-                        <a href="{{ route('admin.kegiatan.index') }}" class="btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+
+                    <div class="detail-content">
+                        <p><strong>Lokasi:</strong> {{ $detail->lokasi }}</p>
+                        <p><strong>Deskripsi:</strong></p>
+                        <p>{!! nl2br(e($detail->deskripsi)) !!}</p>
+                    </div>
+
+                    <div class="detail-actions">
+                        <a href="{{ route('admin.kegiatan.index', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-detail-edit">
+                            <i class="fas fa-edit"></i> Edit
                         </a>
+                        <button class="btn-detail-delete" onclick="openDeleteModal({{ $detail->id }})">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
                     </div>
-                @endif
-            </div>
-        @endif
+                </div>
+            @else
+                <div style="text-align: center; padding: 60px 20px; background: #f8fafc; border-radius: 16px;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 64px; color: #f59e0b; margin-bottom: 20px;"></i>
+                    <h3 style="font-size: 20px; color: #1e293b; margin-bottom: 12px; margin-top: 0;">Data Tidak Ditemukan</h3>
+                    <p style="color: #64748b; margin-bottom: 24px;">Kegiatan dengan ID ini tidak ada atau telah dihapus.</p>
+                    <a href="{{ route('admin.kegiatan.index') }}" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                    </a>
+                </div>
+            @endif
+        </div>
+    @endif
 
-        @if($action === 'tambah' || $action === 'edit')
-            <div class="content-card">
-                <div class="card-header">
-                    <h2 style="font-size: 20px; font-weight: 700; color: #1e293b;">
+    @if($action === 'tambah' || $action === 'edit')
+        <div class="content-card">
+            <div class="card-header">
+                <div>
+                    <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0;">
                         {{ $page_title ?? ($action === 'tambah' ? 'Tambah Kegiatan Desa' : 'Edit Kegiatan Desa') }}
                     </h2>
-                    <div class="breadcrumb">
+                    <div class="breadcrumb" style="margin: 0;">
                         Dashboard / Kegiatan Desa / {{ $action === 'tambah' ? 'Tambah' : 'Edit' }} Kegiatan
                     </div>
                 </div>
+            </div>
 
-                <form method="POST" action="{{ route('admin.kegiatan.index') }}" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="action" value="{{ $action }}">
-                    @if(isset($edit) && $edit)
-                        <input type="hidden" name="id" value="{{ $edit->id ?? '' }}">
-                    @endif
-                    
-                    <div class="form-wrapper">
-                        <div class="form-grid">
-                            <div class="form-section">
-                                <div class="form-group">
-                                    <label>Nama Kegiatan</label>
-                                    <input type="text" name="judul" required value="{{ old('judul', $edit->judul ?? '') }}" placeholder="Masukkan nama kegiatan">
-                                </div>
-                                <div class="form-group">
-                                    <label>Lokasi</label>
-                                    <input type="text" name="lokasi" required value="{{ old('lokasi', $edit->lokasi ?? '') }}" placeholder="Masukkan lokasi kegiatan">
-                                </div>
-                                <div class="form-group">
-                                    <label>Deskripsi</label>
-                                    <textarea name="deskripsi" required placeholder="Masukkan deskripsi kegiatan">{{ old('deskripsi', $edit->deskripsi ?? '') }}</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label>Tanggal</label>
-                                    <input type="date" name="tanggal" required value="{{ old('tanggal', $edit->tanggal ?? '') }}">
-                                </div>
+            <form method="POST" action="{{ route('admin.kegiatan.index') }}" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="action" value="{{ $action }}">
+                @if(isset($edit) && $edit)
+                    <input type="hidden" name="id" value="{{ $edit->id ?? '' }}">
+                @endif
+                
+                <div class="form-wrapper">
+                    <div class="form-grid">
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label>Nama Kegiatan</label>
+                                <input type="text" name="judul" required value="{{ old('judul', $edit->judul ?? '') }}" placeholder="Masukkan nama kegiatan">
                             </div>
-
-                            <div class="form-section">
-                                <div class="form-group">
-                                    <label>Upload Foto Kegiatan</label>
-                                    <div class="upload-container" id="uploadBox">
-                                        @php
-                                            $previewSrc = '';
-                                            if (isset($edit) && !empty($edit->foto)) {
-                                                $mime = $edit->foto_type ?? 'image/jpeg';
-                                                $raw = $edit->foto;
-                                                $isBase64 = preg_match('/^[A-Za-z0-9+\/=]+$/', $raw);
-                                                $previewSrc = $mime . ';base64,' . ($isBase64 ? $raw : base64_encode($raw));
-                                            }
-                                        @endphp
-                                        <img id="previewImg" class="upload-preview"
-                                             src="{{ $previewSrc }}"
-                                             style="{{ $previewSrc ? 'display:block;' : 'display:none;' }}"
-                                             alt="Preview">
-                                        <div class="upload-placeholder" id="uploadPlaceholder" style="{{ $previewSrc ? 'display:none;' : 'display:flex;' }}">
-                                            <i class="fas fa-cloud-upload-alt"></i>
-                                            <span>Klik untuk upload foto</span>
-                                        </div>
-                                        <input type="file" id="uploadFoto" name="foto" class="upload-input" accept="image/*">
-                                    </div>
-                                </div>
+                            <div class="form-group">
+                                <label>Lokasi</label>
+                                <input type="text" name="lokasi" required value="{{ old('lokasi', $edit->lokasi ?? '') }}" placeholder="Masukkan lokasi kegiatan">
+                            </div>
+                            <div class="form-group">
+                                <label>Deskripsi</label>
+                                <textarea name="deskripsi" required placeholder="Masukkan deskripsi kegiatan">{{ old('deskripsi', $edit->deskripsi ?? '') }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Tanggal</label>
+                                <input type="date" name="tanggal" required value="{{ old('tanggal', $edit->tanggal ?? '') }}">
                             </div>
                         </div>
 
-                        <div class="form-actions">
-                            <a href="{{ route('admin.kegiatan.index') }}" class="btn-secondary">
-                                <i class="fas fa-times"></i> Batal
-                            </a>
-                            <button type="submit" name="save_kegiatan" class="btn-primary">
-                                <i class="fas fa-save"></i>
-                                {{ $action === 'edit' ? 'Update Data' : 'Simpan Data' }}
-                            </button>
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label>Upload Foto Kegiatan</label>
+                                <div class="upload-container" id="uploadBox">
+                                    @php
+                                        // ✅ BARU: Preview untuk edit mode menggunakan Storage::url()
+                                        $previewSrc = '';
+                                        if (isset($edit) && !empty($edit->foto)) {
+                                            $previewSrc = Storage::url($edit->foto);
+                                        }
+                                    @endphp
+                                    <img id="previewImg" class="upload-preview"
+                                         src="{{ $previewSrc }}"
+                                         style="{{ $previewSrc ? 'display:block;' : 'display:none;' }}"
+                                         alt="Preview">
+                                    <div class="upload-placeholder" id="uploadPlaceholder" style="{{ $previewSrc ? 'display:none;' : 'display:flex;' }}">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>Klik untuk upload foto</span>
+                                    </div>
+                                    <input type="file" id="uploadFoto" name="foto" class="upload-input" accept="image/*">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </form>
-            </div>
-        @endif
-    </div>
+
+                    <div class="form-actions">
+                        <a href="{{ route('admin.kegiatan.index') }}" class="btn-secondary">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
+                        <button type="submit" name="save_kegiatan" class="btn-primary">
+                            <i class="fas fa-save"></i>
+                            {{ $action === 'edit' ? 'Update Data' : 'Simpan Data' }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    @endif
 </div>
 
 <!-- MODAL KONFIRMASI HAPUS -->
@@ -972,7 +950,7 @@
         }
     }
     
-    // Preview gambar upload
+    // Preview gambar upload (untuk file baru yang dipilih user)
     document.addEventListener('DOMContentLoaded', function () {
         const fileInput = document.getElementById('uploadFoto');
         const previewImg = document.getElementById('previewImg');

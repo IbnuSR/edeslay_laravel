@@ -5,6 +5,7 @@
         <p>Memberikan informasi lengkap mengenai karakteristik demografi penduduk suatu wilayah. Mulai dari jumlah penduduk, usia, jenis kelamin, tingkat pendidikan, pekerjaan, dan aspek penting lainnya yang menggambarkan komposisi populasi secara rinci.</p>
     </div>
 
+    {{-- Berdasarkan Jumlah Penduduk dan Kepala Keluarga --}}
     <h3 class="infografis-subtitle">Berdasarkan Jumlah Penduduk Dan Kepala Keluarga</h3>
     <div class="infografis-grid">
         <div class="info-card">
@@ -37,6 +38,7 @@
         </div>
     </div>
 
+    {{-- Berdasarkan Perkawinan --}}
     <h3 class="infografis-subtitle">Berdasarkan Perkawinan</h3>
     <div class="infografis-grid">
         <div class="info-card">
@@ -65,16 +67,19 @@
         </div>
     </div>
 
+    {{-- Berdasarkan Kelompok Umur (Pyramid Chart) --}}
     <h3 class="infografis-subtitle">Berdasarkan Kelompok Umur</h3>
     <div class="pyramid-chart-container">
         <canvas id="pyramidChart"></canvas>
     </div>
 
+    {{-- Berdasarkan Pendidikan --}}
     <h3 class="infografis-subtitle">Berdasarkan Pendidikan</h3>
     <div class="chart-container">
         <canvas id="pendidikanChart"></canvas>
     </div>
 
+    {{-- Berdasarkan Pekerjaan --}}
     <h3 class="infografis-subtitle">Berdasarkan Pekerjaan</h3>
     <div class="infografis-grid">
         <div class="info-card">
@@ -107,12 +112,18 @@
 {{-- JAVASCRIPT KHUSUS INFOGRAFIS (CHARTS) --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Pyramid Chart (Kelompok Umur)
+        // Pyramid Chart (Kelompok Umur) - Data dari controller
         const pyramidCtx = document.getElementById('pyramidChart');
         if (pyramidCtx) {
             const umurLabels = ['0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', '70-74', '75-79', '80-84', '85+'];
-            const lakiData = [122, 181, 225, 217, 180, 174, 156, 167, 173, 140, 123, 81, 80, 56, 31, 30, 26, 0];
-            const perempuanData = [111, 211, 205, 204, 191, 172, 164, 161, 177, 147, 105, 99, 61, 57, 30, 52, 0, 0];
+            
+            // Ambil data dari variable PHP yang dikirim controller
+            const lakiData = [
+                @foreach($infografis['kelompok_umur'] as $kelompok) {{ $kelompok['laki'] }}, @endforeach
+            ];
+            const perempuanData = [
+                @foreach($infografis['kelompok_umur'] as $kelompok) {{ $kelompok['perempuan'] }}, @endforeach
+            ];
 
             new Chart(pyramidCtx.getContext('2d'), {
                 type: 'bar',
@@ -138,11 +149,22 @@
             });
         }
 
-        // Pendidikan Chart
+        // Pendidikan Chart - Data dari controller
         const pendidikanCtx = document.getElementById('pendidikanChart');
         if (pendidikanCtx) {
             const pendidikanLabels = ['Tidak/Belum Sekolah', 'Belum Tamat SD/Sederajat', 'Tamat SD/Sederajat', 'SLTP/Sederajat', 'SLTA/Sederajat', 'Diploma I/II', 'Diploma III/Sarjana Muda', 'Diploma IV/Strata I', 'Strata II', 'Strata III'];
-            const pendidikanData = [931, 249, 1533, 708, 674, 16, 32, 302, 11, 0];
+            const pendidikanData = [
+                {{ $infografis['pendidikan']['tidak_belum_sekolah'] }},
+                {{ $infografis['pendidikan']['belum_tamat_sd'] }},
+                {{ $infografis['pendidikan']['tamat_sd'] }},
+                {{ $infografis['pendidikan']['sltp_sederajat'] }},
+                {{ $infografis['pendidikan']['slta_sederajat'] }},
+                {{ $infografis['pendidikan']['diploma_i_ii'] }},
+                {{ $infografis['pendidikan']['diploma_iii_sarjana_muda'] }},
+                {{ $infografis['pendidikan']['diploma_iv_strata_i'] }},
+                {{ $infografis['pendidikan']['strata_ii'] }},
+                {{ $infografis['pendidikan']['strata_iii'] }}
+            ];
 
             new Chart(pendidikanCtx.getContext('2d'), {
                 type: 'bar',

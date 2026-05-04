@@ -1,6 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
 <style>
 /* ===== BODY ===== */
 body.forgot-body {
@@ -242,4 +239,3 @@ body.forgot-body {
 </div>
 
 </body>
-@endsection

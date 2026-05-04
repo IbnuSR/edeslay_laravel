@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class KegiatanController extends Controller
 {
@@ -64,6 +65,12 @@ class KegiatanController extends Controller
 
         // ================= DELETE (GET) =================
         if ($action == 'delete') {
+            // Hapus file foto jika ada
+            $kegiatan = DB::table('kegiatan')->where('id', $id)->first();
+            if ($kegiatan && $kegiatan->foto) {
+                Storage::disk('public')->delete($kegiatan->foto);
+            }
+            
             DB::table('kegiatan')->where('id', $id)->delete();
 
             return redirect()->route('admin.kegiatan.index')
@@ -77,20 +84,25 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required',
-            'lokasi' => 'required',
-            'deskripsi' => 'required',
-            'tanggal' => 'required',
-            'foto' => 'nullable|image|max:5120'
+            'judul' => 'required|string|max:255',
+            'lokasi' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'tanggal' => 'required|date',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120'
         ]);
 
-        $foto = null;
-        $type = null;
+        $fotoPath = null;
+        $fotoType = null;
 
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
-            $foto = file_get_contents($file->getRealPath());
-            $type = $file->getMimeType();
+            
+            // Generate unique filename
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
+            
+            // Simpan ke storage/app/public/kegiatan
+            $fotoPath = $file->storeAs('kegiatan', $filename, 'public');
+            $fotoType = $file->getMimeType();
         }
 
         DB::table('kegiatan')->insert([
@@ -98,8 +110,8 @@ class KegiatanController extends Controller
             'lokasi' => $request->lokasi,
             'deskripsi' => $request->deskripsi,
             'tanggal' => $request->tanggal,
-            'foto' => $foto,
-            'foto_type' => $type,
+            'foto' => $fotoPath,  // Simpan PATH saja
+            'foto_type' => $fotoType,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -112,12 +124,12 @@ class KegiatanController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'id' => 'required',
-            'judul' => 'required',
-            'lokasi' => 'required',
-            'deskripsi' => 'required',
-            'tanggal' => 'required',
-            'foto' => 'nullable|image|max:5120'
+            'id' => 'required|integer|exists:kegiatan,id',
+            'judul' => 'required|string|max:255',
+            'lokasi' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'tanggal' => 'required|date',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120'
         ]);
 
         $data = [
@@ -129,8 +141,16 @@ class KegiatanController extends Controller
         ];
 
         if ($request->hasFile('foto')) {
+            // Ambil data lama untuk hapus file lama
+            $old = DB::table('kegiatan')->where('id', $request->id)->first();
+            if ($old && $old->foto) {
+                Storage::disk('public')->delete($old->foto);
+            }
+
             $file = $request->file('foto');
-            $data['foto'] = file_get_contents($file->getRealPath());
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
+            
+            $data['foto'] = $file->storeAs('kegiatan', $filename, 'public');
             $data['foto_type'] = $file->getMimeType();
         }
 
