@@ -101,29 +101,7 @@ Route::middleware(['auth'])
         Route::put('/profile', [ProfileController::class, 'update'])
             ->name('profile.update');
 
-        // ================= INFOGRAFIS =================
-        Route::get('/infografis', [InfografisController::class, 'index'])
-            ->name('infografis.index');
-
-        Route::post('/infografis', [InfografisController::class, 'store'])
-            ->name('infografis.store');
-
-        Route::get('/infografis/{id}', [InfografisController::class, 'show'])
-            ->whereNumber('id')
-            ->name('infografis.show');
-
-        Route::get('/infografis/{id}/edit', [InfografisController::class, 'edit'])
-            ->whereNumber('id')
-            ->name('infografis.edit');
-
-        Route::put('/infografis/{id}', [InfografisController::class, 'update'])
-            ->whereNumber('id')
-            ->name('infografis.update');
-
-        Route::delete('/infografis/{id}', [InfografisController::class, 'destroy'])
-            ->whereNumber('id')
-            ->name('infografis.destroy');
-
+       
         // ================= KEGIATAN =================
         Route::get('/kegiatan', [KegiatanController::class, 'index'])
             ->name('kegiatan.index');
@@ -148,25 +126,59 @@ Route::middleware(['auth'])
             ->name('kegiatan.destroy');
 
         // ================= PRESTASI =================
-        Route::get('/prestasi', [PrestasiController::class, 'index'])
-            ->name('prestasi.index');
+Route::get('/prestasi', [PrestasiController::class, 'index'])
+    ->name('prestasi.index');
 
-        Route::post('/prestasi', [PrestasiController::class, 'store'])
-            ->name('prestasi.store');
+Route::post('/prestasi', [PrestasiController::class, 'store'])
+    ->name('prestasi.store');
+
+Route::get('/prestasi/{id}', [PrestasiController::class, 'show'])
+    ->whereNumber('id')
+    ->name('prestasi.show');
+
+Route::get('/prestasi/{id}/edit', [PrestasiController::class, 'edit'])
+    ->whereNumber('id')
+    ->name('prestasi.edit');
+
+Route::put('/prestasi/{id}', [PrestasiController::class, 'update'])
+    ->whereNumber('id')
+    ->name('prestasi.update');
+
+Route::delete('/prestasi/{id}', [PrestasiController::class, 'destroy'])
+    ->whereNumber('id')
+    ->name('prestasi.destroy');
 
         // ================= PELAYANAN =================
-        Route::get('/pelayanan', [PelayananController::class, 'index'])
-            ->name('pelayanan.index');
+Route::get('/pelayanan', [PelayananController::class, 'index'])
+    ->name('pelayanan.index');
 
-        Route::post('/pelayanan', [PelayananController::class, 'store'])
-            ->name('pelayanan.store');
+Route::post('/pelayanan', [PelayananController::class, 'store'])
+    ->name('pelayanan.store');
 
-        // ================= SARAN =================
+Route::get('/pelayanan/{id}', [PelayananController::class, 'show'])
+    ->whereNumber('id')
+    ->name('pelayanan.show');
+
+Route::get('/pelayanan/{id}/edit', [PelayananController::class, 'edit'])
+    ->whereNumber('id')
+    ->name('pelayanan.edit');
+
+Route::put('/pelayanan/{id}', [PelayananController::class, 'update'])
+    ->whereNumber('id')
+    ->name('pelayanan.update');
+
+Route::delete('/pelayanan/{id}', [PelayananController::class, 'destroy'])
+    ->whereNumber('id')
+    ->name('pelayanan.destroy');
+
+        // ================= SARAN (ADMIN ONLY) =================
         Route::get('/saran', [SaranController::class, 'index'])
             ->name('saran.index');
 
-        Route::post('/saran', [SaranController::class, 'store'])
-            ->name('saran.store');
+        Route::delete('/saran/{id}', [SaranController::class, 'destroy'])
+            ->whereNumber('id')
+            ->name('saran.destroy');
+
 
         // ================= STRUKTUR =================
         Route::get('/struktur', [StrukturController::class, 'index'])
@@ -175,6 +187,19 @@ Route::middleware(['auth'])
         Route::post('/struktur', [StrukturController::class, 'store'])
             ->name('struktur.store');
     });
+
+ /*
+|--------------------------------------------------------------------------
+| PUBLIC API ROUTES (Untuk Mobile App - Tanpa CSRF)
+|--------------------------------------------------------------------------
+*/
+
+// Mobile app bisa kirim saran tanpa login & tanpa CSRF
+Route::post('/api/saran', [SaranController::class, 'store'])
+    ->name('api.saran.store');
+
+
+
 /*
 |--------------------------------------------------------------------------
 | FORCE LOGOUT

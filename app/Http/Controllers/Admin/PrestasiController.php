@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PrestasiController extends Controller
 {
@@ -21,15 +22,22 @@ class PrestasiController extends Controller
         $search = $request->get('search');
 
         // mapping action dari URL
-        if ($action == 'tambah') $action = 'add_form';
+        if ($action == 'tambah') $action = 'tambah';
 
         // ================= DATA USER =================
-        $namaAdmin = $user->nama_lengkap ?? 'Admin';
+        // ✅ FIX: Fallback ke 'Administrator' agar konsisten
+        $namaAdmin = $user->nama_lengkap ?? 'Administrator';
         $roleAdmin = $user->role ?? 'admin';
         $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
 
         // ================= DELETE =================
         if ($action == 'delete' && $id) {
+            // ✅ FIX: Hapus file dari storage juga
+            $prestasi = DB::table('prestasi')->where('id', $id)->first();
+            if ($prestasi && $prestasi->foto) {
+                Storage::disk('public')->delete($prestasi->foto);
+            }
+            
             DB::table('prestasi')->where('id', $id)->delete();
             return redirect()->route('admin.prestasi.index')
                 ->with('success', 'Prestasi berhasil dihapus');
@@ -63,7 +71,7 @@ class PrestasiController extends Controller
             $page_title = 'Tambah Prestasi';
         }
 
-        // ================= RETURN VIEW (FIX UTAMA) =================
+        // ================= RETURN VIEW =================
         return view('admin.prestasi', [
             'action' => $action,
             'prestasiList' => $prestasiList,
@@ -83,27 +91,34 @@ class PrestasiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required',
-            'deskripsi' => 'required',
-            'tanggal' => 'required',
-            'foto' => 'nullable|image|max:5120',
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'tanggal' => 'required|date',
+            // ✅ FIX: Validasi mime types spesifik + max size
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
-        $foto = null;
-        $foto_type = null;
+        $fotoPath = null;
+        $fotoType = null;
 
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
-            $foto = file_get_contents($file->getRealPath());
-            $foto_type = $file->getMimeType();
+            
+            // ✅ FIX: Generate unique filename
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
+            
+            // ✅ FIX: Simpan ke storage/app/public/prestasi (bukan base64)
+            $fotoPath = $file->storeAs('prestasi', $filename, 'public');
+            $fotoType = $file->getMimeType();
         }
 
         DB::table('prestasi')->insert([
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,
             'tanggal' => $request->tanggal,
-            'foto' => $foto,
-            'foto_type' => $foto_type,
+            // ✅ FIX: Simpan PATH saja, bukan binary
+            'foto' => $fotoPath,
+            'foto_type' => $fotoType,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -116,10 +131,10 @@ class PrestasiController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'judul' => 'required',
-            'deskripsi' => 'required',
-            'tanggal' => 'required',
-            'foto' => 'nullable|image|max:5120',
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'tanggal' => 'required|date',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $data = [
@@ -130,8 +145,16 @@ class PrestasiController extends Controller
         ];
 
         if ($request->hasFile('foto')) {
+            // ✅ FIX: Hapus file lama dari storage
+            $old = DB::table('prestasi')->where('id', $id)->first();
+            if ($old && $old->foto) {
+                Storage::disk('public')->delete($old->foto);
+            }
+
             $file = $request->file('foto');
-            $data['foto'] = file_get_contents($file->getRealPath());
+            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
+            
+            $data['foto'] = $file->storeAs('prestasi', $filename, 'public');
             $data['foto_type'] = $file->getMimeType();
         }
 
@@ -141,9 +164,14 @@ class PrestasiController extends Controller
             ->with('success', 'Prestasi berhasil diupdate');
     }
 
-    // ================= DESTROY =================
+    // ================= DESTROY (Opsional - sudah ada di index) =================
     public function destroy($id)
     {
+        $prestasi = DB::table('prestasi')->where('id', $id)->first();
+        if ($prestasi && $prestasi->foto) {
+            Storage::disk('public')->delete($prestasi->foto);
+        }
+        
         DB::table('prestasi')->where('id', $id)->delete();
 
         return redirect()->route('admin.prestasi.index')

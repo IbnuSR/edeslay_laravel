@@ -11,6 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // ✅ TAMBAHKAN INI: Exclude CSRF untuk route API
+        $middleware->validateCsrfTokens(except: [
+            'api/*',  // ← Semua route api/* tidak butuh CSRF token
+        ]);
+
         // ❌ KOMENTARI/HAPUS AdminMiddleware sementara
         // $middleware->alias([
         //     'admin' => \App\Http\Middleware\AdminMiddleware::class,

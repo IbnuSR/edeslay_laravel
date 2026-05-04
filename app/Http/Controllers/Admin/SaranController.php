@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class SaranController extends Controller
 {
     /**
-     * Display a listing of saran (with search, sort, view, delete actions).
+     * Display a listing of saran (Admin panel).
      */
     public function index(Request $request)
     {
@@ -22,33 +24,35 @@ class SaranController extends Controller
         $search = trim($request->get('search', ''));
         $sort = $request->get('sort', 'desc');
         $orderDir = ($sort === 'asc') ? 'ASC' : 'DESC';
-        $nextSort = ($sort === 'asc') ? 'desc' : 'asc';
 
         // Data profil untuk top-bar
         $namaAdmin = $user->nama_lengkap ?? 'Administrator';
         $roleAdmin = $user->role ?? 'admin';
         $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
-        $fotoProfilSrc = null;
-        if (!empty($user->foto)) {
-            $fotoProfilSrc = 'image/jpeg;base64,' . base64_encode($user->foto);
-        }
 
-        // Handle DELETE
+        // ================= DELETE =================
         if ($action === 'delete' && $id) {
+            // Hapus foto jika ada
+            $saran = DB::table('saran')->where('id', intval($id))->first();
+            if ($saran && $saran->foto_sampul) {
+                Storage::disk('public')->delete($saran->foto_sampul);
+            }
+            
             DB::table('saran')->where('id', intval($id))->delete();
-            return redirect()->route('admin.saran,index')->with('success', 'Saran berhasil dihapus');
+            
+            return redirect()->route('admin.saran.index')
+                ->with('success', 'Saran berhasil dihapus');
         }
 
-        // Fetch data based on action
-        $saranList = [];
+        // ================= FETCH DATA LIST =================
+        $saranList = collect();
         $detail = null;
-        $message = $request->session()->get('message');
 
         if ($action === 'list') {
             $query = DB::table('saran');
             if ($search) {
-                // HANYA cari di judul, tidak di isi_saran (sesuai native code)
-                $query->where('judul', 'like', "%{$search}%");
+                $query->where('judul', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
             }
             $saranList = $query->orderBy('tanggal_dikirim', $orderDir)
                               ->orderBy('id', $orderDir)
@@ -58,13 +62,69 @@ class SaranController extends Controller
         if ($action === 'view' && $id) {
             $detail = DB::table('saran')->where('id', intval($id))->first();
             if (!$detail) {
-                return redirect()->route('admin.saran.index')->with('error', 'Data saran tidak ditemukan');
+                return redirect()->route('admin.saran.index')
+                    ->with('error', 'Data saran tidak ditemukan');
             }
         }
 
         return view('admin.saran', compact(
-            'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin', 'fotoProfilSrc',
-            'action', 'saranList', 'detail', 'search', 'sort', 'nextSort', 'message'
+            'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin',
+            'action', 'saranList', 'detail', 'search', 'sort'
         ));
     }
-}
+
+    /**
+     * ✅ STORE: Endpoint untuk mobile app (dengan upload foto opsional)
+     */
+public function store(Request $request)
+{
+    // Validasi
+    $validator = Validator::make($request->all(), [
+        'tanggal_pengisian' => 'required|date',  // ✅ Ganti email dengan tanggal
+        'judul' => 'required|string|max:255',
+        'isi_saran' => 'required|string|max:1000',
+        'foto_sampul' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+    ], [
+        'tanggal_pengisian.required' => 'Tanggal pengisian wajib diisi',
+        'tanggal_pengisian.date' => 'Format tanggal tidak valid',
+        'judul.required' => 'Judul wajib diisi',
+        'isi_saran.required' => 'Isi saran wajib diisi',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validasi gagal',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    // Handle upload foto
+    $fotoPath = null;
+    $fotoType = null;
+    
+    if ($request->hasFile('foto_sampul')) {
+        $file = $request->file('foto_sampul');
+        $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
+        $fotoPath = $file->storeAs('saran', $filename, 'public');
+        $fotoType = $file->getMimeType();
+    }
+
+    // Simpan ke database
+    $id = DB::table('saran')->insertGetId([
+        'tanggal_pengisian' => $request->tanggal_pengisian,  // ✅ Gunakan tanggal_pengisian
+        'judul' => $request->judul,
+        'isi_saran' => $request->isi_saran,
+        'foto_sampul' => $fotoPath,
+        'foto_type' => $fotoType,
+        'tanggal_dikirim' => now(),  // Tetap auto-timestamp
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Terima kasih! Saran Anda telah kami terima.',
+        'data' => ['id' => $id]
+    ], 201);
+}}
