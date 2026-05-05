@@ -21,38 +21,41 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        // 1. Validasi
+        // 1. Validasi input
         $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
+            'username' => 'required|string|min:3',
+            'password' => 'required|string|min:6',
         ], [
-            'username.required' => 'Username harus diisi',
-            'password.required' => 'Password harus diisi',
+            'username.required' => 'Username wajib diisi',
+            'username.min' => 'Username minimal 3 karakter',
+            'password.required' => 'Password wajib diisi',
+            'password.min' => 'Password minimal 6 karakter',
         ]);
 
-        // 2. Cari user
+        // 2. Cari user berdasarkan username
         $user = DB::table('users')->where('username', $request->username)->first();
 
-        // 3. Cek username
+        // 3. Cek username tidak ditemukan
         if (!$user) {
             return back()
-                ->withErrors(['username' => 'Username tidak ditemukan'])
+                ->withErrors(['username' => 'Username tidak terdaftar'])
                 ->withInput();
         }
 
-        // 4. Cek password
+        // 4. Cek password salah
         if (!Hash::check($request->password, $user->password)) {
             return back()
                 ->withErrors(['password' => 'Password yang Anda masukkan salah'])
                 ->withInput();
         }
 
-        // 5. Login & session
+        // 5. Login & regenerasi session
         Auth::loginUsingId($user->id);
         $request->session()->regenerate();
 
         // 6. Redirect ke Admin Dashboard
-        return redirect('/admin/dashboard')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
+        return redirect('/admin/dashboard')
+            ->with('success', 'Selamat datang, ' . ($user->nama_lengkap ?? 'Administrator'));
     }
 
     public function logout(Request $request)
@@ -61,7 +64,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        // ✅ Redirect ke Dashboard Umum (bukan login)
         return redirect('/')->with('info', 'Anda telah logout');
     }
 }
