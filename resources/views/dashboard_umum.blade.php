@@ -63,10 +63,23 @@
         .infografis-subtitle { font-size: 1.5rem; color: #1c3f9f; font-weight: 700; margin-bottom: 1.5rem; margin-top: 3rem; }
 
         /* ===== VISI MISI ===== */
-        .visi-misi-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 3rem; border-radius: 20px; color: white; text-align: center; max-width: 1000px; margin: 0 auto; }
-        .visi-misi-box h2 { font-size: 2rem; margin-bottom: 1.5rem; }
-        .visi-misi-box p { font-size: 1.1rem; line-height: 1.8; }
+        .visi-misi-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 3rem;
+    border-radius: 20px;
+    color: white;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: left; /* ubah dari center ke left */
+}
+        .visi-misi-box h2 {
+    text-align: center; /* judul tetap tengah */
+}
 
+.visi-misi-box p {
+    text-align: justify; /* ini yang bikin rata kiri-kanan */
+    line-height: 1.9;
+}
         /* ===== CARDS SLIDER (Kegiatan & Prestasi) ===== */
         .cards-slider { position: relative; overflow: hidden; }
         .cards-track { display: flex; gap: 2rem; transition: transform 0.5s ease; }

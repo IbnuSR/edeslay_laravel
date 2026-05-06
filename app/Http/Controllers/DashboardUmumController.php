@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Infografis;
 
 class DashboardUmumController extends Controller
@@ -18,11 +19,23 @@ class DashboardUmumController extends Controller
             ->limit(6)
             ->get()
             ->map(function ($item) {
-                if ($item->foto && $item->foto_type) {
-                    if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
-                        $item->image_url = $item->foto_type . ';base64,' . $item->foto;
+                // ✅ LOGIKA PINTAR: Cek apakah foto berupa path file atau base64/BLOB
+                if ($item->foto) {
+                    // Jika foto mengandung '/' atau '.' dan tidak base64, anggap sebagai path file
+                    if ((strpos($item->foto, '/') !== false || strpos($item->foto, '.') !== false) 
+                        && !preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                        // ✅ Gunakan Storage::url() untuk file path
+                        $item->image_url = Storage::url($item->foto);
+                    } 
+                    // Jika foto berupa base64 string atau BLOB
+                    elseif ($item->foto_type) {
+                        if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                            $item->image_url = $item->foto_type . ';base64,' . $item->foto;
+                        } else {
+                            $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
+                        }
                     } else {
-                        $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
+                        $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
                     }
                 } else {
                     $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
@@ -39,11 +52,20 @@ class DashboardUmumController extends Controller
             ->limit(6)
             ->get()
             ->map(function ($item) {
-                if ($item->foto && $item->foto_type) {
-                    if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
-                        $item->image_url = $item->foto_type . ';base64,' . $item->foto;
+                // ✅ LOGIKA PINTAR: Sama seperti kegiatan
+                if ($item->foto) {
+                    if ((strpos($item->foto, '/') !== false || strpos($item->foto, '.') !== false) 
+                        && !preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                        $item->image_url = Storage::url($item->foto);
+                    } 
+                    elseif ($item->foto_type) {
+                        if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                            $item->image_url = $item->foto_type . ';base64,' . $item->foto;
+                        } else {
+                            $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
+                        }
                     } else {
-                        $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
+                        $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
                     }
                 } else {
                     $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
@@ -52,7 +74,7 @@ class DashboardUmumController extends Controller
             });
 
         // =====================================================================
-        // 3. AMBIL DATA STRUKTUR DESA
+        // 3. AMBIL DATA STRUKTUR DESA (TETAP SAMA)
         // =====================================================================
         $strukturDesa = DB::table('struktur_desa')
             ->select('jabatan', 'nama')
@@ -60,7 +82,7 @@ class DashboardUmumController extends Controller
             ->get();
 
         // =====================================================================
-        // 4. 🔄 AMBIL DATA INFOGRAFIS (HYBRID: DB + HARDCODE FALLBACK)
+        // 4. INFOGRAFIS (UPDATED: TAMBAH ICON)
         // =====================================================================
         
         // 4a. Ambil semua data dari tabel infografis
@@ -81,23 +103,54 @@ class DashboardUmumController extends Controller
             return $default;
         };
 
-        // 4b. Susun struktur nested array (sesuai view lama)
+        // 4b. Susun struktur nested array (DENGAN ICON)
         $infografis = [
-            // Dasar
-            'total_penduduk' => $getValue('total penduduk', 4456),
-            'kepala_keluarga' => $getValue('kepala keluarga', 1250),
-            'laki_laki' => $getValue('laki-laki', 2200),
-            'perempuan' => $getValue('perempuan', 2256),
+    // Dasar - ✅ DENGAN ICON (PAKAI FILE YANG KAMU SEBUTKAN)
+    'total_penduduk' => [
+        'value' => $getValue('total penduduk', 4456),
+        'icon' => asset('assets/icons/penduduk.png'),  // ✅ File: penduduk.png
+    ],
+    'kepala_keluarga' => [
+        'value' => $getValue('kepala keluarga', 1250),
+        'icon' => asset('assets/icons/family.png'),    // ✅ File: family.png
+    ],
+    'laki_laki' => [
+        'value' => $getValue('laki-laki', 2200),
+        'icon' => asset('assets/icons/male.png'),      // ✅ File: male.png
+    ],
+    'perempuan' => [
+        'value' => $getValue('perempuan', 2256),
+        'icon' => asset('assets/icons/female.png'),    // ✅ File: female.png
+    ],
+    
             
-            // Perkawinan
-            'perkawinan' => [
-                'belum_kawin' => $getValue('belum kawin', 1200),
-                'kawin' => $getValue('kawin', 2800),
-                'cerai_hidup' => $getValue('cerai hidup', 150),
-                'cerai_mati' => $getValue('cerai mati', 200),
-                'kawin_tercatat' => $getValue('kawin tercatat', 2500),
-                'kawin_tidak_tercatat' => $getValue('kawin tidak tercatat', 300),
-            ],
+           // ===== PERKAWINAN (✅ DENGAN ICON) =====
+'perkawinan' => [
+    'belum_kawin' => [
+        'value' => $getValue('belum kawin', 1200),
+        'icon' => asset('assets/icons/bk.png'),  // ✅ belum kawin
+    ],
+    'kawin' => [
+        'value' => $getValue('kawin', 2800),
+        'icon' => asset('assets/icons/k.png'),   // ✅ kawin
+    ],
+    'cerai_hidup' => [
+        'value' => $getValue('cerai hidup', 150),
+        'icon' => asset('assets/icons/ch.png'),  // ✅ cerai hidup
+    ],
+    'cerai_mati' => [
+        'value' => $getValue('cerai mati', 200),
+        'icon' => asset('assets/icons/cm.png'),  // ✅ cerai mati
+    ],
+    'kawin_tercatat' => [
+        'value' => $getValue('kawin tercatat', 2500),
+        'icon' => asset('assets/icons/kt.png'),  // ✅ kawin tercatat
+    ],
+    'kawin_tidak_tercatat' => [
+        'value' => $getValue('kawin tidak tercatat', 300),
+        'icon' => asset('assets/icons/ktt.png'), // ✅ kawin tidak tercatat
+    ],
+],
             
             // Kelompok Umur (Pyramid) - Hardcode dulu, nanti bisa dikembangkan
             'kelompok_umur' => [
@@ -135,16 +188,33 @@ class DashboardUmumController extends Controller
                 'strata_iii' => $getValue('s3', 0),
             ],
             
-            // Pekerjaan
-            'pekerjaan' => [
-                'belum_tidak_bekerja' => $getValue('tidak bekerja', 1850),
-                'pelajar_mahasiswa' => $getValue('pelajar', 680),
-                'pegawai_negeri' => $getValue('pegawai negeri', 320),
-                'karyawan_swasta' => $getValue('karyawan swasta', 550),
-                'petani_pekebun' => $getValue('petani', 420),
-                'pedagang' => $getValue('pedagang', 280),
-                'lainnya' => $getValue('lainnya', 356),
-            ]
+            // ===== PEKERJAAN (✅ DENGAN ICON) =====
+'pekerjaan' => [
+    'belum_tidak_bekerja' => [
+        'value' => $getValue('tidak bekerja', 1850),
+        'icon' => asset('assets/icons/bb.png'), // bb = Belum Bekerja
+    ],
+    'pelajar_mahasiswa' => [
+        'value' => $getValue('pelajar', 680),
+        'icon' => asset('assets/icons/m.png'),  // m = Mahasiswa/Pelajar
+    ],
+    'pegawai_negeri' => [
+        'value' => $getValue('pegawai negeri', 320),
+        'icon' => asset('assets/icons/pn.png'), // pn = Pegawai Negeri
+    ],
+    'karyawan_swasta' => [
+        'value' => $getValue('karyawan swasta', 550),
+        'icon' => asset('assets/icons/ps.png'), // ps = Pegawai Swasta
+    ],
+    'petani_pekebun' => [
+        'value' => $getValue('petani', 420),
+        'icon' => asset('assets/icons/p.png'),  // p = Petani
+    ],
+    'pedagang' => [
+        'value' => $getValue('pedagang', 280),
+        'icon' => asset('assets/icons/D.png'),  // D = Dagang
+    ],
+],
         ];
 
         // =====================================================================
@@ -154,7 +224,7 @@ class DashboardUmumController extends Controller
             'kegiatanList',
             'prestasiList',
             'strukturDesa',
-            'infografis'  // ← Struktur nested array (compatible dengan view lama!)
+            'infografis'
         ));
     }
 }
