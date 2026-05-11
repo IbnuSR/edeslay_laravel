@@ -11,6 +11,8 @@ use App\Mail\OtpMail;
 
 use Carbon\Carbon;
 
+
+// API MOBILE OJO DI GABUNG KE WEB ROUTES, BUAT FILE BARU DI CONTROLLER YA (AuthController)
 class AuthController extends Controller
 {
     public function login(Request $request)
@@ -176,26 +178,36 @@ class AuthController extends Controller
     }
     public function register(Request $request)
     {
-        $request->validate([
-            'nama_lengkap' => 'required',
-            'username' => 'required|unique:users,username',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
-        ]);
+        try {
 
-        $user = User::create([
-            'nama_lengkap' => $request->nama_lengkap,
-            'name' => $request->nama_lengkap, // 🔥 penting
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'masyarakat'
-        ]);
+            $request->validate([
+                'nama_lengkap' => 'required',
+                'username' => 'required|unique:users,username',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|min:6'
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Registrasi berhasil',
-            'user' => $user
-        ]);
+            $user = User::create([
+                'nama_lengkap' => $request->nama_lengkap,
+                'name' => $request->nama_lengkap,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'masyarakat'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registrasi berhasil',
+                'user' => $user
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
