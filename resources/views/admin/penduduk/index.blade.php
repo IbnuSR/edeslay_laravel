@@ -312,6 +312,20 @@
                 <span>➕</span> Tambah Data
             </a>
         </div>
+    <div class="card-header">
+    <h2>Daftar Data Penduduk</h2>
+    <div style="display: flex; gap: 12px;">
+        {{-- Tombol Import --}}
+        <a href="{{ route('admin.penduduk.import') }}" 
+           style="background: #10b981; color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            📥 Import Excel
+        </a>
+        {{-- Tombol Tambah Data --}}
+        <a href="{{ route('admin.penduduk.create') }}" 
+           style="background: linear-gradient(135deg, #2b6cb0, #2f80ed); color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            ➕ Tambah Data
+        </a>
+    </div>
 
         {{-- FILTER BOX --}}
         <form method="GET" class="filter-box">

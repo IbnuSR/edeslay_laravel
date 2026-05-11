@@ -121,19 +121,21 @@ Route::middleware(['auth', 'prevent-back'])
         Route::delete('/saran/{id}', [SaranController::class, 'destroy'])->whereNumber('id')->name('saran.destroy');
 
         // ================= DATA PENDUDUK =================
+        // CRUD Routes (EXISTING - JANGAN DIHAPUS)
         Route::get('/penduduk', [PendudukController::class, 'index'])->name('penduduk.index');
         Route::get('/penduduk/create', [PendudukController::class, 'create'])->name('penduduk.create');
         Route::post('/penduduk', [PendudukController::class, 'store'])->name('penduduk.store');
         Route::get('/penduduk/{penduduk}/edit', [PendudukController::class, 'edit'])->name('penduduk.edit');
         Route::put('/penduduk/{penduduk}', [PendudukController::class, 'update'])->name('penduduk.update');
-
-        // ✅ ROUTE BARU: Halaman konfirmasi hapus (GET)
         Route::get('/penduduk/{penduduk}/delete', [PendudukController::class, 'confirmDelete'])->name('penduduk.delete');
-
-        // ✅ ROUTE EKSEKUSI HAPUS (DELETE)
         Route::delete('/penduduk/{penduduk}', [PendudukController::class, 'destroy'])->name('penduduk.destroy');
 
-        // API untuk infografis
+        // ✅ ROUTE BARU: IMPORT EXCEL
+        Route::get('/penduduk/import', [PendudukController::class, 'import'])->name('penduduk.import');
+        Route::post('/penduduk/import', [PendudukController::class, 'processImport'])->name('penduduk.import.process');
+        Route::get('/penduduk/template', [PendudukController::class, 'downloadTemplate'])->name('penduduk.template');
+
+        // API untuk infografis (EXISTING)
         Route::get('/api/infografis-data', [PendudukController::class, 'infografisData'])->name('api.infografis.data');
 
         // ================= STRUKTUR =================
