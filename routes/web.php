@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\StrukturController;
 use App\Http\Controllers\DashboardUmumController;
 use App\Http\Controllers\Admin\InfografisController;
 use App\Http\Controllers\Admin\PendudukController;
+use App\Http\Controllers\Admin\PengajuanSuratController; // ✅ Import Controller Baru
 
 /*
 |--------------------------------------------------------------------------
@@ -141,6 +142,34 @@ Route::middleware(['auth', 'prevent-back'])
         // ================= STRUKTUR =================
         Route::get('/struktur', [StrukturController::class, 'index'])->name('struktur.index');
         Route::post('/struktur', [StrukturController::class, 'store'])->name('struktur.store');
+
+        // ================= INFOGRAFIS (CRUD LENGKAP) ✅
+        Route::get('/infografis', [InfografisController::class, 'index'])->name('infografis.index');
+        Route::post('/infografis', [InfografisController::class, 'store'])->name('infografis.store');
+        Route::get('/infografis/{id}', [InfografisController::class, 'show'])->whereNumber('id')->name('infografis.show');
+        Route::get('/infografis/{id}/edit', [InfografisController::class, 'edit'])->whereNumber('id')->name('infografis.edit');
+        Route::put('/infografis/{id}', [InfografisController::class, 'update'])->whereNumber('id')->name('infografis.update');
+        Route::delete('/infografis/{id}', [InfografisController::class, 'destroy'])->whereNumber('id')->name('infografis.destroy');
+
+        // ================= PENGAJUAN SURAT (BARU) ✅
+        // List pengajuan: /admin/surat?jenis=domisili
+        Route::get('/surat', [PengajuanSuratController::class, 'index'])->name('surat.index');
+        
+        // Detail pengajuan: /admin/surat/domisili/5
+        Route::get('/surat/{jenis}/{id}', [PengajuanSuratController::class, 'show'])
+            ->where(['jenis' => '[a-z]+', 'id' => '[0-9]+'])
+            ->name('surat.detail');
+        
+        // Update status: POST /admin/surat/domisili/5/update
+        Route::post('/surat/{jenis}/{id}/update', [PengajuanSuratController::class, 'updateStatus'])
+            ->where(['jenis' => '[a-z]+', 'id' => '[0-9]+'])
+            ->name('surat.update');
+        
+        // Print laporan: GET /admin/surat/domisili/print
+        Route::get('/surat/{jenis}/print', [PengajuanSuratController::class, 'print'])
+            ->where(['jenis' => '[a-z]+'])
+            ->name('surat.print');
+
     });
 
 /*

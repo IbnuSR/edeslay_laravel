@@ -1,6 +1,4 @@
 <!-- SIDEBAR CSS -->
-<!-- SIDEBAR CSS -->
-<!-- SIDEBAR CSS -->
 <style>
     .sidebar { 
         width: 280px; background: #FFFFFF; padding: 24px 20px; 
@@ -21,7 +19,7 @@
         color: #64748b; text-decoration: none !important; border: none !important;
     }
     
-    /* ✅ Ikon Default: Abu-abu silver (biar kelihatan di background putih) */
+    /* ✅ Ikon Default: Abu-abu silver */
     .menu-item img { 
         width: 24px; height: 24px; object-fit: contain; 
         filter: brightness(0) invert(0.42); 
@@ -31,7 +29,6 @@
     /* ✅ Hover: Teks & Ikon jadi BIRU */
     .menu-item:hover { background: #f1f5f9; color: #1976d2; }
     .menu-item:hover img { 
-        /* Filter khusus untuk mengubah warna ikon jadi biru (#1976d2) */
         filter: invert(32%) sepia(84%) saturate(3524%) hue-rotate(198deg) brightness(92%) contrast(95%);
     }
     
@@ -40,9 +37,7 @@
         background: linear-gradient(135deg, #2b6cb0, #2f80ed);
         color: white; box-shadow: 0 8px 20px rgba(47, 128, 237, 0.3);
     }
-    .menu-item.active img { 
-        filter: brightness(0) invert(1); /* Balik jadi putih */
-    }
+    .menu-item.active img { filter: brightness(0) invert(1); }
 
     .sidebar-footer { padding: 20px 0; border-top: 1px solid #f1f5f9; }
     .sidebar-footer .logout { 
@@ -51,6 +46,16 @@
         cursor: pointer; font-weight: 500; text-decoration: none !important;
     }
     .sidebar-footer .logout:hover { color: #ef4444; background: #fee2e2; }
+/* Ikon Logout */
+.sidebar-footer .logout img {
+    width: 24px; height: 24px; object-fit: contain;
+    filter: brightness(0) invert(0.42); /* Abu-abu default */
+    transition: filter 0.3s ease;
+}
+.sidebar-footer .logout:hover img {
+    filter: invert(28%) sepia(90%) saturate(5000%) hue-rotate(350deg) brightness(95%) contrast(95%); /* Merah saat hover */
+}
+
 </style>
 
 <!-- SIDEBAR HTML -->
@@ -76,25 +81,31 @@
             <img src="{{ asset('assets/icons/prestasi.png') }}"> Prestasi
         </a>
 
-        {{-- ✅ DATA PENDUDUK - BARU DITAMBAHKAN --}}
+        <!-- Data Penduduk -->
         <a href="{{ route('admin.penduduk.index') }}" class="menu-item {{ Request::is('admin/penduduk*') ? 'active' : '' }}">
             <img src="{{ asset('assets/icons/penduduk.png') }}"> Data Penduduk
         </a>
 
+        <!-- ✅ PENGAJUAN SURAT (UPDATED IKON) -->
+        <a href="{{ route('admin.surat.index', ['jenis' => request('jenis', 'domisili')]) }}" class="menu-item {{ Request::is('admin/surat*') ? 'active' : '' }}">
+            <img src="{{ asset('assets/icons/pss.png') }}"> Pengajuan Surat
+        </a>
+
         <!-- Pelayanan -->
         <a href="{{ route('admin.pelayanan.index') }}" class="menu-item {{ Request::is('admin/pelayanan*') ? 'active' : '' }}">
-            <img src="{{ asset('assets/icons/pelayanan1.png') }}"> Pelayanan
+            <img src="{{ asset('assets/icons/kotaksaran1.png') }}"> Pelayanan
         </a>
 
         <!-- Kotak Saran -->
         <a href="{{ route('admin.saran.index') }}" class="menu-item {{ Request::is('admin/saran*') ? 'active' : '' }}">
-            <img src="{{ asset('assets/icons/kotaksaran1.png') }}"> Kotak Saran
+            <img src="{{ asset('assets/icons/ks.png') }}"> Kotak Saran
         </a>
     </div>  
 
-    <div class="sidebar-footer">
+      <div class="sidebar-footer">
         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
         <a href="#" class="logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <img src="{{ asset('assets/icons/logout1.png') }}" alt="Logout">
             <span>Keluar</span>
         </a>
     </div>

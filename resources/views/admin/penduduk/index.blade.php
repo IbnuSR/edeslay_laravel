@@ -64,27 +64,14 @@
         gap: 16px; 
         transition: transform 0.2s;
     }
-    .stat-card:hover {
-        transform: translateY(-3px);
-    }
+    .stat-card:hover { transform: translateY(-3px); }
     .stat-icon-box { 
-        width: 52px; 
-        height: 52px; 
-        border-radius: 14px; 
-        background: #f0f4ff; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        color: #1976d2; 
-        font-size: 22px; 
+        width: 52px; height: 52px; border-radius: 14px; 
+        background: #f0f4ff; display: flex; align-items: center; justify-content: center; 
+        color: #1976d2; font-size: 22px; 
     }
     .stat-label { font-size: 13px; color: #6b7280; font-weight: 500;}
-    .stat-value { 
-        font-size: 26px; 
-        font-weight: 700; 
-        margin-top: 4px; 
-        color: #1e293b; 
-    }
+    .stat-value { font-size: 26px; font-weight: 700; margin-top: 4px; color: #1e293b; }
     
     /* ===== CONTENT CARD ===== */
     .content-card { 
@@ -141,9 +128,7 @@
         transition: all 0.2s;
         white-space: nowrap;
     }
-    .btn-filter:hover {
-        background: #2563eb;
-    }
+    .btn-filter:hover { background: #2563eb; }
     
     /* ===== TABLE ===== */
     .table-container { overflow-x: auto; width: 100%; }
@@ -306,26 +291,22 @@
 
     {{-- CONTENT CARD --}}
     <div class="content-card">
+        {{-- CARD HEADER (SUDAH DIGABUNG - TANPA DUPLIKAT) --}}
         <div class="card-header">
             <h2>Daftar Data Penduduk</h2>
-            <a href="{{ route('admin.penduduk.create') }}" class="btn-primary" style="background: linear-gradient(135deg, #2b6cb0, #2f80ed); color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer;">
-                <span>➕</span> Tambah Data
-            </a>
+            <div style="display: flex; gap: 12px;">
+                {{-- Tombol Import --}}
+                <a href="{{ route('admin.penduduk.import') }}" 
+                   style="background: #10b981; color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    📥 Import Excel
+                </a>
+                {{-- Tombol Tambah Data --}}
+                <a href="{{ route('admin.penduduk.create') }}" 
+                   style="background: linear-gradient(135deg, #2b6cb0, #2f80ed); color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    ➕ Tambah Data
+                </a>
+            </div>
         </div>
-    <div class="card-header">
-    <h2>Daftar Data Penduduk</h2>
-    <div style="display: flex; gap: 12px;">
-        {{-- Tombol Import --}}
-        <a href="{{ route('admin.penduduk.import') }}" 
-           style="background: #10b981; color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-            📥 Import Excel
-        </a>
-        {{-- Tombol Tambah Data --}}
-        <a href="{{ route('admin.penduduk.create') }}" 
-           style="background: linear-gradient(135deg, #2b6cb0, #2f80ed); color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-            ➕ Tambah Data
-        </a>
-    </div>
 
         {{-- FILTER BOX --}}
         <form method="GET" class="filter-box">
