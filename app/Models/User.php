@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens; // ← TAMBAHKAN INI
 
 class User extends Authenticatable
 {
-    use Notifiable, HasFactory;
+    use HasApiTokens, Notifiable, HasFactory; // ← TAMBAHKAN HasApiTokens
 
     protected $table = 'users';
     protected $primaryKey = 'id';
@@ -24,7 +25,7 @@ class User extends Authenticatable
         'jenis_kelamin',
         'no_telp',
         'alamat',
-        'name', // dari kiri (kalau dipakai)
+        'name',
     ];
 
     protected $hidden = [
@@ -32,5 +33,10 @@ class User extends Authenticatable
         'remember_token'
     ];
 
-    public $timestamps = false; // dari kiri (PENTING kalau DB tidak pakai created_at)
+    // Jika kolom password di-hash, tambahkan casts
+    protected $casts = [
+        'password' => 'hashed',
+    ];
+
+    public $timestamps = false;
 }

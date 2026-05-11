@@ -76,12 +76,17 @@
             <img src="{{ asset('assets/icons/prestasi.png') }}"> Prestasi
         </a>
 
+        {{-- ✅ DATA PENDUDUK - BARU DITAMBAHKAN --}}
+        <a href="{{ route('admin.penduduk.index') }}" class="menu-item {{ Request::is('admin/penduduk*') ? 'active' : '' }}">
+            <img src="{{ asset('assets/icons/penduduk.png') }}"> Data Penduduk
+        </a>
+
         <!-- Pelayanan -->
         <a href="{{ route('admin.pelayanan.index') }}" class="menu-item {{ Request::is('admin/pelayanan*') ? 'active' : '' }}">
             <img src="{{ asset('assets/icons/pelayanan1.png') }}"> Pelayanan
         </a>
 
-        <!-- Kotak Saran (NEW) -->
+        <!-- Kotak Saran -->
         <a href="{{ route('admin.saran.index') }}" class="menu-item {{ Request::is('admin/saran*') ? 'active' : '' }}">
             <img src="{{ asset('assets/icons/kotaksaran1.png') }}"> Kotak Saran
         </a>

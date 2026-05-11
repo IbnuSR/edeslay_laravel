@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\SaranController;
 use App\Http\Controllers\Admin\StrukturController;
 use App\Http\Controllers\DashboardUmumController;
 use App\Http\Controllers\Admin\InfografisController;
+use App\Http\Controllers\Admin\PendudukController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,7 +91,6 @@ Route::middleware(['auth', 'prevent-back'])
         Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
         
-        // ✅ Direct upload routes (tanpa edit form)
         Route::post('/profile/upload-avatar', [ProfileController::class, 'uploadAvatar'])->name('profile.upload-avatar');
         Route::post('/profile/upload-cover', [ProfileController::class, 'uploadCover'])->name('profile.upload-cover');
 
@@ -119,6 +119,22 @@ Route::middleware(['auth', 'prevent-back'])
         // ================= SARAN =================
         Route::get('/saran', [SaranController::class, 'index'])->name('saran.index');
         Route::delete('/saran/{id}', [SaranController::class, 'destroy'])->whereNumber('id')->name('saran.destroy');
+
+        // ================= DATA PENDUDUK =================
+        Route::get('/penduduk', [PendudukController::class, 'index'])->name('penduduk.index');
+        Route::get('/penduduk/create', [PendudukController::class, 'create'])->name('penduduk.create');
+        Route::post('/penduduk', [PendudukController::class, 'store'])->name('penduduk.store');
+        Route::get('/penduduk/{penduduk}/edit', [PendudukController::class, 'edit'])->name('penduduk.edit');
+        Route::put('/penduduk/{penduduk}', [PendudukController::class, 'update'])->name('penduduk.update');
+
+        // ✅ ROUTE BARU: Halaman konfirmasi hapus (GET)
+        Route::get('/penduduk/{penduduk}/delete', [PendudukController::class, 'confirmDelete'])->name('penduduk.delete');
+
+        // ✅ ROUTE EKSEKUSI HAPUS (DELETE)
+        Route::delete('/penduduk/{penduduk}', [PendudukController::class, 'destroy'])->name('penduduk.destroy');
+
+        // API untuk infografis
+        Route::get('/api/infografis-data', [PendudukController::class, 'infografisData'])->name('api.infografis.data');
 
         // ================= STRUKTUR =================
         Route::get('/struktur', [StrukturController::class, 'index'])->name('struktur.index');
