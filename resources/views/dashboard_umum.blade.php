@@ -64,22 +64,17 @@
 
         /* ===== VISI MISI ===== */
         .visi-misi-box {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 3rem;
-    border-radius: 20px;
-    color: white;
-    max-width: 1000px;
-    margin: 0 auto;
-    text-align: left; /* ubah dari center ke left */
-}
-        .visi-misi-box h2 {
-    text-align: center; /* judul tetap tengah */
-}
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3rem;
+            border-radius: 20px;
+            color: white;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .visi-misi-box h2 { text-align: center; }
+        .visi-misi-box p { text-align: justify; line-height: 1.9; }
 
-.visi-misi-box p {
-    text-align: justify; /* ini yang bikin rata kiri-kanan */
-    line-height: 1.9;
-}
         /* ===== CARDS SLIDER (Kegiatan & Prestasi) ===== */
         .cards-slider { position: relative; overflow: hidden; }
         .cards-track { display: flex; gap: 2rem; transition: transform 0.5s ease; }
@@ -101,12 +96,67 @@
         .info-content .number { color: #667eea; font-size: 1.8rem; font-weight: 700; }
         .pyramid-chart-container, .chart-container { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 2rem; }
 
-        /* ===== STRUKTUR GRID ===== */
-        .struktur-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-        .struktur-card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; transition: all 0.3s; }
-        .struktur-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
-        .struktur-card h3 { color: #1c3f9f; font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .struktur-card p { color: #6b7280; font-size: 0.95rem; }
+        /* ===== STRUKTUR GRID - ✅ UKURAN SERAGAM ===== */
+        .struktur-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 2rem; 
+            margin-top: 2rem;
+        }
+
+        .struktur-card { 
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            height: 100%;
+            min-height: 320px;
+        }
+
+        .struktur-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .struktur-foto {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            border: 4px solid #e3f2fd;
+            background: #f1f5f9;
+            flex-shrink: 0;
+        }
+
+        .struktur-card h3 {
+            color: #1c3f9f;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0.5rem 0 0.25rem;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .struktur-jabatan {
+            color: #667eea;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+
+        .struktur-nip {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
 
         /* ===== DOWNLOAD & FOOTER ===== */
         .download-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 4rem 5%; text-align: center; }
@@ -140,11 +190,22 @@
             .logo-text h1 { font-size: 1rem; }
             .cards-grid, .infografis-grid, .struktur-grid { grid-template-columns: 1fr; }
             .section { padding: 3rem 5%; }
+            
+            /* Struktur responsive */
+            .struktur-card { min-height: 280px; padding: 1.5rem 1rem; }
+            .struktur-foto { width: 100px; height: 100px; }
+            .struktur-card h3 { font-size: 1rem; }
+            .struktur-jabatan { font-size: 0.85rem; }
         }
         @media (max-width: 480px) {
             .hero-slider { height: 380px; }
             .hero-content h1 { font-size: 1.5rem; }
             .hero-content p { font-size: 0.9rem; }
+            
+            /* Struktur mobile kecil */
+            .struktur-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .struktur-card { min-height: 260px; padding: 1rem 0.75rem; }
+            .struktur-foto { width: 80px; height: 80px; margin-bottom: 1rem; }
         }
     </style>
 </head>
@@ -247,13 +308,31 @@
         </div>
     </section>
 
-    <!-- STRUKTUR DESA -->
+    <!-- STRUKTUR DESA - ✅ UKURAN SERAGAM -->
     <section class="section" id="struktur">
-        <div class="section-title"><h2>Struktur Perangkat Desa</h2></div>
+        <div class="section-title">
+            <h2>Struktur Perangkat Desa</h2>
+            <p>Kenali jajaran perangkat desa yang siap melayani masyarakat Banjardowo.</p>
+        </div>
         <div class="struktur-grid">
-            @foreach($strukturDesa as $struktur)
-            <div class="struktur-card"><h3>{{ $struktur->jabatan }}</h3><p>{{ $struktur->nama ?? '-' }}</p></div>
-            @endforeach
+            @forelse($strukturDesa as $struktur)
+            <div class="struktur-card">
+                <img src="{{ $struktur->foto_url }}" 
+                     alt="{{ $struktur->nama }}" 
+                     class="struktur-foto"
+                     onerror="this.src='{{ asset('assets/images/default-avatar.png') }}'; this.onerror=null;">
+                <h3>{{ $struktur->nama }}</h3>
+                <p class="struktur-jabatan">{{ $struktur->jabatan }}</p>
+                @if($struktur->nip)
+                    <small class="struktur-nip">{{ $struktur->nip }}</small>
+                @endif
+            </div>
+            @empty
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #6b7280;">
+                <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>Belum ada data struktur desa</p>
+            </div>
+            @endforelse
         </div>
     </section>
 

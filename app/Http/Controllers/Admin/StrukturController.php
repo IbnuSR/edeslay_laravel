@@ -3,65 +3,86 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\StrukturDesa;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class StrukturController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user = Auth::user();
-        if (!$user) return redirect()->route('login');
+        $struktur = StrukturDesa::orderBy('urutan', 'asc')->get();
+        return view('admin.struktur.index', compact('struktur'));
+    }
 
-        $action = $request->get('action', 'list');
-        $id = $request->get('id');
+    public function create()
+    {
+        return view('admin.struktur.create');
+    }
 
-        // Data profil
-        $namaAdmin = $user->nama_lengkap ?? 'Administrator';
-        $roleAdmin = $user->role ?? 'admin';
-        $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
-        $fotoProfilSrc = !empty($user->foto) ? 'image/jpeg;base64,' . base64_encode($user->foto) : null;
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
+            'nip' => 'nullable|string|max:100',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'urutan' => 'required|integer|min:0',
+        ]);
 
-        // Handle DELETE
-        if ($action === 'delete' && $id) {
-            DB::table('struktur_desa')->where('id', intval($id))->delete();
-            return redirect()->route('admin.struktur.index')->with('success', 'Data struktur berhasil dihapus');
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('struktur-desa', 'public');
         }
 
-        // Handle SAVE (Tambah/Edit)
-        if ($request->isMethod('post') && $request->has('save_struktur')) {
-            $validated = $request->validate([
-                'jabatan' => 'required|string|max:255',
-                'nama' => 'required|string|max:255',
-            ]);
+        StrukturDesa::create($validated);
 
-            if (!empty($request->input('id'))) {
-                // UPDATE
-                DB::table('struktur_desa')->where('id', intval($request->input('id')))->update([
-                    'jabatan' => $validated['jabatan'],
-                    'nama' => $validated['nama'],
-                    'updated_at' => now(),
-                ]);
-            } else {
-                // INSERT
-                DB::table('struktur_desa')->insert([
-                    'jabatan' => $validated['jabatan'],
-                    'nama' => $validated['nama'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+        return redirect()->route('admin.struktur.index')
+            ->with('success', 'Data perangkat desa berhasil ditambahkan');
+    }
+
+    public function edit(StrukturDesa $struktur)
+    {
+        return view('admin.struktur.edit', compact('struktur'));
+    }
+
+    public function update(Request $request, StrukturDesa $struktur)
+    {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
+            'nip' => 'nullable|string|max:100',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'urutan' => 'required|integer|min:0',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($struktur->foto) {
+                Storage::disk('public')->delete($struktur->foto);
             }
-            return redirect()->route('admin.struktur.index')->with('success', 'Data struktur berhasil disimpan');
+            $validated['foto'] = $request->file('foto')->store('struktur-desa', 'public');
         }
 
-        // Fetch data
-        $strukturList = DB::table('struktur_desa')->orderBy('id', 'asc')->get();
-        $edit = $id ? DB::table('struktur_desa')->where('id', intval($id))->first() : null;
+        $struktur->update($validated);
 
-        return view('admin.struktur', compact(
-            'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin', 'fotoProfilSrc',
-            'action', 'strukturList', 'edit'
-        ));
+        return redirect()->route('admin.struktur.index')
+            ->with('success', 'Data perangkat desa berhasil diperbarui');
+    }
+
+    public function confirmDelete(StrukturDesa $struktur)
+    {
+        return view('admin.struktur.delete', compact('struktur'));
+    }
+
+    public function destroy(StrukturDesa $struktur)
+    {
+        if ($struktur->foto) {
+            Storage::disk('public')->delete($struktur->foto);
+        }
+
+        $struktur->delete();
+
+        return redirect()->route('admin.struktur.index')
+            ->with('success', 'Data perangkat desa berhasil dihapus');
     }
 }

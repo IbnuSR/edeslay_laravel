@@ -51,11 +51,11 @@
     /* Ikon Logout */
     .sidebar-footer .logout img {
         width: 24px; height: 24px; object-fit: contain;
-        filter: brightness(0) invert(0.42); /* Abu-abu default */
+        filter: brightness(0) invert(0.42);
         transition: filter 0.3s ease;
     }
     .sidebar-footer .logout:hover img {
-        filter: invert(28%) sepia(90%) saturate(5000%) hue-rotate(350deg) brightness(95%) contrast(95%); /* Merah saat hover */
+        filter: invert(28%) sepia(90%) saturate(5000%) hue-rotate(350deg) brightness(95%) contrast(95%);
     }
 </style>
 
@@ -87,7 +87,7 @@
             <img src="{{ asset('assets/icons/penduduk.png') }}"> Data Penduduk
         </a>
 
-        <!-- ✅ PENGAJUAN SURAT (UPDATED IKON) -->
+        <!-- Pengajuan Surat -->
         <a href="{{ route('admin.surat.index', ['jenis' => request('jenis', 'domisili')]) }}" class="menu-item {{ Request::is('admin/surat*') ? 'active' : '' }}">
             <img src="{{ asset('assets/icons/pss.png') }}"> Pengajuan Surat
         </a>
@@ -101,14 +101,53 @@
         <a href="{{ route('admin.saran.index') }}" class="menu-item {{ Request::is('admin/saran*') ? 'active' : '' }}">
             <img src="{{ asset('assets/icons/ks.png') }}"> Kotak Saran
         </a>
+
+        <!-- ✅ STRUKTUR PERANGKAT DESA - BARU DITAMBAHKAN -->
+        <a href="{{ route('admin.struktur.index') }}" class="menu-item {{ Request::is('admin/struktur*') ? 'active' : '' }}">
+            <img src="{{ asset('assets/icons/struktur.png') }}"> Struktur Desa
+        </a>
     </div>  
 
-    <!-- ✅ SIDEBAR FOOTER: HANYA LOGOUT (TANPA PROFIL) -->
+    <!-- ✅ SIDEBAR FOOTER: HANYA LOGOUT -->
     <div class="sidebar-footer">
         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
-        <a href="#" class="logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+        
+        {{-- ✅ UBAH: Tambah id="logoutBtn" dan hapus onclick --}}
+        <a href="#" id="logoutBtn" class="logout">
             <img src="{{ asset('assets/icons/logout1.png') }}" alt="Logout">
             <span>Keluar</span>
         </a>
     </div>
 </div>
+
+{{-- ✅ SWEETALERT2 CDN + Script Popup Logout --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutForm = document.getElementById('logout-form');
+    
+    if (logoutBtn && logoutForm) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            Swal.fire({
+                title: 'Konfirmasi Logout',
+                text: 'Apakah Anda yakin ingin keluar dari sistem?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Logout',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit form logout
+                    logoutForm.submit();
+                }
+            });
+        });
+    }
+});
+</script>

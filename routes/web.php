@@ -139,9 +139,14 @@ Route::middleware(['auth', 'prevent-back'])
         // API untuk infografis (EXISTING)
         Route::get('/api/infografis-data', [PendudukController::class, 'infografisData'])->name('api.infografis.data');
 
-        // ================= STRUKTUR =================
+       // ================= STRUKTUR PERANGKAT DESA =================
         Route::get('/struktur', [StrukturController::class, 'index'])->name('struktur.index');
+        Route::get('/struktur/create', [StrukturController::class, 'create'])->name('struktur.create');
         Route::post('/struktur', [StrukturController::class, 'store'])->name('struktur.store');
+        Route::get('/struktur/{struktur}/edit', [StrukturController::class, 'edit'])->name('struktur.edit');
+        Route::put('/struktur/{struktur}', [StrukturController::class, 'update'])->name('struktur.update');
+        Route::get('/struktur/{struktur}/delete', [StrukturController::class, 'confirmDelete'])->name('struktur.delete');
+        Route::delete('/struktur/{struktur}', [StrukturController::class, 'destroy'])->name('struktur.destroy');
 
         // ================= INFOGRAFIS (CRUD LENGKAP) ✅
         Route::get('/infografis', [InfografisController::class, 'index'])->name('infografis.index');

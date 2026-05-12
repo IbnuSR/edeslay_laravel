@@ -70,13 +70,22 @@ class DashboardUmumController extends Controller
                 return $item;
             });
 
-        // =====================================================================
-        // 3. AMBIL DATA STRUKTUR DESA
-        // =====================================================================
-        $strukturDesa = DB::table('struktur_desa')
-            ->select('jabatan', 'nama')
-            ->orderBy('id', 'asc')
-            ->get();
+       // =====================================================================
+       // 3. AMBIL DATA STRUKTUR DESA
+       // =====================================================================
+       $strukturDesa = DB::table('struktur_desa')
+          ->select('id', 'nama', 'jabatan', 'nip', 'foto', 'urutan')
+          ->orderBy('urutan', 'asc')
+          ->get()
+          ->map(function ($item) {
+            // Handle foto: path storage atau default
+            if ($item->foto) {
+                $item->foto_url = asset('storage/' . $item->foto);
+            } else {
+                $item->foto_url = asset('assets/images/default-avatar.png');
+            }
+            return $item;
+        });
 
         // =====================================================================
         // 4. INFOGRAFIS - AMBIL DARI TABEL PENDUDUK
