@@ -12,9 +12,9 @@ class User extends Authenticatable
     use HasApiTokens, Notifiable, HasFactory;
 
     protected $table = 'users';
-
     protected $primaryKey = 'id';
 
+    // ✅ FIX 1: Tambahkan field yang dipakai controller
     protected $fillable = [
         'username',
         'password',
@@ -22,8 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'role',
-        'foto',
-        'cover',
+        'foto',              // ✅ Avatar/profil
+        'foto_sampul',       // ✅ GANTI 'cover' → 'foto_sampul' (sesuai controller)
         'jenis_kelamin',
         'no_telp',
         'alamat',
@@ -38,18 +38,25 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    // ✅ FIX 2: Hapus atau sesuaikan appends jika tidak dipakai
     protected $appends = [
-        'foto_url'
+        // 'foto_url'  // ← Opsional, kalau tidak dipakai di view bisa dihapus
     ];
 
+    // ✅ FIX 3: Accessor yang fleksibel (handle berbagai path)
     public function getFotoUrlAttribute()
     {
         if ($this->foto) {
+            // Kalau path sudah termasuk folder (misal: 'profile/filename.jpg')
+            if (str_contains($this->foto, '/')) {
+                return asset('storage/' . $this->foto);
+            }
+            // Kalau path cuma filename (misal: 'filename.jpg')
             return asset('storage/profile/' . $this->foto);
         }
-
         return null;
     }
 
-    public $timestamps = false;
+    // ✅ FIX 4: Aktifkan timestamps (atau hapus baris ini kalau memang tidak pakai)
+    public $timestamps = true;  // ✅ UBAH dari false → true
 }

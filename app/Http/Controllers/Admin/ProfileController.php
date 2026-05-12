@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User; // ✅ TAMBAHKAN INI
 
 class ProfileController extends Controller
 {
@@ -15,36 +15,35 @@ class ProfileController extends Controller
      * Show admin profile page
      */
     public function show()
-{
-    $user = Auth::user();
-    if (!$user) {
-        return redirect()->route('login');
-    }
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
 
-    // ✅ KEMBALIKAN VARIABEL INI
-    $namaAdmin = $user->nama_lengkap ?? 'Administrator';
-    $roleAdmin = $user->role ?? 'admin';
-    $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
-    
-    $fotoProfilSrc = null;
-    if (!empty($user->foto)) {
-        $fotoProfilSrc = filter_var($user->foto, FILTER_VALIDATE_URL) 
-            ? $user->foto 
-            : asset('storage/' . $user->foto);
-    }
-    
-    $fotoSampulSrc = null;
-    if (!empty($user->foto_sampul)) {
-        $fotoSampulSrc = filter_var($user->foto_sampul, FILTER_VALIDATE_URL) 
-            ? $user->foto_sampul 
-            : asset('storage/' . $user->foto_sampul);
-    }
+        $namaAdmin = $user->nama_lengkap ?? 'Administrator';
+        $roleAdmin = $user->role ?? 'admin';
+        $inisialAdmin = strtoupper(substr($namaAdmin, 0, 1));
+        
+        $fotoProfilSrc = null;
+        if (!empty($user->foto)) {
+            $fotoProfilSrc = filter_var($user->foto, FILTER_VALIDATE_URL) 
+                ? $user->foto 
+                : asset('storage/' . $user->foto);
+        }
+        
+        $fotoSampulSrc = null;
+        if (!empty($user->foto_sampul)) {
+            $fotoSampulSrc = filter_var($user->foto_sampul, FILTER_VALIDATE_URL) 
+                ? $user->foto_sampul 
+                : asset('storage/' . $user->foto_sampul);
+        }
 
-    return view('admin.profile', compact(
-        'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin',
-        'fotoProfilSrc', 'fotoSampulSrc'
-    ));
-}
+        return view('admin.profile', compact(
+            'user', 'namaAdmin', 'roleAdmin', 'inisialAdmin',
+            'fotoProfilSrc', 'fotoSampulSrc'
+        ));
+    }
 
     /**
      * Show edit profile form
@@ -78,7 +77,6 @@ class ProfileController extends Controller
             'email' => $validated['email'],
             'no_telepon' => $validated['no_telepon'] ?? null,
             'alamat' => $validated['alamat'] ?? null,
-            'updated_at' => now(),
         ];
 
         if ($request->hasFile('foto')) {
@@ -99,7 +97,9 @@ class ProfileController extends Controller
             $updateData['foto_sampul'] = $file->storeAs('covers', $filename, 'public');
         }
 
-        DB::table('users')->where('id', $user->id)->update($updateData);
+        // ✅ PAKAI ELOQUENT UPDATE, BUKAN DB::TABLE
+        $user->update($updateData);
+
         return redirect()->route('admin.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
@@ -125,9 +125,9 @@ class ProfileController extends Controller
             return back()->withErrors(['password_lama' => 'Password lama salah']);
         }
 
-        DB::table('users')->where('id', $user->id)->update([
+        // ✅ PAKAI ELOQUENT UPDATE
+        $user->update([
             'password' => Hash::make($validated['password_baru']),
-            'updated_at' => now(),
         ]);
 
         return back()->with('success', 'Password berhasil diubah');
@@ -141,11 +141,11 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ], [
             'avatar.required' => 'Pilih gambar terlebih dahulu',
             'avatar.image' => 'File harus berupa gambar',
-            'avatar.max' => 'Ukuran gambar maksimal 2MB',
+            'avatar.max' => 'Ukuran gambar maksimal 10MB',
         ]);
 
         // Hapus foto lama
@@ -157,10 +157,8 @@ class ProfileController extends Controller
         $filename = 'profile_' . time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
         $path = $file->storeAs('profile', $filename, 'public');
 
-        DB::table('users')->where('id', $user->id)->update([
-            'foto' => $path,
-            'updated_at' => now(),
-        ]);
+        // ✅ PAKAI ELOQUENT UPDATE, BUKAN DB::TABLE
+        $user->update(['foto' => $path]);
 
         return response()->json([
             'success' => true,
@@ -177,11 +175,11 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         $request->validate([
-            'cover' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'cover' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
         ], [
             'cover.required' => 'Pilih gambar terlebih dahulu',
             'cover.image' => 'File harus berupa gambar',
-            'cover.max' => 'Ukuran gambar maksimal 5MB',
+            'cover.max' => 'Ukuran gambar maksimal 20MB',
         ]);
 
         // Hapus cover lama
@@ -193,10 +191,8 @@ class ProfileController extends Controller
         $filename = 'cover_' . time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
         $path = $file->storeAs('covers', $filename, 'public');
 
-        DB::table('users')->where('id', $user->id)->update([
-            'foto_sampul' => $path,
-            'updated_at' => now(),
-        ]);
+        // ✅ PAKAI ELOQUENT UPDATE, BUKAN DB::TABLE
+        $user->update(['foto_sampul' => $path]);
 
         return response()->json([
             'success' => true,

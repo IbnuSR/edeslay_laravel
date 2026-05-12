@@ -725,16 +725,20 @@ function closeCropModal() {
 }
 
 // ===== UPLOAD WITHOUT CROP =====
+// ===== UPLOAD WITHOUT CROP =====
 function uploadWithoutCrop() {
     if (!currentFile) return;
 
     const formData = new FormData();
     formData.append(currentUploadType === 'avatar' ? 'avatar' : 'cover', currentFile);
-    formData.append('_token', '{{ csrf_token() }}');
+    // ✅ HAPUS: formData.append('_token', ...) ← tidak works dengan FormData+fetch
     
     const url = currentUploadType === 'avatar' 
         ? '{{ route("admin.profile.upload-avatar") }}'
         : '{{ route("admin.profile.upload-cover") }}';
+    
+    // ✅ Ambil CSRF token dari meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     
     // Show loading
     const btn = document.querySelector('.btn-crop-skip');
@@ -742,8 +746,22 @@ function uploadWithoutCrop() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
     btn.disabled = true;
 
-    fetch(url, { method: 'POST', body: formData })
-    .then(res => res.json())
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,  // ✅ Token di HEADER, bukan body
+            'Accept': 'application/json'  // ✅ Pastikan response JSON
+        },
+        body: formData  // ✅ Jangan set Content-Type, browser otomatis set multipart/form-data
+    })
+    .then(async res => {
+        // ✅ Cek jika response bukan JSON (misal HTML error page)
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Response bukan JSON. Server mungkin return error page.');
+        }
+        return res.json();
+    })
     .then(data => {
         if (data.success) {
             if (currentUploadType === 'avatar') {
@@ -758,8 +776,8 @@ function uploadWithoutCrop() {
         }
     })
     .catch(err => {
-        console.error(err);
-        showNotification('error', 'Terjadi kesalahan saat upload');
+        console.error('Upload error:', err);
+        showNotification('error', 'Terjadi kesalahan: ' + err.message);
     })
     .finally(() => {
         btn.innerHTML = originalText;
@@ -767,6 +785,7 @@ function uploadWithoutCrop() {
     });
 }
 
+// ===== CROP AND UPLOAD =====
 // ===== CROP AND UPLOAD =====
 function cropAndUpload() {
     if (!cropper) return;
@@ -783,11 +802,14 @@ function cropAndUpload() {
     canvas.toBlob(function(blob) {
         const formData = new FormData();
         formData.append(currentUploadType === 'avatar' ? 'avatar' : 'cover', blob, 'cropped.jpg');
-        formData.append('_token', '{{ csrf_token() }}');
+        // ✅ HAPUS: formData.append('_token', ...)
         
         const url = currentUploadType === 'avatar' 
             ? '{{ route("admin.profile.upload-avatar") }}'
             : '{{ route("admin.profile.upload-cover") }}';
+        
+        // ✅ Ambil CSRF token dari meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         
         // Show loading
         const btn = document.querySelector('#cropModal .btn-crop-primary');
@@ -797,9 +819,19 @@ function cropAndUpload() {
         
         fetch(url, {
             method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,  // ✅ Token di HEADER
+                'Accept': 'application/json'
+            },
             body: formData
         })
-        .then(res => res.json())
+        .then(async res => {
+            const contentType = res.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Response bukan JSON. Server mungkin return error page.');
+            }
+            return res.json();
+        })
         .then(data => {
             if (data.success) {
                 if (currentUploadType === 'avatar') {
@@ -815,8 +847,8 @@ function cropAndUpload() {
             }
         })
         .catch(err => {
-            console.error(err);
-            showNotification('error', 'Terjadi kesalahan saat upload');
+            console.error('Upload error:', err);
+            showNotification('error', 'Terjadi kesalahan: ' + err.message);
             resetCropButtons();
         })
         .finally(() => {

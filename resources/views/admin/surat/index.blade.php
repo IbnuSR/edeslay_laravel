@@ -25,15 +25,19 @@
             <input type="text" id="searchJenisSurat" placeholder="Cari Jenis Surat...">
         </div>
         
-        <!-- User Profile -->
+        <!-- ✅ User Profile - PAKAI VARIABEL GLOBAL DARI AppServiceProvider -->
         <div class="user-profile">
             <div class="user-info">
-                <div class="user-name">{{ Auth::user()->name ?? 'Administrator Desa Banjardowo' }}</div>
-                <div class="user-role">{{ Auth::user()->username ?? 'admin' }}</div>
+                <div class="user-name">{{ $namaAdmin ?? 'Administrator Desa Banjardowo' }}</div>
+                <div class="user-role">{{ $roleAdmin ?? 'admin' }}</div>
             </div>
-            <div class="user-avatar">
-                {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
-            </div>
+            <a href="{{ route('admin.profile') }}" class="user-avatar">
+                @if($fotoProfilSrc ?? false)
+                    <img src="{{ $fotoProfilSrc }}" alt="Foto" onerror="this.parentElement.innerHTML='{{ $inisialAdmin ?? 'A' }}'">
+                @else
+                    {{ $inisialAdmin ?? 'A' }}
+                @endif
+            </a>
         </div>
     </div>
 </div>
@@ -65,7 +69,13 @@
                     <i class="fas {{ $item['icon'] }} me-2"></i>
                     <span>{{ $item['label'] }}</span>
                     <span class="badge ms-2 {{ request('jenis') == $key ? 'bg-light text-primary' : 'bg-primary' }}">
-                        @php echo \DB::table('pengajuan_' . $key)->count(); @endphp
+                        @php 
+                            $count = 0;
+                            try {
+                                $count = \DB::table('pengajuan_' . $key)->count();
+                            } catch (\Exception $e) { $count = 0; }
+                            echo $count;
+                        @endphp
                     </span>
                 </a>
                 @endforeach
@@ -82,7 +92,13 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Sedang Diproses</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php $jenis = request('jenis', 'domisili'); $proses = \DB::table('pengajuan_' . $jenis)->where('status', 'proses')->count(); @endphp
+                                @php 
+                                    $jenis = request('jenis', 'domisili'); 
+                                    $proses = 0;
+                                    try {
+                                        $proses = \DB::table('pengajuan_' . $jenis)->where('status', 'proses')->count();
+                                    } catch (\Exception $e) { $proses = 0; }
+                                @endphp
                                 {{ $proses }}
                             </div>
                         </div>
@@ -99,7 +115,12 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Selesai</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php $selesai = \DB::table('pengajuan_' . $jenis)->where('status', 'selesai')->count(); @endphp
+                                @php 
+                                    $selesai = 0;
+                                    try {
+                                        $selesai = \DB::table('pengajuan_' . $jenis)->where('status', 'selesai')->count();
+                                    } catch (\Exception $e) { $selesai = 0; }
+                                @endphp
                                 {{ $selesai }}
                             </div>
                         </div>
@@ -116,7 +137,12 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ditolak</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php $ditolak = \DB::table('pengajuan_' . $jenis)->where('status', 'ditolak')->count(); @endphp
+                                @php 
+                                    $ditolak = 0;
+                                    try {
+                                        $ditolak = \DB::table('pengajuan_' . $jenis)->where('status', 'ditolak')->count();
+                                    } catch (\Exception $e) { $ditolak = 0; }
+                                @endphp
                                 {{ $ditolak }}
                             </div>
                         </div>
@@ -133,7 +159,12 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Pengajuan</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php $total = \DB::table('pengajuan_' . $jenis)->count(); @endphp
+                                @php 
+                                    $total = 0;
+                                    try {
+                                        $total = \DB::table('pengajuan_' . $jenis)->count();
+                                    } catch (\Exception $e) { $total = 0; }
+                                @endphp
                                 {{ $total }}
                             </div>
                         </div>
@@ -148,6 +179,12 @@
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     @endif
@@ -178,7 +215,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($data as $index => $row)
+                        {{-- ✅ PAKAI $data ?? [] AGAR TIDAK ERROR JIKA NULL --}}
+                        @forelse($data ?? [] as $index => $row)
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>
@@ -187,25 +225,25 @@
                             </td>
                             <td>{{ $row->nik ?? $row->nik_pelapor ?? '-' }}</td>
                             <td>{{ $row->no_hp ?? '-' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row->tanggal_pengajuan)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($row->tanggal_pengajuan ?? now())->format('d/m/Y') }}</td>
                             <td>
-                                @if($row->metode_pengambilan == 'cetak_online')
+                                @if(($row->metode_pengambilan ?? '') == 'cetak_online')
                                     <span class="badge bg-info"><i class="fas fa-download me-1"></i>Online</span>
                                 @else
                                     <span class="badge bg-purple"><i class="fas fa-store me-1"></i>Ambil Desa</span>
                                 @endif
                             </td>
                             <td>
-                                @if($row->status == 'proses')
+                                @if(($row->status ?? '') == 'proses')
                                     <span class="badge bg-warning text-dark"><i class="fas fa-spinner fa-spin me-1"></i>Proses</span>
-                                @elseif($row->status == 'selesai')
+                                @elseif(($row->status ?? '') == 'selesai')
                                     <span class="badge bg-success"><i class="fas fa-check me-1"></i>Selesai</span>
                                 @else
                                     <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Ditolak</span>
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('admin.surat.detail', ['jenis' => request('jenis'), 'id' => $row->id]) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('admin.surat.detail', ['jenis' => request('jenis'), 'id' => $row->id ?? 0]) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-eye"></i> Detail
                                 </a>
                             </td>
@@ -237,33 +275,11 @@
         align-items: center;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-    
-    .header-left {
-        flex: 1;
-    }
-    
-    .header-title {
-        font-size: 28px;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0 0 8px 0;
-    }
-    
-    .breadcrumb {
-        font-size: 14px;
-        color: #64748b;
-        font-weight: 500;
-    }
-    
-    .breadcrumb span {
-        color: #94a3b8;
-    }
-    
-    .header-right {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
+    .header-left { flex: 1; }
+    .header-title { font-size: 28px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0; }
+    .breadcrumb { font-size: 14px; color: #64748b; font-weight: 500; }
+    .breadcrumb span { color: #94a3b8; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
     
     /* Tombol Cetak Laporan */
     .btn-print-laporan {
@@ -280,15 +296,11 @@
         box-shadow: 0 2px 8px rgba(78, 115, 223, 0.3);
         transition: all 0.3s ease;
     }
-    
     .btn-print-laporan:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(78, 115, 223, 0.4);
     }
-    
-    .btn-print-laporan i {
-        font-size: 16px;
-    }
+    .btn-print-laporan i { font-size: 16px; }
     
     .search-box {
         background: white;
@@ -300,24 +312,13 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         min-width: 280px;
     }
-    
-    .search-box i {
-        color: #94a3b8;
-        font-size: 16px;
-    }
-    
+    .search-box i { color: #94a3b8; font-size: 16px; }
     .search-box input {
-        border: none;
-        outline: none;
-        font-size: 14px;
-        width: 100%;
-        color: #64748b;
+        border: none; outline: none; font-size: 14px; width: 100%; color: #64748b;
     }
+    .search-box input::placeholder { color: #94a3b8; }
     
-    .search-box input::placeholder {
-        color: #94a3b8;
-    }
-    
+    /* ✅ User Profile Style */
     .user-profile {
         background: white;
         border-radius: 50px;
@@ -326,35 +327,20 @@
         align-items: center;
         gap: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        text-decoration: none !important;
     }
-    
-    .user-info {
-        text-align: right;
-    }
-    
-    .user-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: #1e293b;
-    }
-    
-    .user-role {
-        font-size: 12px;
-        color: #94a3b8;
-    }
-    
+    .user-info { text-align: right; }
+    .user-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+    .user-role { font-size: 12px; color: #94a3b8; }
     .user-avatar {
-        width: 40px;
-        height: 40px;
+        width: 40px; height: 40px;
         background: linear-gradient(135deg, #f97316, #fb923c);
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 700;
-        font-size: 16px;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 700; font-size: 16px;
+        overflow: hidden; flex-shrink: 0; text-decoration: none !important;
     }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     
     /* Existing Styles */
     .border-left-primary { border-left: 4px solid #4e73df !important; }
@@ -371,29 +357,17 @@
 document.getElementById('searchJenisSurat')?.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         var search = this.value.toLowerCase().trim();
-        
-        // Mapping kata kunci ke jenis surat
         var mapping = {
-            'domisili': 'domisili',
-            'sktm': 'sktm',
-            'penghasilan': 'penghasilan',
-            'kelahiran': 'kelahiran',
-            'ktp': 'ktp',
-            'kematian': 'kematian',
-            'izin': 'izin',
-            'nikah': 'nikah'
+            'domisili': 'domisili', 'sktm': 'sktm', 'penghasilan': 'penghasilan',
+            'kelahiran': 'kelahiran', 'ktp': 'ktp', 'kematian': 'kematian',
+            'izin': 'izin', 'nikah': 'nikah'
         };
-        
-        // Cari jenis surat yang cocok
         for (var key in mapping) {
             if (key.includes(search) || search.includes(key)) {
-                // Redirect ke halaman jenis surat
                 window.location.href = '{{ route('admin.surat.index') }}?jenis=' + mapping[key];
                 return;
             }
         }
-        
-        // Kalau tidak ketemu, alert
         alert('Jenis surat tidak ditemukan. Coba: domisili, sktm, ktp, kelahiran, kematian, izin, nikah, penghasilan');
     }
 });
@@ -402,7 +376,6 @@ document.getElementById('searchJenisSurat')?.addEventListener('keypress', functi
 document.getElementById('searchTable')?.addEventListener('keyup', function() {
     var search = this.value.toLowerCase();
     var rows = document.querySelectorAll('#dataTable tbody tr');
-    
     rows.forEach(function(row) {
         var text = row.textContent.toLowerCase();
         row.style.display = text.includes(search) ? '' : 'none';

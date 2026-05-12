@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <style>
     /* ===== RESET LINK DEFAULT ===== */
     a {
@@ -639,19 +640,19 @@
                 <i class="fas fa-search" style="color: #94a3b8;"></i>
                 <input type="text" name="search" placeholder="Cari Kegiatan" value="{{ old('search', $search ?? '') }}">
             </form>
-            <div class="profile-wrapper">
-                <div class="profile-info">
-                    <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
-                    <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
-                </div>
-                <a href="{{ route('admin.profile') }}" class="profile-avatar">
-                    @if(isset($fotoProfilSrc) && $fotoProfilSrc)
-                        <img src="{{ $fotoProfilSrc }}" alt="Foto">
-                    @else
-                        {{ substr($namaAdmin ?? 'A', 0, 1) }}
-                    @endif
-                </a>
-            </div>
+           <div class="profile-wrapper">
+    <div class="profile-info">
+        <div class="name">{{ $namaAdmin }}</div>
+        <div class="role">{{ $roleAdmin }}</div>
+    </div>
+    <a href="{{ route('admin.profile') }}" class="profile-avatar">
+        @if($fotoProfilSrc)
+            <img src="{{ $fotoProfilSrc }}" alt="Foto" onerror="this.parentElement.innerHTML='{{ $inisialAdmin }}'">
+        @else
+            {{ $inisialAdmin }}
+        @endif
+    </a>
+</div>
         </div>
     </div>
     @endif

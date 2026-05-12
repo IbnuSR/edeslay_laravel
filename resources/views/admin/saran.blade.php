@@ -137,15 +137,19 @@
                 <i class="fas fa-search" style="color: #94a3b8;"></i>
                 <input type="text" name="search" placeholder="Cari Saran" value="{{ old('search', $search ?? '') }}">
             </form>
-            <div class="profile-wrapper">
-                <div class="profile-info">
-                    <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
-                    <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
-                </div>
-                <a href="{{ route('admin.profile') }}" class="profile-avatar">
-                    {{ $inisialAdmin ?? 'A' }}
-                </a>
-            </div>
+           <div class="profile-wrapper">
+    <div class="profile-info">
+        <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
+        <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
+    </div>
+    <a href="{{ route('admin.profile') }}" class="profile-avatar">
+        @if($fotoProfilSrc ?? false)
+            <img src="{{ $fotoProfilSrc }}" alt="Foto" onerror="this.parentElement.innerHTML='{{ $inisialAdmin ?? 'A' }}'">
+        @else
+            {{ $inisialAdmin ?? 'A' }}
+        @endif
+    </a>
+</div>
         </div>
     </div>
     @endif

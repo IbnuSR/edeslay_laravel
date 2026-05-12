@@ -40,22 +40,23 @@
     .menu-item.active img { filter: brightness(0) invert(1); }
 
     .sidebar-footer { padding: 20px 0; border-top: 1px solid #f1f5f9; }
+    
     .sidebar-footer .logout { 
         display: flex; align-items: center; gap: 14px; padding: 14px 16px; 
         color: #64748b; border-radius: 14px; transition: all 0.3s; 
         cursor: pointer; font-weight: 500; text-decoration: none !important;
     }
     .sidebar-footer .logout:hover { color: #ef4444; background: #fee2e2; }
-/* Ikon Logout */
-.sidebar-footer .logout img {
-    width: 24px; height: 24px; object-fit: contain;
-    filter: brightness(0) invert(0.42); /* Abu-abu default */
-    transition: filter 0.3s ease;
-}
-.sidebar-footer .logout:hover img {
-    filter: invert(28%) sepia(90%) saturate(5000%) hue-rotate(350deg) brightness(95%) contrast(95%); /* Merah saat hover */
-}
-
+    
+    /* Ikon Logout */
+    .sidebar-footer .logout img {
+        width: 24px; height: 24px; object-fit: contain;
+        filter: brightness(0) invert(0.42); /* Abu-abu default */
+        transition: filter 0.3s ease;
+    }
+    .sidebar-footer .logout:hover img {
+        filter: invert(28%) sepia(90%) saturate(5000%) hue-rotate(350deg) brightness(95%) contrast(95%); /* Merah saat hover */
+    }
 </style>
 
 <!-- SIDEBAR HTML -->
@@ -102,7 +103,8 @@
         </a>
     </div>  
 
-      <div class="sidebar-footer">
+    <!-- ✅ SIDEBAR FOOTER: HANYA LOGOUT (TANPA PROFIL) -->
+    <div class="sidebar-footer">
         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
         <a href="#" class="logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <img src="{{ asset('assets/icons/logout1.png') }}" alt="Logout">
