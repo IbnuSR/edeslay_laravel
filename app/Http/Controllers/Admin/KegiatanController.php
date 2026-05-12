@@ -88,7 +88,13 @@ class KegiatanController extends Controller
             'lokasi' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal' => 'required|date',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120'
+            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480'
+        ], [
+            // ✅ Custom error message untuk ukuran file
+            'foto.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
+            'foto.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
+            'foto.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
         ]);
 
         $fotoPath = null;
@@ -129,7 +135,13 @@ class KegiatanController extends Controller
             'lokasi' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal' => 'required|date',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120'
+            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480'
+        ], [
+            // ✅ Custom error message untuk ukuran file
+            'foto.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
+            'foto.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
+            'foto.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
         ]);
 
         $data = [

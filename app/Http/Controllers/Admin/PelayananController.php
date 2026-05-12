@@ -74,7 +74,13 @@ class PelayananController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi_singkat' => 'required|string|max:500',
             'isi_panduan' => 'required|string',
-            'foto_pendukung' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
+            'foto_pendukung' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
+        ], [
+            // ✅ Custom error message untuk ukuran file
+            'foto_pendukung.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
+            'foto_pendukung.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
+            'foto_pendukung.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
         ]);
 
         $fotoPath = null;
@@ -106,7 +112,13 @@ class PelayananController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi_singkat' => 'required|string|max:500',
             'isi_panduan' => 'required|string',
-            'foto_pendukung' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
+            'foto_pendukung' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
+        ], [
+            // ✅ Custom error message untuk ukuran file
+            'foto_pendukung.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
+            'foto_pendukung.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
+            'foto_pendukung.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
         ]);
 
         $updateData = [
