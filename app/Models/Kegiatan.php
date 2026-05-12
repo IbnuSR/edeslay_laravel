@@ -1,5 +1,5 @@
 <?php
-// app/Models/Kegiatan.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,5 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Kegiatan extends Model
 {
     protected $table = 'kegiatan';
-    protected $fillable = ['judul','deskripsi','tanggal','foto','foto_type'];
+
+    protected $fillable = [
+        'judul',
+        'lokasi',
+        'deskripsi',
+        'tanggal',
+        'foto',
+        'foto_type',
+    ];
 }

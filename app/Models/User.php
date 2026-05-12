@@ -2,30 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Laravel\Sanctum\HasApiTokens; // ← TAMBAHKAN INI
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, HasFactory; // ← TAMBAHKAN HasApiTokens
+    use HasApiTokens, Notifiable, HasFactory;
 
     protected $table = 'users';
+
     protected $primaryKey = 'id';
-    
+
     protected $fillable = [
-        'nama_lengkap',
         'username',
-        'email',
         'password',
+        'nama_lengkap',
+        'name',
+        'email',
         'role',
         'foto',
         'cover',
         'jenis_kelamin',
         'no_telp',
         'alamat',
-        'name',
     ];
 
     protected $hidden = [
@@ -33,10 +34,22 @@ class User extends Authenticatable
         'remember_token'
     ];
 
-    // Jika kolom password di-hash, tambahkan casts
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    protected $appends = [
+        'foto_url'
+    ];
+
+    public function getFotoUrlAttribute()
+    {
+        if ($this->foto) {
+            return asset('storage/profile/' . $this->foto);
+        }
+
+        return null;
+    }
 
     public $timestamps = false;
 }

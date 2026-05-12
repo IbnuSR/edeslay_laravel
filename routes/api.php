@@ -2,123 +2,116 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Api\KegiatanController as ApiKegiatanController;
-use App\Http\Controllers\Api\PrestasiController as ApiPrestasiController;
-use App\Http\Controllers\Api\PelayananController as ApiPelayananController;
-use App\Http\Controllers\Api\StrukturController as ApiStrukturController;
-use App\Http\Controllers\Api\InfografisController as ApiInfografisController;
-use App\Http\Controllers\Api\PengajuanSuratController as ApiPengajuanSuratController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes - Mobile App
-|--------------------------------------------------------------------------
-*/
+// =========================================================
+// CONTROLLER API MOBILE
+// =========================================================
 
-// 🔥 PUBLIC ROUTES (Tanpa Auth / Token)
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\KegiatanController;
+use App\Http\Controllers\Api\SaranController;
 
-// Test Connection
+// =========================================================
+// API MOBILE + WEB TERPADU
+// =========================================================
+
+// ================= TEST API =================
+
 Route::get('/test', function () {
     return response()->json([
         "status" => "success",
-        "message" => "API Desa Banjardowo Online ✅",
+        "message" => "API Desa Online ✅",
         "timestamp" => now()
     ]);
 });
 
-// Auth Mobile API
-Route::post('/login', [AuthController::class, 'login'])->name('api.login');
-Route::post('/register', [AuthController::class, 'register'])->name('api.register');
-Route::post('/send-otp', [AuthController::class, 'sendOtp'])->name('api.otp.send');
-Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('api.otp.resend');
-Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('api.otp.verify');
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('api.password.reset');
+// =========================================================
+// AUTH MOBILE
+// =========================================================
 
-// Public Data: Kegiatan
-Route::get('/kegiatan', [ApiKegiatanController::class, 'index'])->name('api.kegiatan.index');
-Route::get('/kegiatan/{id}', [ApiKegiatanController::class, 'show'])->name('api.kegiatan.show');
-Route::get('/kegiatan/kategori/{kategori}', [ApiKegiatanController::class, 'byKategori'])->name('api.kegiatan.kategori');
+Route::post('/login', [AuthController::class, 'login']);
 
-// Public Data: Prestasi
-Route::get('/prestasi', [ApiPrestasiController::class, 'index'])->name('api.prestasi.index');
-Route::get('/prestasi/{id}', [ApiPrestasiController::class, 'show'])->name('api.prestasi.show');
+Route::post('/register', [AuthController::class, 'register']);
 
-// Public Data: Pelayanan
-Route::get('/pelayanan', [ApiPelayananController::class, 'index'])->name('api.pelayanan.index');
+Route::post('/send-otp', [AuthController::class, 'sendOtp']);
 
-// Public Data: Struktur Organisasi
-Route::get('/struktur', [ApiStrukturController::class, 'index'])->name('api.struktur.index');
+Route::post('/resend-otp', [AuthController::class, 'sendOtp']);
 
-// Public Data: Infografis / Statistik Penduduk
-Route::get('/infografis', [ApiInfografisController::class, 'index'])->name('api.infografis.index');
-Route::get('/infografis/detail', [ApiInfografisController::class, 'detail'])->name('api.infografis.detail');
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 
-// Public: Kirim Saran/Kritik
-Route::post('/saran', [\App\Http\Controllers\Admin\SaranController::class, 'store'])->name('api.saran.store');
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-// Public: Info Jenis Surat yang Tersedia
-Route::get('/surat/jenis', [ApiPengajuanSuratController::class, 'jenisSurat'])->name('api.surat.jenis');
+// =========================================================
+// USER PROFILE MOBILE
+// =========================================================
 
-// 🔥 PROTECTED ROUTES (Butuh Token Bearer - Auth:Sanctum)
+Route::get('/user/{id}', [AuthController::class, 'getUser']);
+
+Route::post('/update-profile', [AuthController::class, 'updateProfile']);
+
+Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+Route::post('/update-email', [AuthController::class, 'updateEmail']);
+
+// =========================================================
+// SARAN MOBILE
+// =========================================================
+
+Route::get('/saran/{email}', [SaranController::class, 'getSaranUser']);
+
+Route::post('/tambah-saran', [SaranController::class, 'tambahSaran']);
+
+Route::get('/detail-saran/{id}', [SaranController::class, 'detailSaran']);
+
+Route::post('/update-saran', [SaranController::class, 'updateSaran']);
+
+Route::delete('/delete-saran/{id}', [SaranController::class, 'deleteSaran']);
+
+// =========================================================
+// KEGIATAN MOBILE
+// =========================================================
+
+Route::get('/kegiatan', [KegiatanController::class, 'getKegiatan']);
+
+Route::get('/detail-kegiatan/{id}', [KegiatanController::class, 'detailKegiatan']);
+
+// =========================================================
+// API WEBSITE YANG SUDAH ADA
+// =========================================================
+
+// Saran Publik Website
+Route::post('/saran', [\App\Http\Controllers\Admin\SaranController::class, 'store']);
+
+// =========================================================
+// PROTECTED ROUTES SANCTUM
+// =========================================================
+
 Route::middleware('auth:sanctum')->group(function () {
-    
-    // Get user data yang sedang login
+
+    // USER LOGIN
     Route::get('/user', function (Request $request) {
+
         return response()->json([
             "status" => "success",
             "data" => $request->user()
         ]);
-    })->name('api.user');
-    
-    // Logout (Hapus Token)
-    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
-    
-    // Update Profile User Mobile
-    Route::put('/user/profile', [AuthController::class, 'updateProfile'])->name('api.user.update');
-    
-    // ================= PENGAJUAN SURAT API (Protected) =================
-    
-    // Submit Pengajuan Surat Baru
-    Route::post('/pengajuan/store', [ApiPengajuanSuratController::class, 'store'])->name('api.pengajuan.store');
-    
-    // Upload Dokumen Tambahan untuk Pengajuan
-    Route::post('/pengajuan/{id}/upload', [ApiPengajuanSuratController::class, 'uploadDokumen'])->name('api.pengajuan.upload');
-    
-    // Cek Status Pengajuan (by ID)
-    Route::get('/pengajuan/{jenis}/{id}/status', [ApiPengajuanSuratController::class, 'status'])->name('api.pengajuan.status');
-    
-    // Riwayat Semua Pengajuan User (by Auth User / NIK)
-    Route::get('/pengajuan/riwayat', [ApiPengajuanSuratController::class, 'riwayat'])->name('api.pengajuan.riwayat');
-    
-    // Download Surat Jadi (PDF) - Jika Status Sudah 'selesai'
-    Route::get('/pengajuan/{jenis}/{id}/download', [ApiPengajuanSuratController::class, 'download'])->name('api.pengajuan.download');
-    
-    // Hapus/Batalkan Pengajuan (Jika masih 'proses')
-    Route::delete('/pengajuan/{jenis}/{id}', [ApiPengajuanSuratController::class, 'cancel'])->name('api.pengajuan.cancel');
-    
-    // ================= DATA PENDUDUK (Protected - Optional) =================
-    // Jika ingin membatasi akses data penduduk hanya untuk user terauth
-    Route::get('/penduduk/saya', function (Request $request) {
-        $nik = $request->user()->nik;
-        $data = \App\Models\Penduduk::where('nik', $nik)->first();
-        return response()->json([
-            "status" => $data ? "success" : "not_found",
-            "data" => $data
-        ]);
-    })->name('api.penduduk.saya');
+
+    });
+
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout']);
 
 });
 
-/*
-|--------------------------------------------------------------------------
-| FALLBACK ROUTE (Jika endpoint tidak ditemukan)
-|--------------------------------------------------------------------------
-*/
+// =========================================================
+// FALLBACK API
+// =========================================================
+
 Route::fallback(function () {
+
     return response()->json([
         "status" => "error",
-        "message" => "API Endpoint tidak ditemukan ❌",
-        "hint" => "Cek dokumentasi API atau hubungi admin desa"
+        "message" => "API Endpoint tidak ditemukan ❌"
     ], 404);
+
 });
