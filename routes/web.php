@@ -19,7 +19,7 @@ use App\Http\Controllers\Admin\StrukturController;
 use App\Http\Controllers\DashboardUmumController;
 use App\Http\Controllers\Admin\InfografisController;
 use App\Http\Controllers\Admin\PendudukController;
-use App\Http\Controllers\Admin\PengajuanSuratController; // ✅ Import Controller Baru
+use App\Http\Controllers\Admin\PengajuanSuratController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +85,8 @@ Route::middleware(['auth', 'prevent-back'])
 
         // ================= DASHBOARD =================
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        // ✅ TAMBAHKAN INI: Route untuk search autocomplete saran di dashboard
+        Route::get('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
 
         // ================= PROFILE =================
         Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
@@ -139,7 +141,7 @@ Route::middleware(['auth', 'prevent-back'])
         // API untuk infografis (EXISTING)
         Route::get('/api/infografis-data', [PendudukController::class, 'infografisData'])->name('api.infografis.data');
 
-       // ================= STRUKTUR PERANGKAT DESA =================
+        // ================= STRUKTUR PERANGKAT DESA =================
         Route::get('/struktur', [StrukturController::class, 'index'])->name('struktur.index');
         Route::get('/struktur/create', [StrukturController::class, 'create'])->name('struktur.create');
         Route::post('/struktur', [StrukturController::class, 'store'])->name('struktur.store');

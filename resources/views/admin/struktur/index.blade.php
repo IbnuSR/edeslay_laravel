@@ -1,5 +1,4 @@
 @extends('layouts.app')
-a
 @section('content')
 <style>
     .main-container { padding: 2rem; }

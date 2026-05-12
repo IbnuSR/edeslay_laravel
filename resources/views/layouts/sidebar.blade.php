@@ -104,7 +104,7 @@
 
         <!-- ✅ STRUKTUR PERANGKAT DESA - BARU DITAMBAHKAN -->
         <a href="{{ route('admin.struktur.index') }}" class="menu-item {{ Request::is('admin/struktur*') ? 'active' : '' }}">
-            <img src="{{ asset('assets/icons/struktur.png') }}"> Struktur Desa
+            <img src="{{ asset('assets/icons/sd.png') }}"> Struktur Desa
         </a>
     </div>  
 

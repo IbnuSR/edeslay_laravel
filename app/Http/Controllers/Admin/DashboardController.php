@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    /**
+     * Display the admin dashboard
+     */
     public function index()
     {
         $user = Auth::user();
@@ -27,19 +31,18 @@ class DashboardController extends Controller
                 : asset('storage/' . $user->foto);
         }
 
-        // STATISTIK (FIX: samakan dengan Blade snake_case)
+        // STATISTIK
         $total_prestasi       = DB::table('prestasi')->count();
         $total_kegiatan       = DB::table('kegiatan')->count();
         $total_saran          = DB::table('saran')->count();
         $total_panduan_surat  = DB::table('panduan_surat')->count();
 
-        // GRAFIK
+        // GRAFIK: Data saran 6 bulan terakhir
         $labels = [];
         $data   = [];
 
         for ($i = 5; $i >= 0; $i--) {
             $time = strtotime("-$i months");
-
             $labels[] = date('M Y', $time);
 
             $data[] = DB::table('saran')
@@ -48,7 +51,7 @@ class DashboardController extends Controller
                 ->count();
         }
 
-        // SARAN LIST (FIX snake_case)
+        // SARAN LIST: 3 terbaru untuk ditampilkan di dashboard
         $saran_list = DB::table('saran')
             ->select('id', 'judul', 'email', 'isi_saran', 'tanggal_dikirim', 'foto_sampul', 'foto_type')
             ->orderBy('tanggal_dikirim', 'desc')
@@ -68,5 +71,35 @@ class DashboardController extends Controller
             'data',
             'saran_list'
         ));
+    }
+
+    /**
+     * ✅ SEARCH API: Untuk autocomplete search saran di dashboard
+     * Endpoint: GET /admin/dashboard/search?q=keyword
+     */
+    public function search(Request $request)
+    {
+        $search = trim($request->get('q', ''));
+        
+        $results = [
+            'saran' => [],
+            'query' => $search,
+        ];
+
+        if ($search && strlen($search) >= 2) {
+            // Search di tabel saran: judul, isi_saran, atau email
+            $results['saran'] = DB::table('saran')
+                ->select('id', 'judul', 'email', 'isi_saran', 'tanggal_dikirim')
+                ->where(function($query) use ($search) {
+                    $query->where('judul', 'like', "%{$search}%")
+                          ->orWhere('isi_saran', 'like', "%{$search}%")
+                          ->orWhere('email', 'like', "%{$search}%");
+                })
+                ->orderBy('tanggal_dikirim', 'desc')
+                ->limit(10)
+                ->get();
+        }
+
+        return response()->json($results);
     }
 }
