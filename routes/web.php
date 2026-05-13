@@ -20,6 +20,9 @@ use App\Http\Controllers\DashboardUmumController;
 use App\Http\Controllers\Admin\InfografisController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengajuanSuratController;
+use App\Http\Controllers\StrukturDesaDetailController;
+use App\Http\Controllers\KegiatanListController;
+use App\Http\Controllers\PrestasiListController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,8 +54,17 @@ Route::get('/login-otomatis', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/', [DashboardUmumController::class, '__invoke'])->name('home');
+
+// ✅ Route Publik untuk "Lihat Semua"
+Route::get('/kegiatan', [KegiatanListController::class, 'index'])->name('kegiatan.index');
+Route::get('/prestasi', [PrestasiListController::class, 'index'])->name('prestasi.index');
+
+// ✅ Route Detail Artikel
 Route::get('/kegiatan/{id}', [KegiatanDetailController::class, 'show'])->name('kegiatan.detail');
 Route::get('/prestasi/{id}', [PrestasiDetailController::class, 'show'])->name('prestasi.detail');
+
+// ✅ Route Struktur Desa Detail (Public)
+Route::get('/struktur-desa', [StrukturDesaDetailController::class, '__invoke'])->name('struktur.detail');
 
 /*
 |--------------------------------------------------------------------------
@@ -85,7 +97,6 @@ Route::middleware(['auth', 'prevent-back'])
 
         // ================= DASHBOARD =================
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        // ✅ TAMBAHKAN INI: Route untuk search autocomplete saran di dashboard
         Route::get('/dashboard/search', [DashboardController::class, 'search'])->name('dashboard.search');
 
         // ================= PROFILE =================
@@ -97,7 +108,7 @@ Route::middleware(['auth', 'prevent-back'])
         Route::post('/profile/upload-avatar', [ProfileController::class, 'uploadAvatar'])->name('profile.upload-avatar');
         Route::post('/profile/upload-cover', [ProfileController::class, 'uploadCover'])->name('profile.upload-cover');
 
-        // ================= KEGIATAN =================
+        // ================= KEGIATAN (ADMIN) =================
         Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
         Route::post('/kegiatan', [KegiatanController::class, 'store'])->name('kegiatan.store');
         Route::get('/kegiatan/{id}', [KegiatanController::class, 'show'])->whereNumber('id')->name('kegiatan.show');
@@ -105,7 +116,7 @@ Route::middleware(['auth', 'prevent-back'])
         Route::put('/kegiatan/{id}', [KegiatanController::class, 'update'])->whereNumber('id')->name('kegiatan.update');
         Route::delete('/kegiatan/{id}', [KegiatanController::class, 'destroy'])->whereNumber('id')->name('kegiatan.destroy');
 
-        // ================= PRESTASI =================
+        // ================= PRESTASI (ADMIN) =================
         Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
         Route::post('/prestasi', [PrestasiController::class, 'store'])->name('prestasi.store');
         Route::get('/prestasi/{id}/edit', [PrestasiController::class, 'edit'])->whereNumber('id')->name('prestasi.edit');
@@ -124,7 +135,6 @@ Route::middleware(['auth', 'prevent-back'])
         Route::delete('/saran/{id}', [SaranController::class, 'destroy'])->whereNumber('id')->name('saran.destroy');
 
         // ================= DATA PENDUDUK =================
-        // CRUD Routes (EXISTING - JANGAN DIHAPUS)
         Route::get('/penduduk', [PendudukController::class, 'index'])->name('penduduk.index');
         Route::get('/penduduk/create', [PendudukController::class, 'create'])->name('penduduk.create');
         Route::post('/penduduk', [PendudukController::class, 'store'])->name('penduduk.store');
@@ -138,10 +148,10 @@ Route::middleware(['auth', 'prevent-back'])
         Route::post('/penduduk/import', [PendudukController::class, 'processImport'])->name('penduduk.import.process');
         Route::get('/penduduk/template', [PendudukController::class, 'downloadTemplate'])->name('penduduk.template');
 
-        // API untuk infografis (EXISTING)
+        // API untuk infografis
         Route::get('/api/infografis-data', [PendudukController::class, 'infografisData'])->name('api.infografis.data');
 
-        // ================= STRUKTUR PERANGKAT DESA =================
+        // ================= STRUKTUR PERANGKAT DESA (ADMIN CRUD) =================
         Route::get('/struktur', [StrukturController::class, 'index'])->name('struktur.index');
         Route::get('/struktur/create', [StrukturController::class, 'create'])->name('struktur.create');
         Route::post('/struktur', [StrukturController::class, 'store'])->name('struktur.store');
@@ -159,20 +169,13 @@ Route::middleware(['auth', 'prevent-back'])
         Route::delete('/infografis/{id}', [InfografisController::class, 'destroy'])->whereNumber('id')->name('infografis.destroy');
 
         // ================= PENGAJUAN SURAT (BARU) ✅
-        // List pengajuan: /admin/surat?jenis=domisili
         Route::get('/surat', [PengajuanSuratController::class, 'index'])->name('surat.index');
-        
-        // Detail pengajuan: /admin/surat/domisili/5
         Route::get('/surat/{jenis}/{id}', [PengajuanSuratController::class, 'show'])
             ->where(['jenis' => '[a-z]+', 'id' => '[0-9]+'])
             ->name('surat.detail');
-        
-        // Update status: POST /admin/surat/domisili/5/update
         Route::post('/surat/{jenis}/{id}/update', [PengajuanSuratController::class, 'updateStatus'])
             ->where(['jenis' => '[a-z]+', 'id' => '[0-9]+'])
             ->name('surat.update');
-        
-        // Print laporan: GET /admin/surat/domisili/print
         Route::get('/surat/{jenis}/print', [PengajuanSuratController::class, 'print'])
             ->where(['jenis' => '[a-z]+'])
             ->name('surat.print');
