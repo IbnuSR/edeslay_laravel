@@ -14,7 +14,7 @@
     /* ===== TOP BAR ===== */
     .top-bar { 
         display: flex; align-items: center; justify-content: space-between; 
-        margin-bottom: 30px; background: #e3f2fd; padding: 20px 30px;
+        margin-bottom: 30px; background: #bdddff; padding: 20px 30px;
         border-radius: 16px; flex-wrap: wrap; gap: 20px;
     }
     .page-header h1 { font-size: 26px; font-weight: 700; color: #1e293b; margin-bottom: 4px; margin-top: 0; }

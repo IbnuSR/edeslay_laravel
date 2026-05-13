@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ✅ WAJIB: CSRF Token Meta Tag -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <title>Admin Desa Banjardowo</title>
     
     <!-- CSS Global (Font, Icon, dll) -->
@@ -66,6 +70,43 @@
     
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ✅ WAJIB: Setup CSRF Token untuk AJAX -->
+    <script>
+        // Setup CSRF token untuk semua request AJAX (fetch/axios/jQuery)
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            if (token) {
+                // Untuk fetch API
+                window.fetch = new Proxy(window.fetch, {
+                    apply(target, thisArg, args) {
+                        if (args[1]?.headers instanceof Headers) {
+                            args[1].headers.set('X-CSRF-TOKEN', token);
+                        } else if (args[1]?.headers) {
+                            args[1].headers['X-CSRF-TOKEN'] = token;
+                        } else {
+                            args[1] = args[1] || {};
+                            args[1].headers = { 'X-CSRF-TOKEN': token, ...args[1].headers };
+                        }
+                        return Reflect.apply(target, thisArg, args);
+                    }
+                });
+                
+                // Untuk axios (jika dipakai)
+                if (window.axios) {
+                    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+                }
+                
+                // Untuk jQuery (jika dipakai)
+                if (window.jQuery) {
+                    jQuery.ajaxSetup({
+                        headers: { 'X-CSRF-TOKEN': token }
+                    });
+                }
+            }
+        });
+    </script>
     
     <!-- Optional: Custom JS -->
     @stack('scripts')

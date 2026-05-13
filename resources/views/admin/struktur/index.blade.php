@@ -2,7 +2,7 @@
 @section('content')
 <style>
     .main-container { padding: 2rem; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .top-bar { display: flex; justify-content: space-between; background: #bdddff; align-items: center; margin-bottom: 2rem; }
     .page-header h1 { font-size: 24px; color: #1e293b; margin: 0; }
     .breadcrumb { font-size: 14px; color: #64748b; }
     .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; text-decoration: none; display: inline-block; }

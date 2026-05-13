@@ -51,27 +51,20 @@
                 </div>
 
                 <!-- PROFILE -->
-                <div class="profile-box">
-
-                    <div>
-
-                        <div class="fw-bold text-dark small">
-                            {{ Auth::user()->name ?? 'Administrator' }}
-                        </div>
-
-                        <div class="text-muted small">
-                            {{ Auth::user()->username ?? 'admin' }}
-                        </div>
-
-                    </div>
-
-                    <div class="profile-avatar">
-
-                        {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
-
-                    </div>
-
-                </div>
+               {{-- Profile --}}
+<div class="profile-wrapper">
+    <div class="profile-info">
+        <div class="name">{{ $namaAdmin ?? 'Administrator' }}</div>
+        <div class="role">{{ $roleAdmin ?? 'admin' }}</div>
+    </div>
+    <a href="{{ route('admin.profile') }}" class="profile-avatar">
+        @if(isset($fotoProfilSrc) && $fotoProfilSrc)
+            <img src="{{ $fotoProfilSrc }}" alt="Foto">
+        @else
+            {{ $inisialAdmin ?? 'A' }}
+        @endif
+    </a>
+</div>
 
             </div>
 
@@ -583,14 +576,14 @@
 
 body {
 
-    background: #f4f7fb;
+    background: rgb(244, 247, 251);
 }
 
 /* ================= HEADER ================= */
 
 .dashboard-header {
 
-    background: white;
+    background: #bdddff;
 
     border-radius: 18px;
 
@@ -638,21 +631,46 @@ body {
     width: 160px;
 }
 
-/* ================= PROFILE ================= */
+/* ================= PROFILE (✅ UPDATED) ================= */
 
-.profile-box {
-
-    background: #f8fafc;
-
-    border-radius: 50px;
-
-    padding: 8px 14px;
+.profile-wrapper {
 
     display: flex;
 
     align-items: center;
 
     gap: 12px;
+
+    padding: 8px 16px;
+
+    background: white;
+
+    border-radius: 999px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+
+    white-space: nowrap;
+}
+
+.profile-info {
+
+    text-align: right;
+}
+
+.profile-info .name {
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+    color: #1e293b;
+}
+
+.profile-info .role {
+
+    font-size: 12px;
+
+    color: #94a3b8;
 }
 
 .profile-avatar {
@@ -661,7 +679,7 @@ body {
 
     height: 40px;
 
-    border-radius: 50%;
+    border-radius: 999px;
 
     background: linear-gradient(
         135deg,
@@ -669,15 +687,32 @@ body {
         #fb923c
     );
 
-    color: white;
-
     display: flex;
 
     align-items: center;
 
     justify-content: center;
 
-    font-weight: bold;
+    font-weight: 600;
+
+    font-size: 16px;
+
+    color: white;
+
+    overflow: hidden;
+
+    flex-shrink: 0;
+
+    text-decoration: none !important;
+}
+
+.profile-avatar img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
 }
 
 /* ================= JENIS CARD ================= */
@@ -686,7 +721,7 @@ body {
 
     background: white;
 
-    border: 1px solid #e5e7eb;
+    border: 1px solid #848484;
 
     border-radius: 16px;
 

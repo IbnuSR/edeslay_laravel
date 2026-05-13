@@ -24,7 +24,7 @@
         align-items: center; 
         justify-content: space-between; 
         margin-bottom: 30px;
-        background: #e3f2fd;
+        background: #bdddff;
         padding: 20px 30px;
         border-radius: 16px;
         flex-wrap: wrap;
