@@ -13,7 +13,56 @@ class DashboardUmumController extends Controller
     public function __invoke()
     {
         // =====================================================================
-        // 1. AMBIL DATA KEGIATAN (Limit 6 untuk slider)
+        // 1. HERO SLIDES - KONFIGURASI FILE LOKAL
+        // 'file' berisi path relatif dari folder 'public/'
+        // =====================================================================
+        $heroSlides = [
+        [
+            'type' => 'video',
+            'file' => 'assets/videos/hero/hero1.mp4',
+            'title' => 'Selamat Datang di E-Deslay',
+            'subtitle' => 'Website Resmi Kelurahan Banjardowo',
+            'tagline' => 'Layanan Digital Desa Yang Lebih Mudah Dan Cepat'
+        ],
+        [
+            'type' => 'video',
+            'file' => 'assets/videos/hero/hero2.mp4',
+            'title' => 'Profil Desa Banjardowo',
+            'subtitle' => 'Membangun Desa Bersama',
+            'tagline' => 'Transparan, Efisien, dan Berkarakter'
+        ],
+        [
+            'type' => 'video',
+            'file' => 'assets/videos/hero/hero3.mp4',
+            'title' => 'Inovasi Digital untuk Kesejahteraan',
+            'subtitle' => 'Desa Banjardowo Menuju Smart Village',
+            'tagline' => 'Akses Informasi Cepat, Jelas, dan Terstruktur'
+        ],
+        [
+            'type' => 'video',
+            'file' => 'assets/videos/hero/hero4.mp4',
+            'title' => 'Potensi Desa Banjardowo',
+            'subtitle' => 'Mengenal Sumber Daya Alam & Manusia',
+            'tagline' => 'Desa yang Kaya akan Potensi'
+        ],
+        [
+            'type' => 'video',
+            'file' => 'assets/videos/hero/hero5.mp4',
+            'title' => 'Kegiatan Masyarakat',
+            'subtitle' => 'Gotong Royong & Kearifan Lokal',
+            'tagline' => 'Bersama Membangun Desa'
+        ],
+        [
+            'type' => 'video',
+            'file' => 'assets/videos/hero/hero6.mp4',
+            'title' => 'Prestasi & Harapan',
+            'subtitle' => 'Langkah Maju Desa Banjardowo',
+            'tagline' => 'Terus Berkarya untuk Negeri'
+        ],
+    ];
+
+        // =====================================================================
+        // 2. AMBIL DATA KEGIATAN (Limit 6 untuk slider)
         // =====================================================================
         $kegiatanList = DB::table('kegiatan')
             ->select('id', 'judul', 'deskripsi', 'tanggal', 'foto', 'foto_type')
@@ -42,7 +91,7 @@ class DashboardUmumController extends Controller
             });
 
         // =====================================================================
-        // 2. AMBIL DATA PRESTASI (Limit 6 untuk slider)
+        // 3. AMBIL DATA PRESTASI (Limit 6 untuk slider)
         // =====================================================================
         $prestasiList = DB::table('prestasi')
             ->select('id', 'judul', 'deskripsi', 'tanggal', 'foto', 'foto_type')
@@ -70,49 +119,40 @@ class DashboardUmumController extends Controller
                 return $item;
             });
 
-       // =====================================================================
-       // 3. AMBIL DATA STRUKTUR DESA
-       // =====================================================================
-       $strukturDesa = DB::table('struktur_desa')
-          ->select('id', 'nama', 'jabatan', 'nip', 'foto', 'urutan')
-          ->orderBy('urutan', 'asc')
-          ->get()
-          ->map(function ($item) {
-            // Handle foto: path storage atau default
-            if ($item->foto) {
-                $item->foto_url = asset('storage/' . $item->foto);
-            } else {
-                $item->foto_url = asset('assets/images/default-avatar.png');
-            }
-            return $item;
-        });
+        // =====================================================================
+        // 4. AMBIL DATA STRUKTUR DESA
+        // =====================================================================
+        $strukturDesa = DB::table('struktur_desa')
+            ->select('id', 'nama', 'jabatan', 'nip', 'foto', 'urutan')
+            ->orderBy('urutan', 'asc')
+            ->get()
+            ->map(function ($item) {
+                if ($item->foto) {
+                    $item->foto_url = asset('storage/' . $item->foto);
+                } else {
+                    $item->foto_url = asset('assets/images/default-avatar.png');
+                }
+                return $item;
+            });
 
         // =====================================================================
-        // 4. INFOGRAFIS - AMBIL DARI TABEL PENDUDUK
+        // 5. INFOGRAFIS - AMBIL DARI TABEL PENDUDUK
         // =====================================================================
         
-        // Helper: ambil icon path
         $getIcon = fn($name) => asset("assets/icons/{$name}.png");
-        
-        // Query dasar untuk penduduk
         $q = Penduduk::query();
         
-        // Jika kolom status_penduduk ada, filter hanya 'Tetap'
         try {
             if (Schema::hasColumn('penduduk', 'status_penduduk')) {
                 $q->where('status_penduduk', 'Tetap');
             }
-        } catch (\Exception $e) {
-            // Skip jika kolom tidak ada
-        }
+        } catch (\Exception $e) {}
 
-        // 4a. Jumlah Dasar
         $total = $q->count();
         $kk = (clone $q)->where('status_keluarga', 'Kepala Keluarga')->count();
         $laki = (clone $q)->where('jenis_kelamin', 'L')->count();
         $perempuan = (clone $q)->where('jenis_kelamin', 'P')->count();
 
-        // 4b. Perkawinan (sesuai struktur blade)
         $perkawinan = [
             'belum_kawin' => ['value' => (clone $q)->where('status_perkawinan', 'Belum Kawin')->count(), 'icon' => $getIcon('bk')],
             'kawin' => ['value' => (clone $q)->where('status_perkawinan', 'Kawin')->count(), 'icon' => $getIcon('k')],
@@ -122,17 +162,14 @@ class DashboardUmumController extends Controller
             'kawin_tidak_tercatat' => ['value' => (clone $q)->where('status_perkawinan', 'Kawin')->where('kawin_tercatat', 'Tidak')->count(), 'icon' => $getIcon('ktt')],
         ];
 
-        // 4c. Kelompok Umur (Pyramid) - ✅ DIPERBAIKI
         $ageGroups = ['0-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65-69','70-74','75-79','80-84','85+'];
         $kelompokUmur = [];
         
         foreach ($ageGroups as $range) {
-            // Handle range dengan '+' (contoh: '85+')
             if (str_contains($range, '+')) {
                 $min = (int) str_replace('+', '', $range);
-                $max = 999; // Unlimited
+                $max = 999;
             } else {
-                // Handle range normal (contoh: '0-4')
                 [$min, $max] = explode('-', $range);
                 $max = (int)$max;
                 $min = (int)$min;
@@ -144,7 +181,6 @@ class DashboardUmumController extends Controller
             $kelompokUmur[$range] = ['laki' => $lakiAge, 'perempuan' => $perempuanAge];
         }
 
-        // 4d. Pendidikan (GROUPING sesuai label blade)
         $pendidikanRaw = (clone $q)->selectRaw('
             CASE 
                 WHEN pendidikan IN ("Tidak Sekolah","Belum Sekolah") THEN "tidak_belum_sekolah"
@@ -175,7 +211,6 @@ class DashboardUmumController extends Controller
             'strata_iii' => $pendidikanRaw->get('strata_iii', 0),
         ];
 
-        // 4e. Pekerjaan (GROUPING sesuai label blade)
         $pekerjaanRaw = (clone $q)->selectRaw('
             CASE 
                 WHEN pekerjaan IN ("Belum Bekerja","Tidak Bekerja","Menganggur") OR pekerjaan IS NULL OR pekerjaan = "" THEN "belum_tidak_bekerja"
@@ -198,7 +233,6 @@ class DashboardUmumController extends Controller
             'pedagang' => ['value' => $pekerjaanRaw->get('pedagang', 0), 'icon' => $getIcon('D')],
         ];
 
-        // 4f. Susun array $infografis FINAL
         $infografis = [
             'total_penduduk' => ['value' => $total, 'icon' => $getIcon('penduduk')],
             'kepala_keluarga' => ['value' => $kk, 'icon' => $getIcon('family')],
@@ -211,9 +245,10 @@ class DashboardUmumController extends Controller
         ];
 
         // =====================================================================
-        // 5. RETURN VIEW
+        // 6. RETURN VIEW
         // =====================================================================
         return view('dashboard_umum', compact(
+            'heroSlides',      // ✅ ARRAY HERO SLIDES LOKAL
             'kegiatanList',
             'prestasiList',
             'strukturDesa',

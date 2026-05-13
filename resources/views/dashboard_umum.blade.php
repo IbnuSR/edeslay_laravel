@@ -37,17 +37,76 @@
         .login-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
         .mobile-menu-btn { display: none; background: none; border: none; color: #1c3f9f; font-size: 1.5rem; cursor: pointer; padding: 8px; }
 
-        /* ===== HERO SLIDER ===== */
-        .hero-slider { margin-top: 72px; position: relative; height: 580px; overflow: hidden; border-radius: 0 0 30px 30px; }
-        .hero-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.8s ease-in-out; transform: scale(1.05); }
-        .hero-slide.active { opacity: 1; transform: scale(1); transition: opacity 0.8s ease-in-out, transform 6s ease-out; }
-        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%); display: flex; align-items: center; justify-content: center; text-align: center; color: white; }
+        /* ===== HERO SLIDER - FIXED ===== */
+        .hero-slider { 
+            margin-top: 72px; 
+            position: relative; 
+            height: 580px; 
+            overflow: hidden; 
+            border-radius: 0 0 30px 30px; 
+        }
+        .hero-slide { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            opacity: 0; 
+            transition: opacity 0.8s ease-in-out; 
+            z-index: 1;
+        }
+        .hero-slide.active { 
+            opacity: 1; 
+            z-index: 2;
+            transition: opacity 0.8s ease-in-out;
+        }
+        .hero-slide video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .hero-overlay { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            color: white;
+            z-index: 1;
+        }
         .hero-content { max-width: 700px; padding: 2rem; animation: fadeInUp 0.8s ease; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .hero-content h1 { font-size: 3rem; font-weight: 800; margin-bottom: 0.8rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3); line-height: 1.2; }
         .hero-content p { font-size: 1.3rem; margin-bottom: 1rem; opacity: 0.95; font-weight: 500; }
         .hero-tagline { display: inline-block; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 10px 24px; border-radius: 25px; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.25); }
-        .hero-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); color: white; font-size: 1.2rem; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .hero-nav-btn { 
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.2); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255,255,255,0.3); 
+            color: white; 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            z-index: 10; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.3s; 
+        }
         .hero-nav-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-50%) scale(1.1); }
         .hero-nav-btn.prev { left: 25px; }
         .hero-nav-btn.next { right: 25px; }
@@ -96,14 +155,13 @@
         .info-content .number { color: #667eea; font-size: 1.8rem; font-weight: 700; }
         .pyramid-chart-container, .chart-container { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 2rem; }
 
-        /* ===== STRUKTUR GRID - ✅ UKURAN SERAGAM ===== */
+        /* ===== STRUKTUR GRID - UKURAN SERAGAM ===== */
         .struktur-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
             gap: 2rem; 
             margin-top: 2rem;
         }
-
         .struktur-card { 
             background: white;
             border-radius: 16px;
@@ -117,46 +175,14 @@
             height: 100%;
             min-height: 320px;
         }
-
-        .struktur-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-        }
-
+        .struktur-card:hover { transform: translateY(-8px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
         .struktur-foto {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-bottom: 1.5rem;
-            border: 4px solid #e3f2fd;
-            background: #f1f5f9;
-            flex-shrink: 0;
+            width: 120px; height: 120px; object-fit: cover; border-radius: 50%;
+            margin-bottom: 1.5rem; border: 4px solid #e3f2fd; background: #f1f5f9; flex-shrink: 0;
         }
-
-        .struktur-card h3 {
-            color: #1c3f9f;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0.5rem 0 0.25rem;
-            text-align: center;
-            line-height: 1.3;
-        }
-
-        .struktur-jabatan {
-            color: #667eea;
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin: 0.5rem 0;
-            text-align: center;
-        }
-
-        .struktur-nip {
-            color: #94a3b8;
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-            text-align: center;
-        }
+        .struktur-card h3 { color: #1c3f9f; font-size: 1.1rem; font-weight: 600; margin: 0.5rem 0 0.25rem; text-align: center; line-height: 1.3; }
+        .struktur-jabatan { color: #667eea; font-size: 0.95rem; font-weight: 500; margin: 0.5rem 0; text-align: center; }
+        .struktur-nip { color: #94a3b8; font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
 
         /* ===== DOWNLOAD & FOOTER ===== */
         .download-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 4rem 5%; text-align: center; }
@@ -190,8 +216,6 @@
             .logo-text h1 { font-size: 1rem; }
             .cards-grid, .infografis-grid, .struktur-grid { grid-template-columns: 1fr; }
             .section { padding: 3rem 5%; }
-            
-            /* Struktur responsive */
             .struktur-card { min-height: 280px; padding: 1.5rem 1rem; }
             .struktur-foto { width: 100px; height: 100px; }
             .struktur-card h3 { font-size: 1rem; }
@@ -201,8 +225,6 @@
             .hero-slider { height: 380px; }
             .hero-content h1 { font-size: 1.5rem; }
             .hero-content p { font-size: 0.9rem; }
-            
-            /* Struktur mobile kecil */
             .struktur-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
             .struktur-card { min-height: 260px; padding: 1rem 0.75rem; }
             .struktur-foto { width: 80px; height: 80px; margin-bottom: 1rem; }
@@ -234,17 +256,33 @@
         </div>
     </header>
 
-    <!-- HERO SLIDER -->
+    <!-- HERO SLIDER - FIXED -->
     <section class="hero-slider" id="heroSlider">
-        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80');">
-            <div class="hero-overlay"><div class="hero-content"><h1>Selamat Datang di E-Deslay</h1><p>Website Resmi Kelurahan Banjardowo</p><span class="hero-tagline">Layanan Digital Desa Yang Lebih Mudah Dan Cepat</span></div></div>
-        </div>
-        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80');">
-            <div class="hero-overlay"><div class="hero-content"><h1>Membangun Desa Bersama</h1><p>Transparan, Efisien, dan Berkarakter</p><span class="hero-tagline">Mewujudkan Pelayanan Publik yang Berorientasi pada Masyarakat</span></div></div>
-        </div>
-        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80');">
-            <div class="hero-overlay"><div class="hero-content"><h1>Inovasi Digital untuk Kesejahteraan</h1><p>Desa Banjardowo Menuju Smart Village</p><span class="hero-tagline">Akses Informasi Cepat, Jelas, dan Terstruktur</span></div></div>
-        </div>
+        @foreach($heroSlides as $index => $slide)
+            <div class="hero-slide {{ $index === 0 ? 'active' : '' }}">
+                <!-- Video Background -->
+                <video 
+                    @if($index === 0) autoplay @endif
+                    muted 
+                    loop 
+                    playsinline
+                    preload="auto"
+                    style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: -1;">
+                    <source src="{{ asset($slide['file']) }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                
+                <!-- Overlay -->
+                <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+                    <div class="hero-content">
+                        <h1>{{ $slide['title'] }}</h1>
+                        <p>{{ $slide['subtitle'] }}</p>
+                        <span class="hero-tagline">{{ $slide['tagline'] }}</span>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+        
         <button class="hero-nav-btn prev" onclick="geserHero(-1)"><i class="fas fa-chevron-left"></i></button>
         <button class="hero-nav-btn next" onclick="geserHero(1)"><i class="fas fa-chevron-right"></i></button>
         <div class="hero-indicators" id="heroIndicators"></div>
@@ -308,7 +346,7 @@
         </div>
     </section>
 
-    <!-- STRUKTUR DESA - ✅ UKURAN SERAGAM -->
+    <!-- STRUKTUR DESA - UKURAN SERAGAM -->
     <section class="section" id="struktur">
         <div class="section-title">
             <h2>Struktur Perangkat Desa</h2>
@@ -366,12 +404,14 @@
     </footer>
 
     <script>
-        // ===== HERO SLIDER =====
+        // ===== HERO SLIDER WITH VIDEO CONTROL =====
         (function() {
             const slides = document.querySelectorAll('.hero-slide');
             const indicatorsContainer = document.getElementById('heroIndicators');
             let currentHeroSlide = 0;
             let heroAutoInterval;
+            
+            // Buat indikator dots
             slides.forEach((_, i) => {
                 const dot = document.createElement('div');
                 dot.classList.add('hero-dot');
@@ -379,27 +419,72 @@
                 dot.addEventListener('click', () => goToHeroSlide(i));
                 indicatorsContainer.appendChild(dot);
             });
+            
             const dots = document.querySelectorAll('.hero-dot');
+            
             function goToHeroSlide(index) {
+                // Pause video di slide lama
+                const oldVideo = slides[currentHeroSlide].querySelector('video');
+                if (oldVideo) {
+                    oldVideo.pause();
+                    oldVideo.currentTime = 0;
+                }
+                
+                // Update slide & dot
                 slides[currentHeroSlide].classList.remove('active');
-                dots[currentHeroSlide].classList.remove('active');
+                dots[currentHeroSlide]?.classList.remove('active');
+                
                 currentHeroSlide = (index + slides.length) % slides.length;
+                
                 slides[currentHeroSlide].classList.add('active');
-                dots[currentHeroSlide].classList.add('active');
+                dots[currentHeroSlide]?.classList.add('active');
+                
+                // Play video di slide baru dengan delay
+                setTimeout(() => {
+                    const newVideo = slides[currentHeroSlide].querySelector('video');
+                    if (newVideo) {
+                        newVideo.play().catch(error => {
+                            console.log('Video autoplay:', error);
+                        });
+                    }
+                }, 800);
             }
-            window.geserHero = function(direction) { goToHeroSlide(currentHeroSlide + direction); resetHeroAuto(); };
-            function startHeroAuto() { heroAutoInterval = setInterval(() => { goToHeroSlide(currentHeroSlide + 1); }, 5000); }
-            function resetHeroAuto() { clearInterval(heroAutoInterval); startHeroAuto(); }
+            
+            window.geserHero = function(direction) { 
+                goToHeroSlide(currentHeroSlide + direction); 
+                resetHeroAuto(); 
+            };
+            
+            function startHeroAuto() { 
+                heroAutoInterval = setInterval(() => { 
+                    goToHeroSlide(currentHeroSlide + 1); 
+                }, 8000);
+            }
+            
+            function resetHeroAuto() { 
+                clearInterval(heroAutoInterval); 
+                startHeroAuto(); 
+            }
+            
             const heroSlider = document.getElementById('heroSlider');
             heroSlider.addEventListener('mouseenter', () => clearInterval(heroAutoInterval));
             heroSlider.addEventListener('mouseleave', startHeroAuto);
+            
+            // Touch swipe
             let touchStartX = 0, touchEndX = 0;
-            heroSlider.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            heroSlider.addEventListener('touchstart', e => { 
+                touchStartX = e.changedTouches[0].screenX; 
+            }, { passive: true });
+            
             heroSlider.addEventListener('touchend', e => {
                 touchEndX = e.changedTouches[0].screenX;
                 const diff = touchStartX - touchEndX;
-                if (Math.abs(diff) > 50) { goToHeroSlide(diff > 0 ? currentHeroSlide + 1 : currentHeroSlide - 1); resetHeroAuto(); }
+                if (Math.abs(diff) > 50) { 
+                    goToHeroSlide(diff > 0 ? currentHeroSlide + 1 : currentHeroSlide - 1); 
+                    resetHeroAuto(); 
+                }
             }, { passive: true });
+            
             startHeroAuto();
         })();
 
