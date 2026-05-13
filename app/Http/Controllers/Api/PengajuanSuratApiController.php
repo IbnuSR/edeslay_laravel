@@ -1,71 +1,179 @@
 <?php
 
-namespace App\Http\Controllers\Api; // <--- WAJIB BENAR
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Sktm;
 
 class PengajuanSuratApiController extends Controller
 {
-    private $tables = [
-        'domisili' => 'pengajuan_domisili',
-        'sktm' => 'pengajuan_sktm',
-        'penghasilan' => 'pengajuan_penghasilan',
-        'kelahiran' => 'pengajuan_kelahiran',
-        'ktp' => 'pengajuan_ktp',
-        'kematian' => 'pengajuan_kematian',
-        'izin' => 'pengajuan_izin',
-        'nikah' => 'pengajuan_nikah',
-    ];
-
-    // Mobile kirim data сюда
-    public function store(Request $request)
+    // ================= STORE SKTM =================
+    public function storeSKTM(Request $request)
     {
-        $jenis = $request->jenis_surat; // contoh: "domisili"
-        $table = $this->tables[$jenis] ?? null;
+        try {
 
-        if (!$table) return response()->json(['error' => 'Jenis surat tidak dikenali'], 400);
+            $request->validate([
 
-        // 1. Simpan File Scan (KTP/KK) jadi JSON array
-        $files = [];
-        if ($request->hasFile('scan_ktp')) $files['ktp'] = $request->file('scan_ktp')->store('scan_' . $jenis, 'public');
-        if ($request->hasFile('scan_kk')) $files['kk'] = $request->file('scan_kk')->store('scan_' . $jenis, 'public');
-        // Tambahkan file lain sesuai jenis surat jika perlu
+                'user_id' =>
+                    'required',
 
-        // 2. Ambil semua input kecuali file & token
-        $input = $request->except(['_token', 'scan_ktp', 'scan_kk', 'jenis_surat']);
-        $input['dokumen_scan'] = json_encode($files);
-        $input['status'] = 'proses';
-        $input['created_at'] = now();
-        $input['updated_at'] = now();
+                'nama_lengkap' =>
+                    'required',
 
-        // 3. Insert ke Tabel yang sesuai
-        $id = DB::table($table)->insertGetId($input);
+                'nik' =>
+                    'required',
 
-        return response()->json([
-            'success' => true, 
-            'message' => 'Pengajuan berhasil dikirim',
-            'id' => $id
-        ], 201);
+                'no_hp' =>
+                    'required',
+
+                'alamat' =>
+                    'required',
+
+                'tanggal_pengajuan' =>
+                    'required',
+
+                'jumlah_tanggungan' =>
+                    'required',
+
+                'status_ekonomi' =>
+                    'required',
+
+                'tujuan_sktm' =>
+                    'required',
+
+                'metode_pengambilan' =>
+                    'required',
+
+                'dokumen_scan' =>
+                    'required|image|mimes:jpg,jpeg,png|max:2048',
+            ]);
+
+            $path = null;
+
+            // ================= UPLOAD FOTO =================
+            if ($request->hasFile('dokumen_scan')) {
+
+                $file =
+                    $request->file('dokumen_scan');
+
+                $filename =
+                    time() . '_' .
+                    $file->getClientOriginalName();
+
+                // BUAT FOLDER
+                if (!file_exists(public_path('storage/sktm'))) {
+
+                    mkdir(
+                        public_path('storage/sktm'),
+                        0777,
+                        true
+                    );
+                }
+
+                // MOVE FILE
+                $file->move(
+                    public_path('storage/sktm'),
+                    $filename
+                );
+
+                $path =
+                    'storage/sktm/' .
+                    $filename;
+            }
+
+            // ================= SIMPAN DATABASE =================
+            $sktm = new Sktm();
+
+            $sktm->user_id =
+                $request->user_id;
+
+            $sktm->nama_lengkap =
+                $request->nama_lengkap;
+
+            $sktm->nik =
+                $request->nik;
+
+            $sktm->no_hp =
+                $request->no_hp;
+
+            $sktm->alamat =
+                $request->alamat;
+
+            $sktm->tanggal_pengajuan =
+                $request->tanggal_pengajuan;
+
+            $sktm->jumlah_tanggungan =
+                $request->jumlah_tanggungan;
+
+            $sktm->status_ekonomi =
+                $request->status_ekonomi;
+
+            // FIX DATABASE
+            $sktm->tujuan_skmt =
+                $request->tujuan_sktm;
+
+            $sktm->metode_pengambilan =
+                $request->metode_pengambilan;
+
+            $sktm->dokumen_scan =
+                $path;
+
+            $sktm->status =
+                'proses';
+
+            $sktm->save();
+
+            return response()->json([
+
+                'success' => true,
+
+                'message' =>
+                    'Pengajuan berhasil dikirim',
+
+                'data' => $sktm
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    $e->getMessage()
+            ], 500);
+        }
     }
 
-    // Mobile cek status
-    public function checkStatus($jenis, $id)
+    // ================= RIWAYAT USER =================
+    public function getSKTMByUser($userId)
     {
-        $table = $this->tables[$jenis] ?? abort(404);
-        $data = DB::table($table)->where('id', $id)->first();
-        
-        if (!$data) return response()->json(['error' => 'Data tidak ditemukan'], 404);
+        $data = Sktm::where(
+            'user_id',
+            $userId
+        )
+            ->latest()
+            ->get();
 
-        // Format agar mudah dibaca Mobile
         return response()->json([
-            'status' => $data->status,
-            'keterangan' => $data->keterangan_admin, // Jika ambil di desa
-            'alasan_tolak' => $data->alasan_tolak,   // Jika ditolak
-            'file_url' => $data->file_surat_jadi ? asset('storage/' . $data->file_surat_jadi) : null, // Jika online
-            'nomor_surat' => $data->nomor_surat
+
+            'success' => true,
+
+            'data' => $data
+        ]);
+    }
+
+    // ================= GET ALL =================
+    public function getSKTM()
+    {
+        $data = Sktm::latest()->get();
+
+        return response()->json([
+
+            'success' => true,
+
+            'data' => $data
         ]);
     }
 }

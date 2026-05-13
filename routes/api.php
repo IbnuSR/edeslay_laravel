@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PengajuanSuratApiController;
 
 // =========================================================
 // CONTROLLER API MOBILE
@@ -74,6 +75,30 @@ Route::delete('/delete-saran/{id}', [SaranController::class, 'deleteSaran']);
 Route::get('/kegiatan', [KegiatanController::class, 'getKegiatan']);
 
 Route::get('/detail-kegiatan/{id}', [KegiatanController::class, 'detailKegiatan']);
+
+// =========================================================
+// SKTM MOBILE
+// =========================================================
+
+// ================= SKTM =================
+
+Route::post(
+    '/pengajuan-sktm',
+    [PengajuanSuratApiController::class, 'storeSKTM']
+);
+
+Route::get(
+    '/pengajuan-sktm',
+    [PengajuanSuratApiController::class, 'getSKTM']
+);
+
+// ================= RIWAYAT USER =================
+
+Route::get(
+    '/pengajuan-sktm/user/{id}',
+    [PengajuanSuratApiController::class,
+    'getSKTMByUser']
+);
 
 // =========================================================
 // API WEBSITE YANG SUDAH ADA

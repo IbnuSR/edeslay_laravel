@@ -1,385 +1,992 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Header Section dengan Style Baru -->
-<div class="modern-header">
-    <div class="header-left">
-        <h1 class="header-title">Pengajuan Surat Online</h1>
-        <div class="breadcrumb">
-            Dashboard / Pengajuan Surat / {{ ucfirst(request('jenis', 'domisili')) }}
-        </div>
-    </div>
-    
-    <div class="header-right">
-        <!-- Tombol Cetak Laporan -->
-        <a href="{{ route('admin.surat.print', ['jenis' => request('jenis', 'domisili')]) }}" 
-           target="_blank" 
-           class="btn-print-laporan">
-            <i class="fas fa-print"></i>
-            <span>Cetak Laporan</span>
-        </a>
-        
-        <!-- Search Jenis Surat -->
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchJenisSurat" placeholder="Cari Jenis Surat...">
-        </div>
-        
-        <!-- ✅ User Profile - PAKAI VARIABEL GLOBAL DARI AppServiceProvider -->
-        <div class="user-profile">
-            <div class="user-info">
-                <div class="user-name">{{ $namaAdmin ?? 'Administrator Desa Banjardowo' }}</div>
-                <div class="user-role">{{ $roleAdmin ?? 'admin' }}</div>
-            </div>
-            <a href="{{ route('admin.profile') }}" class="user-avatar">
-                @if($fotoProfilSrc ?? false)
-                    <img src="{{ $fotoProfilSrc }}" alt="Foto" onerror="this.parentElement.innerHTML='{{ $inisialAdmin ?? 'A' }}'">
-                @else
-                    {{ $inisialAdmin ?? 'A' }}
-                @endif
-            </a>
-        </div>
-    </div>
-</div>
 
 <div class="container-fluid px-4 py-4">
-    <!-- Tab Navigation -->
-    <div class="card shadow-sm mb-4 border-0">
-        <div class="card-body p-3">
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;" id="jenisSuratGrid">
-                @php
-                    $jenisSurat = [
-                        'domisili' => ['icon' => 'fa-home', 'label' => 'Surat Domisili'],
-                        'sktm' => ['icon' => 'fa-hand-holding-heart', 'label' => 'SKTM'],
-                        'penghasilan' => ['icon' => 'fa-money-bill-wave', 'label' => 'Surat Penghasilan'],
-                        'kelahiran' => ['icon' => 'fa-baby', 'label' => 'Surat Kelahiran'],
-                        'ktp' => ['icon' => 'fa-id-card', 'label' => 'Surat KTP'],
-                        'kematian' => ['icon' => 'fa-pray', 'label' => 'Surat Kematian'],
-                        'izin' => ['icon' => 'fa-file-contract', 'label' => 'Izin Kegiatan'],
-                        'nikah' => ['icon' => 'fa-ring', 'label' => 'Surat Nikah']
-                    ];
-                @endphp
+
+    <!-- ================= HEADER ================= -->
+    <div class="dashboard-header mb-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <!-- LEFT -->
+            <div>
+
+                <h2 class="fw-bold mb-1 text-dark">
+                    Pengajuan Surat Online
+                </h2>
+
+                <div class="text-muted small">
+                    Dashboard /
+                    Pengajuan Surat /
+                    {{ ucfirst(request('jenis', 'domisili')) }}
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+
+                <!-- CETAK -->
+                <a href="{{ route('admin.surat.print', ['jenis' => request('jenis', 'domisili')]) }}"
+                   target="_blank"
+                   class="btn btn-primary rounded-pill px-4 shadow-sm">
+
+                    <i class="fas fa-print me-2"></i>
+                    Cetak Laporan
+
+                </a>
+
+                <!-- SEARCH -->
+                <div class="search-modern">
+
+                    <i class="fas fa-search"></i>
+
+                    <input
+                        type="text"
+                        id="searchJenisSurat"
+                        placeholder="Cari jenis surat..."
+                    >
+
+                </div>
+
+                <!-- PROFILE -->
+                <div class="profile-box">
+
+                    <div>
+
+                        <div class="fw-bold text-dark small">
+                            {{ Auth::user()->name ?? 'Administrator' }}
+                        </div>
+
+                        <div class="text-muted small">
+                            {{ Auth::user()->username ?? 'admin' }}
+                        </div>
+
+                    </div>
+
+                    <div class="profile-avatar">
+
+                        {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= MENU JENIS SURAT ================= -->
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            @php
+
+                $jenisSurat = [
+
+                    'domisili' => [
+                        'icon' => 'fa-home',
+                        'label' => 'Surat Domisili'
+                    ],
+
+                    'sktm' => [
+                        'icon' => 'fa-hand-holding-heart',
+                        'label' => 'SKTM'
+                    ],
+
+                    'penghasilan' => [
+                        'icon' => 'fa-money-bill-wave',
+                        'label' => 'Surat Penghasilan'
+                    ],
+
+                    'kelahiran' => [
+                        'icon' => 'fa-baby',
+                        'label' => 'Surat Kelahiran'
+                    ],
+
+                    'ktp' => [
+                        'icon' => 'fa-id-card',
+                        'label' => 'Surat KTP'
+                    ],
+
+                    'kematian' => [
+                        'icon' => 'fa-pray',
+                        'label' => 'Surat Kematian'
+                    ],
+
+                    'izin' => [
+                        'icon' => 'fa-file-contract',
+                        'label' => 'Izin Kegiatan'
+                    ],
+
+                    'nikah' => [
+                        'icon' => 'fa-ring',
+                        'label' => 'Surat Nikah'
+                    ],
+
+                ];
+
+            @endphp
+
+            <div class="row g-3" id="jenisSuratGrid">
 
                 @foreach($jenisSurat as $key => $item)
-                <a href="{{ route('admin.surat.index', ['jenis' => $key]) }}" 
-                   class="jenis-surat-item d-flex align-items-center justify-content-center p-3 rounded text-decoration-none transition-all
-                          {{ request('jenis') == $key ? 'bg-primary text-white shadow' : 'bg-white text-gray-600 border hover-bg-light' }}"
-                   data-jenis="{{ $item['label'] }}"
-                   style="min-height: 60px; font-weight: 500;">
-                    <i class="fas {{ $item['icon'] }} me-2"></i>
-                    <span>{{ $item['label'] }}</span>
-                    <span class="badge ms-2 {{ request('jenis') == $key ? 'bg-light text-primary' : 'bg-primary' }}">
-                        @php 
-                            $count = 0;
-                            try {
-                                $count = \DB::table('pengajuan_' . $key)->count();
-                            } catch (\Exception $e) { $count = 0; }
-                            echo $count;
-                        @endphp
-                    </span>
-                </a>
+
+                    @php
+                        $count = \DB::table('pengajuan_' . $key)->count();
+                    @endphp
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <a
+                            href="{{ route('admin.surat.index', ['jenis' => $key]) }}"
+                            class="jenis-card text-decoration-none
+                            {{ request('jenis') == $key ? 'active-jenis' : '' }}"
+                            data-jenis="{{ strtolower($item['label']) }}"
+                        >
+
+                            <div class="d-flex align-items-center justify-content-between">
+
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <div class="jenis-icon">
+
+                                        <i class="fas {{ $item['icon'] }}"></i>
+
+                                    </div>
+
+                                    <div class="jenis-title">
+
+                                        {{ $item['label'] }}
+
+                                    </div>
+
+                                </div>
+
+                                <span class="badge rounded-pill bg-primary">
+
+                                    {{ $count }}
+
+                                </span>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
                 @endforeach
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Sedang Diproses</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php 
-                                    $jenis = request('jenis', 'domisili'); 
-                                    $proses = 0;
-                                    try {
-                                        $proses = \DB::table('pengajuan_' . $jenis)->where('status', 'proses')->count();
-                                    } catch (\Exception $e) { $proses = 0; }
-                                @endphp
-                                {{ $proses }}
-                            </div>
-                        </div>
-                        <div class="col-auto"><i class="fas fa-spinner fa-2x text-gray-300"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- ================= FILTER ================= -->
+    <div class="card border-0 shadow-sm mb-4">
 
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Selesai</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php 
-                                    $selesai = 0;
-                                    try {
-                                        $selesai = \DB::table('pengajuan_' . $jenis)->where('status', 'selesai')->count();
-                                    } catch (\Exception $e) { $selesai = 0; }
-                                @endphp
-                                {{ $selesai }}
-                            </div>
-                        </div>
-                        <div class="col-auto"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Ditolak</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php 
-                                    $ditolak = 0;
-                                    try {
-                                        $ditolak = \DB::table('pengajuan_' . $jenis)->where('status', 'ditolak')->count();
-                                    } catch (\Exception $e) { $ditolak = 0; }
-                                @endphp
-                                {{ $ditolak }}
-                            </div>
-                        </div>
-                        <div class="col-auto"><i class="fas fa-times-circle fa-2x text-gray-300"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-3">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Pengajuan</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                @php 
-                                    $total = 0;
-                                    try {
-                                        $total = \DB::table('pengajuan_' . $jenis)->count();
-                                    } catch (\Exception $e) { $total = 0; }
-                                @endphp
-                                {{ $total }}
-                            </div>
-                        </div>
-                        <div class="col-auto"><i class="fas fa-clipboard-list fa-2x text-gray-300"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alert Messages -->
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    <!-- Table Section -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">
-                <i class="fas fa-list me-2"></i>Daftar Pengajuan {{ ucfirst(request('jenis', 'domisili')) }}
-            </h6>
-            <div>
-                <input type="text" id="searchTable" class="form-control form-control-sm" placeholder="Cari Nama/NIK..." style="width: 200px;">
-            </div>
-        </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="table-light">
-                        <tr>
-                            <th width="5%">No</th>
-                            <th width="20%">Nama Pemohon</th>
-                            <th width="15%">NIK</th>
-                            <th width="12%">No. HP</th>
-                            <th width="12%">Tanggal</th>
-                            <th width="12%">Metode</th>
-                            <th width="12%">Status</th>
-                            <th width="12%">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{-- ✅ PAKAI $data ?? [] AGAR TIDAK ERROR JIKA NULL --}}
-                        @forelse($data ?? [] as $index => $row)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>
-                                <div class="fw-bold">{{ $row->nama_lengkap ?? $row->nama_pelapor ?? '-' }}</div>
-                                <small class="text-muted">{{ $row->no_hp ?? '-' }}</small>
-                            </td>
-                            <td>{{ $row->nik ?? $row->nik_pelapor ?? '-' }}</td>
-                            <td>{{ $row->no_hp ?? '-' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row->tanggal_pengajuan ?? now())->format('d/m/Y') }}</td>
-                            <td>
-                                @if(($row->metode_pengambilan ?? '') == 'cetak_online')
-                                    <span class="badge bg-info"><i class="fas fa-download me-1"></i>Online</span>
-                                @else
-                                    <span class="badge bg-purple"><i class="fas fa-store me-1"></i>Ambil Desa</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if(($row->status ?? '') == 'proses')
-                                    <span class="badge bg-warning text-dark"><i class="fas fa-spinner fa-spin me-1"></i>Proses</span>
-                                @elseif(($row->status ?? '') == 'selesai')
-                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Selesai</span>
-                                @else
-                                    <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Ditolak</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('admin.surat.detail', ['jenis' => request('jenis'), 'id' => $row->id ?? 0]) }}" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-eye"></i> Detail
-                                </a>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
-                                <p class="text-muted">Belum ada pengajuan surat {{ ucfirst(request('jenis', 'domisili')) }}</p>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div>
+
+                    <h5 class="fw-bold text-dark mb-1">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        Rekap Pengajuan
+                    </h5>
+
+                    <small class="text-muted">
+                        Filter data berdasarkan periode
+                    </small>
+
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <a href="{{ route('admin.surat.index', [
+                        'jenis' => request('jenis'),
+                        'filter' => 'hari_ini'
+                    ]) }}"
+                       class="btn-filter {{ request('filter') == 'hari_ini' ? 'active-filter' : '' }}">
+
+                        Hari Ini
+
+                    </a>
+
+                    <a href="{{ route('admin.surat.index', [
+                        'jenis' => request('jenis'),
+                        'filter' => 'minggu'
+                    ]) }}"
+                       class="btn-filter {{ request('filter') == 'minggu' ? 'active-filter' : '' }}">
+
+                        Minggu Ini
+
+                    </a>
+
+                    <a href="{{ route('admin.surat.index', [
+                        'jenis' => request('jenis'),
+                        'filter' => 'bulan'
+                    ]) }}"
+                       class="btn-filter {{ request('filter') == 'bulan' ? 'active-filter' : '' }}">
+
+                        Bulan Ini
+
+                    </a>
+
+                    <a href="{{ route('admin.surat.index', [
+                        'jenis' => request('jenis'),
+                        'filter' => 'tahun'
+                    ]) }}"
+                       class="btn-filter {{ request('filter') == 'tahun' ? 'active-filter' : '' }}">
+
+                        Tahun Ini
+
+                    </a>
+
+                    <a href="{{ route('admin.surat.index', [
+                        'jenis' => request('jenis')
+                    ]) }}"
+                       class="btn-filter {{ request('filter') == null ? 'active-filter' : '' }}">
+
+                        Semua
+
+                    </a>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
+
+    <!-- ================= STATS ================= -->
+    @php
+
+        $jenis = request('jenis', 'domisili');
+
+        $proses = \DB::table('pengajuan_' . $jenis)
+            ->where('status', 'proses')
+            ->count();
+
+        $selesai = \DB::table('pengajuan_' . $jenis)
+            ->where('status', 'selesai')
+            ->count();
+
+        $ditolak = \DB::table('pengajuan_' . $jenis)
+            ->where('status', 'ditolak')
+            ->count();
+
+        $total = \DB::table('pengajuan_' . $jenis)
+            ->count();
+
+    @endphp
+
+    <div class="row mb-4">
+
+        <div class="col-xl-3 col-md-6 mb-3">
+
+            <div class="stats-box stats-blue">
+
+                <div>
+
+                    <div class="stats-label">
+                        Sedang Diproses
+                    </div>
+
+                    <div class="stats-number">
+                        {{ $proses }}
+                    </div>
+
+                </div>
+
+                <i class="fas fa-spinner"></i>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+
+            <div class="stats-box stats-green">
+
+                <div>
+
+                    <div class="stats-label">
+                        Selesai
+                    </div>
+
+                    <div class="stats-number">
+                        {{ $selesai }}
+                    </div>
+
+                </div>
+
+                <i class="fas fa-check-circle"></i>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+
+            <div class="stats-box stats-red">
+
+                <div>
+
+                    <div class="stats-label">
+                        Ditolak
+                    </div>
+
+                    <div class="stats-number">
+                        {{ $ditolak }}
+                    </div>
+
+                </div>
+
+                <i class="fas fa-times-circle"></i>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3">
+
+            <div class="stats-box stats-cyan">
+
+                <div>
+
+                    <div class="stats-label">
+                        Total Pengajuan
+                    </div>
+
+                    <div class="stats-number">
+                        {{ $total }}
+                    </div>
+
+                </div>
+
+                <i class="fas fa-file-alt"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= ALERT ================= -->
+    @if(session('success'))
+
+        <div class="alert alert-success border-0 shadow-sm">
+
+            <i class="fas fa-check-circle me-2"></i>
+
+            {{ session('success') }}
+
+        </div>
+
+    @endif
+
+    <!-- ================= TABLE ================= -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <h5 class="fw-bold text-primary mb-0">
+
+                    <i class="fas fa-list me-2"></i>
+
+                    Daftar Pengajuan
+                    {{ strtoupper(request('jenis', 'domisili')) }}
+
+                </h5>
+
+                <div class="search-modern small-search">
+
+                    <i class="fas fa-search"></i>
+
+                    <input
+                        type="text"
+                        id="searchTable"
+                        placeholder="Cari nama / NIK..."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle modern-table" id="dataTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>No</th>
+                            <th>Pemohon</th>
+                            <th>NIK</th>
+                            <th>Tanggal</th>
+                            <th>Metode</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @forelse($data as $index => $row)
+
+                            <tr>
+
+                                <td>{{ $index + 1 }}</td>
+
+                                <td>
+
+                                    <div class="fw-bold">
+                                        {{ $row->nama_lengkap ?? $row->nama_pelapor ?? '-' }}
+                                    </div>
+
+                                    <small class="text-muted">
+                                        {{ $row->no_hp ?? '-' }}
+                                    </small>
+
+                                </td>
+
+                                <td>
+                                    {{ $row->nik ?? $row->nik_pelapor ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ \Carbon\Carbon::parse($row->tanggal_pengajuan)->format('d M Y') }}
+                                </td>
+
+                                <td>
+
+                                    @if($row->metode_pengambilan == 'cetak_online')
+
+                                        <span class="badge bg-info">
+
+                                            <i class="fas fa-download me-1"></i>
+                                            Online
+
+                                        </span>
+
+                                    @else
+
+                                        <span class="badge bg-purple">
+
+                                            <i class="fas fa-store me-1"></i>
+                                            Ambil Desa
+
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                                <td>
+
+                                    @if($row->status == 'proses')
+
+                                        <span class="badge bg-warning text-dark">
+
+                                            <i class="fas fa-spinner fa-spin me-1"></i>
+                                            Proses
+
+                                        </span>
+
+                                    @elseif($row->status == 'selesai')
+
+                                        <span class="badge bg-success">
+
+                                            <i class="fas fa-check me-1"></i>
+                                            Selesai
+
+                                        </span>
+
+                                    @else
+
+                                        <span class="badge bg-danger">
+
+                                            <i class="fas fa-times me-1"></i>
+                                            Ditolak
+
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                                <td>
+
+                                    <a href="{{ route('admin.surat.detail', [
+                                        'jenis' => request('jenis'),
+                                        'id' => $row->id
+                                    ]) }}"
+                                       class="btn btn-primary btn-sm rounded-pill px-3">
+
+                                        <i class="fas fa-eye me-1"></i>
+                                        Detail
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="7" class="text-center py-5">
+
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+
+                                    <div class="text-muted">
+                                        Belum ada pengajuan surat
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <style>
-    /* Modern Header Style */
-    .modern-header {
-        background: linear-gradient(135deg, #e3f2fd 0%, #f5f9ff 100%);
-        border-radius: 16px;
-        padding: 24px 32px;
-        margin-bottom: 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+body {
+
+    background: #f4f7fb;
+}
+
+/* ================= HEADER ================= */
+
+.dashboard-header {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 24px;
+
+    box-shadow:
+        0 4px 20px rgba(
+            0,
+            0,
+            0,
+            0.05
+        );
+}
+
+/* ================= SEARCH ================= */
+
+.search-modern {
+
+    background: #f1f5f9;
+
+    border-radius: 50px;
+
+    padding: 10px 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.search-modern input {
+
+    border: none;
+
+    background: transparent;
+
+    outline: none;
+
+    width: 180px;
+}
+
+.small-search input {
+
+    width: 160px;
+}
+
+/* ================= PROFILE ================= */
+
+.profile-box {
+
+    background: #f8fafc;
+
+    border-radius: 50px;
+
+    padding: 8px 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.profile-avatar {
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #f97316,
+        #fb923c
+    );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+/* ================= JENIS CARD ================= */
+
+.jenis-card {
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    padding: 18px;
+
+    display: block;
+
+    transition: .3s;
+}
+
+.jenis-card:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 10px 25px rgba(
+            0,
+            0,
+            0,
+            0.08
+        );
+}
+
+.active-jenis {
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color: white !important;
+
+    border: none;
+}
+
+.jenis-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 12px;
+
+    background: rgba(
+        37,
+        99,
+        235,
+        0.1
+    );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #2563eb;
+}
+
+.active-jenis .jenis-icon {
+
+    background: rgba(
+        255,
+        255,
+        255,
+        0.2
+    );
+
+    color: white;
+}
+
+.jenis-title {
+
+    font-weight: 600;
+}
+
+/* ================= FILTER ================= */
+
+.btn-filter {
+
+    background: #f1f5f9;
+
+    padding: 10px 18px;
+
+    border-radius: 12px;
+
+    text-decoration: none;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    transition: .3s;
+}
+
+.btn-filter:hover {
+
+    background: #2563eb;
+
+    color: white;
+}
+
+.active-filter {
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    ) !important;
+
+    color: white !important;
+}
+
+/* ================= STATS ================= */
+
+.stats-box {
+
+    border-radius: 20px;
+
+    padding: 24px;
+
+    color: white;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    box-shadow:
+        0 10px 25px rgba(
+            0,
+            0,
+            0,
+            0.08
+        );
+}
+
+.stats-box i {
+
+    font-size: 42px;
+
+    opacity: .25;
+}
+
+.stats-label {
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.stats-number {
+
+    font-size: 34px;
+
+    font-weight: bold;
+}
+
+.stats-blue {
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+}
+
+.stats-green {
+
+    background: linear-gradient(
+        135deg,
+        #10b981,
+        #34d399
+    );
+}
+
+.stats-red {
+
+    background: linear-gradient(
+        135deg,
+        #ef4444,
+        #f87171
+    );
+}
+
+.stats-cyan {
+
+    background: linear-gradient(
+        135deg,
+        #06b6d4,
+        #22d3ee
+    );
+}
+
+/* ================= TABLE ================= */
+
+.modern-table thead {
+
+    background: #f8fafc;
+}
+
+.modern-table thead th {
+
+    border: none;
+
+    padding: 18px;
+
+    color: #334155;
+}
+
+.modern-table tbody td {
+
+    padding: 18px;
+
+    vertical-align: middle;
+}
+
+.modern-table tbody tr {
+
+    transition: .2s;
+}
+
+.modern-table tbody tr:hover {
+
+    background: #f8fbff;
+}
+
+.bg-purple {
+
+    background: #7c3aed !important;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width: 768px){
+
+    .dashboard-header {
+
+        padding: 18px;
     }
-    .header-left { flex: 1; }
-    .header-title { font-size: 28px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0; }
-    .breadcrumb { font-size: 14px; color: #64748b; font-weight: 500; }
-    .breadcrumb span { color: #94a3b8; }
-    .header-right { display: flex; align-items: center; gap: 16px; }
-    
-    /* Tombol Cetak Laporan */
-    .btn-print-laporan {
-        background: linear-gradient(135deg, #4e73df, #2f80ed);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 50px;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        box-shadow: 0 2px 8px rgba(78, 115, 223, 0.3);
-        transition: all 0.3s ease;
+
+    .search-modern input {
+
+        width: 100px;
     }
-    .btn-print-laporan:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(78, 115, 223, 0.4);
-    }
-    .btn-print-laporan i { font-size: 16px; }
-    
-    .search-box {
-        background: white;
-        border-radius: 50px;
-        padding: 10px 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        min-width: 280px;
-    }
-    .search-box i { color: #94a3b8; font-size: 16px; }
-    .search-box input {
-        border: none; outline: none; font-size: 14px; width: 100%; color: #64748b;
-    }
-    .search-box input::placeholder { color: #94a3b8; }
-    
-    /* ✅ User Profile Style */
-    .user-profile {
-        background: white;
-        border-radius: 50px;
-        padding: 10px 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        text-decoration: none !important;
-    }
-    .user-info { text-align: right; }
-    .user-name { font-size: 14px; font-weight: 600; color: #1e293b; }
-    .user-role { font-size: 12px; color: #94a3b8; }
-    .user-avatar {
-        width: 40px; height: 40px;
-        background: linear-gradient(135deg, #f97316, #fb923c);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        color: white; font-weight: 700; font-size: 16px;
-        overflow: hidden; flex-shrink: 0; text-decoration: none !important;
-    }
-    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    
-    /* Existing Styles */
-    .border-left-primary { border-left: 4px solid #4e73df !important; }
-    .border-left-success { border-left: 4px solid #1cc88a !important; }
-    .border-left-danger { border-left: 4px solid #e74a3b !important; }
-    .border-left-info { border-left: 4px solid #36b9cc !important; }
-    .bg-purple { background-color: #6f42c1 !important; }
-    .transition-all { transition: all 0.3s ease; }
-    .hover-bg-light:hover { background-color: #f8f9fa !important; transform: translateY(-2px); }
+
+}
+
 </style>
 
 <script>
-// 1. Search Jenis Surat (Header) - Auto Redirect
-document.getElementById('searchJenisSurat')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        var search = this.value.toLowerCase().trim();
-        var mapping = {
-            'domisili': 'domisili', 'sktm': 'sktm', 'penghasilan': 'penghasilan',
-            'kelahiran': 'kelahiran', 'ktp': 'ktp', 'kematian': 'kematian',
-            'izin': 'izin', 'nikah': 'nikah'
-        };
-        for (var key in mapping) {
-            if (key.includes(search) || search.includes(key)) {
-                window.location.href = '{{ route('admin.surat.index') }}?jenis=' + mapping[key];
-                return;
-            }
-        }
-        alert('Jenis surat tidak ditemukan. Coba: domisili, sktm, ktp, kelahiran, kematian, izin, nikah, penghasilan');
-    }
+
+// ================= SEARCH JENIS =================
+
+document
+.getElementById('searchJenisSurat')
+?.addEventListener('keyup', function(){
+
+    let value = this.value.toLowerCase();
+
+    document
+    .querySelectorAll('.jenis-card')
+    .forEach(function(item){
+
+        let jenis = item.dataset.jenis;
+
+        item.parentElement.style.display =
+            jenis.includes(value)
+            ? 'block'
+            : 'none';
+
+    });
+
 });
 
-// 2. Search Tabel - Filter Nama/NIK
-document.getElementById('searchTable')?.addEventListener('keyup', function() {
-    var search = this.value.toLowerCase();
-    var rows = document.querySelectorAll('#dataTable tbody tr');
-    rows.forEach(function(row) {
-        var text = row.textContent.toLowerCase();
-        row.style.display = text.includes(search) ? '' : 'none';
+// ================= SEARCH TABLE =================
+
+document
+.getElementById('searchTable')
+?.addEventListener('keyup', function(){
+
+    let value = this.value.toLowerCase();
+
+    document
+    .querySelectorAll('#dataTable tbody tr')
+    .forEach(function(row){
+
+        row.style.display =
+            row.innerText.toLowerCase().includes(value)
+            ? ''
+            : 'none';
+
     });
+
 });
+
 </script>
+
 @endsection

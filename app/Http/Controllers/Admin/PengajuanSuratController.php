@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // <--- WAJIB BENAR
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 
 class PengajuanSuratController extends Controller
 {
-    // Mapping Jenis Surat ke Nama Tabel
+    // ================= MAPPING TABLE =================
     private $tables = [
         'domisili'    => 'pengajuan_domisili',
         'sktm'        => 'pengajuan_sktm',
@@ -21,90 +22,266 @@ class PengajuanSuratController extends Controller
         'nikah'       => 'pengajuan_nikah',
     ];
 
-    // 1. LIST DATA (Admin melihat semua pengajuan)
+    // ================= LIST DATA =================
     public function index(Request $request)
     {
-        $jenis = $request->jenis ?? 'domisili'; // Default Domisili
-        $table = $this->tables[$jenis] ?? abort(404);
-        
-        // Urutkan dari yang terbaru (proses dulu)
-        $data = DB::table($table)->orderBy('status')->orderBy('created_at', 'desc')->get();
-        
-        return view('admin.surat.index', compact('data', 'jenis'));
+        $jenis = $request->jenis ?? 'domisili';
+
+        $table = 'pengajuan_' . $jenis;
+
+        // ================= CEK TABLE =================
+        if (!Schema::hasTable($table)) {
+
+            abort(404, 'Jenis surat tidak ditemukan');
+
+        }
+
+        $query = DB::table($table);
+
+        // ================= FILTER PERIODE =================
+        if ($request->filter == 'hari_ini') {
+
+            $query->whereDate(
+                'tanggal_pengajuan',
+                now()->toDateString()
+            );
+
+        } elseif ($request->filter == 'minggu') {
+
+            $query->whereBetween(
+                'tanggal_pengajuan',
+                [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]
+            );
+
+        } elseif ($request->filter == 'bulan') {
+
+            $query->whereMonth(
+                'tanggal_pengajuan',
+                now()->month
+            )->whereYear(
+                'tanggal_pengajuan',
+                now()->year
+            );
+
+        } elseif ($request->filter == 'tahun') {
+
+            $query->whereYear(
+                'tanggal_pengajuan',
+                now()->year
+            );
+        }
+
+        // ================= DATA =================
+        $data = $query
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view(
+            'admin.surat.index',
+            [
+                'data' => $data,
+                'jenis' => $jenis,
+            ]
+        );
     }
 
-    // 2. DETAIL DATA (Admin melihat detail untuk memproses)
+    // ================= DETAIL =================
     public function show($jenis, $id)
     {
         $table = $this->tables[$jenis] ?? abort(404);
-        $surat = DB::table($table)->where('id', $id)->first();
-        
-        if (!$surat) abort(404);
 
-        return view('admin.surat.detail', compact('surat', 'jenis'));
-    }
+        $surat = DB::table($table)
+            ->where('id', $id)
+            ->first();
 
-    // 3. PROSES / UPDATE STATUS (Logika utama sesuai permintaanmu)
-    public function updateStatus(Request $request, $jenis, $id)
-    {
-        $table = $this->tables[$jenis] ?? abort(404);
-        $status = $request->status;
-        $metode = $request->metode_pengambilan; // ambil_desa / cetak_online
+        if (!$surat) {
 
-        $updateData = [
-            'status' => $status,
-            'updated_at' => now()
-        ];
+            abort(404);
 
-        // LOGIKA KALO SELESAI
-        if ($status === 'selesai') {
-            $updateData['nomor_surat'] = $request->nomor_surat;
-
-            if ($metode === 'cetak_online') {
-                // Wajib upload file
-                if ($request->hasFile('file_surat')) {
-                    $path = $request->file('file_surat')->store('surat_jadi', 'public');
-                    $updateData['file_surat_jadi'] = $path;
-                }
-            } else {
-                // Ambil di Desa -> Wajib isi Keterangan
-                $updateData['keterangan_admin'] = $request->keterangan_admin;
-            }
-        } 
-        
-        // LOGIKA KALO DITOLAK
-        elseif ($status === 'ditolak') {
-            $updateData['alasan_tolak'] = $request->alasan_tolak;
         }
 
-        DB::table($table)->where('id', $id)->update($updateData);
-
-        return back()->with('success', 'Status berhasil diupdate!');
+        return view(
+            'admin.surat.detail',
+            compact('surat', 'jenis')
+        );
     }
 
-    // 4. PRINT LAPORAN (Halaman khusus cetak - clean & simple)
+    // ================= UPDATE STATUS =================
+    public function updateStatus(
+        Request $request,
+        $jenis,
+        $id
+    ) {
+
+        $table = $this->tables[$jenis] ?? abort(404);
+
+        // =================================================
+        // MULAI DIKERJAKAN
+        // =================================================
+        if ($request->action == 'start') {
+
+            DB::table($table)
+                ->where('id', $id)
+                ->update([
+
+                    // PENANDA SUDAH DIKERJAKAN
+                    'nomor_surat' =>
+                        'PROCESS-' . time(),
+
+                    'updated_at' => now(),
+                ]);
+
+            return back()->with(
+                'success',
+                'Surat mulai dikerjakan'
+            );
+        }
+
+        $status = $request->status;
+
+        $updateData = [
+
+            'status' => $status,
+
+            'updated_at' => now(),
+        ];
+
+        // =================================================
+        // STATUS SELESAI
+        // =================================================
+        if ($status == 'selesai') {
+
+            $updateData['nomor_surat'] =
+                $request->nomor_surat;
+
+            // =============================================
+            // CETAK ONLINE
+            // =============================================
+            if (
+                $request->hasFile('file_surat')
+            ) {
+
+                $file =
+                    $request->file(
+                        'file_surat'
+                    );
+
+                $filename =
+                    time() . '_' .
+                    $file->getClientOriginalName();
+
+                $path =
+                    $file->storeAs(
+                        'surat_jadi',
+                        $filename,
+                        'public'
+                    );
+
+                // FIX DATABASE COLUMN
+                $updateData[
+                    'file_surat_jadi'
+                ] = $path;
+            }
+
+            // =============================================
+            // KETERANGAN ADMIN
+            // =============================================
+            if (
+                $request->keterangan_admin
+            ) {
+
+                $updateData[
+                    'keterangan_admin'
+                ] =
+                    $request->keterangan_admin;
+            }
+        }
+
+        // =================================================
+        // STATUS DITOLAK
+        // =================================================
+        if ($status == 'ditolak') {
+
+            $updateData[
+                'alasan_tolak'
+            ] =
+                $request->alasan_tolak;
+        }
+
+        // =================================================
+        // UPDATE DATABASE
+        // =================================================
+        DB::table($table)
+            ->where('id', $id)
+            ->update($updateData);
+
+        return back()->with(
+            'success',
+            'Status berhasil diupdate'
+        );
+    }
+
+    // ================= PRINT =================
     public function print($jenis)
     {
-        $table = $this->tables[$jenis] ?? abort(404);
-        
-        // Ambil semua data urut terbaru
-        $data = DB::table($table)->orderBy('created_at', 'desc')->get();
-        
-        // Hitung statistik
+        $table =
+            $this->tables[$jenis]
+            ?? abort(404);
+
+        $data = DB::table($table)
+            ->latest()
+            ->get();
+
         $stats = [
-            'total' => DB::table($table)->count(),
-            'proses' => DB::table($table)->where('status', 'proses')->count(),
-            'selesai' => DB::table($table)->where('status', 'selesai')->count(),
-            'ditolak' => DB::table($table)->where('status', 'ditolak')->count(),
+
+            'total' =>
+                DB::table($table)->count(),
+
+            'proses' =>
+                DB::table($table)
+                    ->where(
+                        'status',
+                        'proses'
+                    )->count(),
+
+            'selesai' =>
+                DB::table($table)
+                    ->where(
+                        'status',
+                        'selesai'
+                    )->count(),
+
+            'ditolak' =>
+                DB::table($table)
+                    ->where(
+                        'status',
+                        'ditolak'
+                    )->count(),
         ];
-        
-        return view('admin.surat.print', [
-            'data' => $data,
-            'jenis' => $jenis,
-            'total' => $stats['total'],
-            'proses' => $stats['proses'],
-            'selesai' => $stats['selesai'],
-            'ditolak' => $stats['ditolak'],
-        ]);
+
+        return view(
+            'admin.surat.print',
+            [
+
+                'data' => $data,
+
+                'jenis' => $jenis,
+
+                'total' =>
+                    $stats['total'],
+
+                'proses' =>
+                    $stats['proses'],
+
+                'selesai' =>
+                    $stats['selesai'],
+
+                'ditolak' =>
+                    $stats['ditolak'],
+            ]
+        );
     }
 }
