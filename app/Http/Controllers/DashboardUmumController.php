@@ -14,52 +14,51 @@ class DashboardUmumController extends Controller
     {
         // =====================================================================
         // 1. HERO SLIDES - KONFIGURASI FILE LOKAL
-        // 'file' berisi path relatif dari folder 'public/'
         // =====================================================================
         $heroSlides = [
-        [
-            'type' => 'video',
-            'file' => 'assets/videos/hero/hero1.mp4',
-            'title' => 'Selamat Datang di E-Deslay',
-            'subtitle' => 'Website Resmi Kelurahan Banjardowo',
-            'tagline' => 'Layanan Digital Desa Yang Lebih Mudah Dan Cepat'
-        ],
-        [
-            'type' => 'video',
-            'file' => 'assets/videos/hero/hero2.mp4',
-            'title' => 'Profil Desa Banjardowo',
-            'subtitle' => 'Membangun Desa Bersama',
-            'tagline' => 'Transparan, Efisien, dan Berkarakter'
-        ],
-        [
-            'type' => 'video',
-            'file' => 'assets/videos/hero/hero3.mp4',
-            'title' => 'Inovasi Digital untuk Kesejahteraan',
-            'subtitle' => 'Desa Banjardowo Menuju Smart Village',
-            'tagline' => 'Akses Informasi Cepat, Jelas, dan Terstruktur'
-        ],
-        [
-            'type' => 'video',
-            'file' => 'assets/videos/hero/hero4.mp4',
-            'title' => 'Potensi Desa Banjardowo',
-            'subtitle' => 'Mengenal Sumber Daya Alam & Manusia',
-            'tagline' => 'Desa yang Kaya akan Potensi'
-        ],
-        [
-            'type' => 'video',
-            'file' => 'assets/videos/hero/hero5.mp4',
-            'title' => 'Kegiatan Masyarakat',
-            'subtitle' => 'Gotong Royong & Kearifan Lokal',
-            'tagline' => 'Bersama Membangun Desa'
-        ],
-        [
-            'type' => 'video',
-            'file' => 'assets/videos/hero/hero6.mp4',
-            'title' => 'Prestasi & Harapan',
-            'subtitle' => 'Langkah Maju Desa Banjardowo',
-            'tagline' => 'Terus Berkarya untuk Negeri'
-        ],
-    ];
+            [
+                'type' => 'video',
+                'file' => 'assets/videos/hero/hero1.mp4',
+                'title' => 'Selamat Datang di E-Deslay',
+                'subtitle' => 'Website Resmi Kelurahan Banjardowo',
+                'tagline' => 'Layanan Digital Desa Yang Lebih Mudah Dan Cepat'
+            ],
+            [
+                'type' => 'video',
+                'file' => 'assets/videos/hero/hero2.mp4',
+                'title' => 'Profil Desa Banjardowo',
+                'subtitle' => 'Membangun Desa Bersama',
+                'tagline' => 'Transparan, Efisien, dan Berkarakter'
+            ],
+            [
+                'type' => 'video',
+                'file' => 'assets/videos/hero/hero3.mp4',
+                'title' => 'Inovasi Digital untuk Kesejahteraan',
+                'subtitle' => 'Desa Banjardowo Menuju Smart Village',
+                'tagline' => 'Akses Informasi Cepat, Jelas, dan Terstruktur'
+            ],
+            [
+                'type' => 'video',
+                'file' => 'assets/videos/hero/hero4.mp4',
+                'title' => 'Potensi Desa Banjardowo',
+                'subtitle' => 'Mengenal Sumber Daya Alam & Manusia',
+                'tagline' => 'Desa yang Kaya akan Potensi'
+            ],
+            [
+                'type' => 'video',
+                'file' => 'assets/videos/hero/hero5.mp4',
+                'title' => 'Kegiatan Masyarakat',
+                'subtitle' => 'Gotong Royong & Kearifan Lokal',
+                'tagline' => 'Bersama Membangun Desa'
+            ],
+            [
+                'type' => 'video',
+                'file' => 'assets/videos/hero/hero6.mp4',
+                'title' => 'Prestasi & Harapan',
+                'subtitle' => 'Langkah Maju Desa Banjardowo',
+                'tagline' => 'Terus Berkarya untuk Negeri'
+            ],
+        ];
 
         // =====================================================================
         // 2. AMBIL DATA KEGIATAN (Limit 6 untuk slider)
@@ -120,23 +119,7 @@ class DashboardUmumController extends Controller
             });
 
         // =====================================================================
-        // 4. AMBIL DATA STRUKTUR DESA
-        // =====================================================================
-        $strukturDesa = DB::table('struktur_desa')
-            ->select('id', 'nama', 'jabatan', 'nip', 'foto', 'urutan')
-            ->orderBy('urutan', 'asc')
-            ->get()
-            ->map(function ($item) {
-                if ($item->foto) {
-                    $item->foto_url = asset('storage/' . $item->foto);
-                } else {
-                    $item->foto_url = asset('assets/images/default-avatar.png');
-                }
-                return $item;
-            });
-
-        // =====================================================================
-        // 5. INFOGRAFIS - AMBIL DARI TABEL PENDUDUK
+        // 4. INFOGRAFIS - AMBIL DARI TABEL PENDUDUK
         // =====================================================================
         
         $getIcon = fn($name) => asset("assets/icons/{$name}.png");
@@ -245,13 +228,22 @@ class DashboardUmumController extends Controller
         ];
 
         // =====================================================================
-        // 6. RETURN VIEW
+        // 5. RETURN VIEW - TANPA strukturDesa (sudah dipisah)
         // =====================================================================
+        $strukturDesa = DB::table('struktur_desa')
+            ->select('id', 'nama', 'jabatan', 'nip', 'foto', 'urutan')
+            ->orderBy('urutan', 'asc')
+            ->get()
+            ->map(function ($item) {
+                $item->foto_url = $item->foto ? asset('storage/' . $item->foto) : asset('assets/images/default-avatar.png');
+                return $item;
+            });
+
         return view('dashboard_umum', compact(
-            'heroSlides',      // ✅ ARRAY HERO SLIDES LOKAL
+            'heroSlides',
             'kegiatanList',
             'prestasiList',
-            'strukturDesa',
+            'strukturDesa', // ✅ PASTIKAN INI ADA
             'infografis'
         ));
     }
