@@ -328,6 +328,12 @@
                         <p>{{ $detail->deskripsi_singkat }}</p>
                         <p><strong>Isi Panduan:</strong></p>
                         <p>{!! nl2br(e($detail->isi_panduan)) !!}</p>
+                        
+                        {{-- ✅ TAMBAHKAN BAGIAN DOKUMEN WAJIB --}}
+                        @if(!empty($detail->dokumen_wajib))
+                        <p><strong>Dokumen Wajib Dibawa:</strong></p>
+                        <p>{!! nl2br(e($detail->dokumen_wajib)) !!}</p>
+                        @endif
                     </div>
                     <div class="detail-actions">
                         <a href="{{ route('admin.pelayanan.index', ['action' => 'edit', 'id' => $detail->id]) }}" class="btn-detail-edit"><i class="fas fa-edit"></i> Edit</a>
@@ -391,8 +397,14 @@
                             <textarea name="deskripsi_singkat" required>{{ old('deskripsi_singkat', $detail->deskripsi_singkat ?? '') }}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Isi Panduan</label>
+                            <label>Isi Panduan (Cara Mengurus)</label>
                             <textarea name="isi_panduan" required style="min-height:200px;">{{ old('isi_panduan', $detail->isi_panduan ?? '') }}</textarea>
+                        </div>
+                        {{-- ✅ TAMBAHKAN FIELD DOKUMEN WAJIB --}}
+                        <div class="form-group">
+                            <label>Dokumen Wajib Dibawa</label>
+                            <textarea name="dokumen_wajib" style="min-height:150px;" placeholder="Contoh:&#10;1. Fotokopi KTP&#10;2. Fotokopi KK&#10;3. Pas foto 3x4&#10;4. Surat Pengantar RT/RW">{{ old('dokumen_wajib', $detail->dokumen_wajib ?? '') }}</textarea>
+                            <small style="color: #64748b; font-size: 12px;">Masukkan daftar dokumen yang diperlukan, satu per baris</small>
                         </div>
                     </div>
                     <div class="form-section">

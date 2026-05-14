@@ -5,9 +5,11 @@
             <h2>Pengajuan Surat Online</h2>
             <p>Layanan pembuatan surat administrasi desa secara digital.</p>
         </div>
+        @if($layananList->count() > 0)
         <button class="see-all-btn" onclick="bukaLayananFullView()">
             Lihat Semua <i class="fas fa-arrow-right"></i>
         </button>
+        @endif
     </div>
     
     <!-- MODE SLIDER (Default) -->
@@ -17,38 +19,21 @@
         </button>
         
         <div class="layanan-track" id="layananTrack">
-            <div class="layanan-card" onclick="bukaDetailLayanan('ktp')">
-                <div class="layanan-icon"><i class="fas fa-id-card"></i></div>
-                <p>Surat Pengantar KTP</p>
+            @forelse($layananList as $layanan)
+            <div class="layanan-card" onclick="bukaDetailLayanan({{ $layanan->id }}, 'db')">
+                @if($layanan->foto_url)
+                <img src="{{ $layanan->foto_url }}" alt="{{ $layanan->judul }}" class="layanan-img">
+                @else
+                <div class="layanan-icon"><i class="fas fa-file-alt"></i></div>
+                @endif
+                <p>{{ Str::limit($layanan->judul, 30) }}</p>
             </div>
-            <div class="layanan-card" onclick="bukaDetailLayanan('skck')">
-                <div class="layanan-icon"><i class="fas fa-shield-alt"></i></div>
-                <p>Surat Keterangan SKCK</p>
+            @empty
+            <div style="flex: 0 0 100%; color: #6b7280; padding: 2rem; text-align: center;">
+                <i class="fas fa-info-circle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>Belum ada layanan tersedia.</p>
             </div>
-            <div class="layanan-card" onclick="bukaDetailLayanan('domisili')">
-                <div class="layanan-icon"><i class="fas fa-home"></i></div>
-                <p>Surat Keterangan Domisili</p>
-            </div>
-            <div class="layanan-card" onclick="bukaDetailLayanan('miskin')">
-                <div class="layanan-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                <p>Surat Tidak Mampu</p>
-            </div>
-            <div class="layanan-card" onclick="bukaDetailLayanan('kelahiran')">
-                <div class="layanan-icon"><i class="fas fa-baby"></i></div>
-                <p>Surat Kelahiran</p>
-            </div>
-            <div class="layanan-card" onclick="bukaDetailLayanan('kematian')">
-                <div class="layanan-icon"><i class="fas fa-book-dead"></i></div>
-                <p>Surat Kematian</p>
-            </div>
-            <div class="layanan-card" onclick="bukaDetailLayanan('pindah')">
-                <div class="layanan-icon"><i class="fas fa-truck-moving"></i></div>
-                <p>Surat Pindah Domisili</p>
-            </div>
-            <div class="layanan-card" onclick="bukaDetailLayanan('usaha')">
-                <div class="layanan-icon"><i class="fas fa-store"></i></div>
-                <p>Surat Keterangan Usaha</p>
-            </div>
+            @endforelse
         </div>
 
         <button class="layanan-nav-btn next" onclick="geserLayanan(1)">
@@ -66,38 +51,16 @@
         </div>
         
         <div class="fullview-grid">
-            <div class="card-full" onclick="bukaDetailLayanan('ktp')">
-                <div class="layanan-icon-full"><i class="fas fa-id-card"></i></div>
-                <p>Surat Pengantar KTP</p>
+            @foreach($layananList as $layanan)
+            <div class="card-full" onclick="bukaDetailLayanan({{ $layanan->id }}, 'db')">
+                @if($layanan->foto_url)
+                <img src="{{ $layanan->foto_url }}" alt="{{ $layanan->judul }}" class="card-full-img">
+                @else
+                <div class="layanan-icon-full"><i class="fas fa-file-alt"></i></div>
+                @endif
+                <p>{{ $layanan->judul }}</p>
             </div>
-            <div class="card-full" onclick="bukaDetailLayanan('skck')">
-                <div class="layanan-icon-full"><i class="fas fa-shield-alt"></i></div>
-                <p>Surat Keterangan SKCK</p>
-            </div>
-            <div class="card-full" onclick="bukaDetailLayanan('domisili')">
-                <div class="layanan-icon-full"><i class="fas fa-home"></i></div>
-                <p>Surat Keterangan Domisili</p>
-            </div>
-            <div class="card-full" onclick="bukaDetailLayanan('miskin')">
-                <div class="layanan-icon-full"><i class="fas fa-hand-holding-heart"></i></div>
-                <p>Surat Tidak Mampu</p>
-            </div>
-            <div class="card-full" onclick="bukaDetailLayanan('kelahiran')">
-                <div class="layanan-icon-full"><i class="fas fa-baby"></i></div>
-                <p>Surat Kelahiran</p>
-            </div>
-            <div class="card-full" onclick="bukaDetailLayanan('kematian')">
-                <div class="layanan-icon-full"><i class="fas fa-book-dead"></i></div>
-                <p>Surat Kematian</p>
-            </div>
-            <div class="card-full" onclick="bukaDetailLayanan('pindah')">
-                <div class="layanan-icon-full"><i class="fas fa-truck-moving"></i></div>
-                <p>Surat Pindah Domisili</p>
-            </div>
-            <div class="card-full" onclick="bukaDetailLayanan('usaha')">
-                <div class="layanan-icon-full"><i class="fas fa-store"></i></div>
-                <p>Surat Keterangan Usaha</p>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -110,6 +73,11 @@
             <button class="modal-close-btn" onclick="tutupModal()">&times;</button>
         </div>
         <div class="modal-body">
+            <img id="modalImage" src="" alt="" style="width: 100%; max-height: 300px; object-fit: contain; margin-bottom: 1.5rem; border-radius: 12px; display: none;">
+            <div class="modal-section">
+                <h3><i class="fas fa-info-circle"></i> Deskripsi</h3>
+                <p id="modalDeskripsi"></p>
+            </div>
             <div class="modal-section">
                 <h3><i class="fas fa-clipboard-list"></i> Cara Mengurus</h3>
                 <ol id="modalSteps" class="modal-steps-list">
@@ -153,7 +121,7 @@
         min-width: 0;
         background: white;
         border-radius: 16px;
-        padding: 2rem 1rem;
+        padding: 2rem 1.5rem;
         text-align: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         transition: transform 0.3s, box-shadow 0.3s;
@@ -162,6 +130,13 @@
     .layanan-card:hover {
         transform: translateY(-6px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    .layanan-img {
+        width: 70px;
+        height: 70px;
+        object-fit: contain;
+        margin: 0 auto 1rem;
+        border-radius: 16px;
     }
     .layanan-icon {
         width: 70px;
@@ -180,7 +155,7 @@
     .layanan-card p {
         color: #374151;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         margin: 0;
         line-height: 1.4;
     }
@@ -243,158 +218,92 @@
         font-size: 1rem;
         margin: 0;
     }
+    .card-full-img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin: 0 auto 1rem;
+        border-radius: 18px;
+    }
 </style>
 
 {{-- JAVASCRIPT KHUSUS LAYANAN --}}
 <script>
-    // ===== DATA DETAIL LAYANAN =====
-    const layananData = {
-        'ktp': {
-            title: 'Surat Pengantar KTP',
-            steps: [
-                'Datang ke Kantor Desa/Kelurahan membawa dokumen persyaratan.',
-                'Minta formulir pengajuan Surat Pengantar KTP ke petugas.',
-                'Isi formulir dengan lengkap dan benar.',
-                'Serahkan formulir beserta dokumen persyaratan.',
-                'Tunggu proses verifikasi data oleh petugas.',
-                'Ambil surat pengantar yang sudah ditandatangani oleh Kepala Desa/Lurah.'
-            ],
-            docs: [
-                'Fotokopi Kartu Keluarga (KK) terbaru.',
-                'Fotokopi Akta Kelahiran.',
-                'Pas foto berwarna 3x4 (latar biru/merah).',
-                'Surat Pengantar dari RT/RW (jika diminta).'
-            ]
-        },
-        'skck': {
-            title: 'Surat Keterangan SKCK',
-            steps: [
-                'Datang ke Kantor Desa/Kelurahan.',
-                'Minta formulir pengantar SKCK.',
-                'Isi data diri sesuai dengan KTP/KK.',
-                'Serahkan ke petugas untuk diproses.',
-                'Cek kembali nama dan data pada surat pengantar.',
-                'Bawa surat pengantar ini ke Kepolisian (Polsek).'
-            ],
-            docs: [
-                'Fotokopi KTP yang masih berlaku.',
-                'Fotokopi Kartu Keluarga (KK).',
-                'Fotokopi Akta Kelahiran.',
-                'Pas foto berwarna 4x6 (latar merah) - 6 lembar.'
-            ]
-        },
-        'domisili': {
-            title: 'Surat Keterangan Domisili',
-            steps: [
-                'Kunjungi Kantor Desa/Kelurahan tempat tinggal.',
-                'Jelaskan tujuan pembuatan Surat Keterangan Domisili.',
-                'Isi formulir yang diberikan petugas.',
-                'Lampirkan bukti pendukung tempat tinggal.',
-                'Tunggu proses tanda tangan dan stempel resmi.'
-            ],
-            docs: [
-                'KTP Asli dan Fotokopi.',
-                'Kartu Keluarga (KK) Asli dan Fotokopi.',
-                'Pas foto 3x4 (2 lembar).'
-            ]
-        },
-        'miskin': {
-            title: 'Surat Keterangan Tidak Mampu',
-            steps: [
-                'Datang ke Kantor Desa/Kelurahan.',
-                'Sampaikan tujuan pengurusan Surat Keterangan Tidak Mampu.',
-                'Petugas akan melakukan verifikasi data.',
-                'Isi formulir pernyataan tidak mampu.',
-                'Surat akan diterbitkan dan ditandatangani.'
-            ],
-            docs: [
-                'Fotokopi KTP Pemohon.',
-                'Fotokopi Kartu Keluarga (KK).',
-                'Surat Pengantar dari RT/RW.'
-            ]
-        },
-        'kelahiran': {
-            title: 'Surat Pengantar Kelahiran',
-            steps: [
-                'Laporkan kelahiran anak ke Desa/Kelurahan.',
-                'Bawa surat keterangan dari bidan/dokter.',
-                'Isi formulir laporan kelahiran.',
-                'Desa akan menerbitkan surat pengantar.'
-            ],
-            docs: [
-                'Surat Keterangan Lahir dari Bidan/Dokter.',
-                'Fotokopi KTP Ayah dan Ibu.',
-                'Fotokopi Kartu Keluarga (KK).',
-                'Fotokopi Buku Nikah Orang Tua.'
-            ]
-        },
-        'kematian': {
-            title: 'Surat Pengantar Kematian',
-            steps: [
-                'Laporkan kematian ke Desa/Kelurahan.',
-                'Bawa surat keterangan kematian dari dokter/RS.',
-                'Isi formulir laporan kematian.',
-                'Desa akan menerbitkan surat pengantar.'
-            ],
-            docs: [
-                'Surat Keterangan Kematian dari Dokter/RS.',
-                'Fotokopi KTP Almarhum/Almarhumah.',
-                'Fotokopi Kartu Keluarga (KK).'
-            ]
-        },
-        'pindah': {
-            title: 'Surat Pindah Domisili',
-            steps: [
-                'Datang ke Kantor Desa/Kelurahan asal.',
-                'Isi formulir permohonan pindah.',
-                'Serahkan dokumen pendukung.',
-                'Desa akan menerbitkan Surat Pengantar Pindah.'
-            ],
-            docs: [
-                'KTP Asli dan Fotokopi seluruh anggota keluarga.',
-                'Kartu Keluarga (KK) Asli.',
-                'Surat Pengantar dari RT/RW.'
-            ]
-        },
-        'usaha': {
-            title: 'Surat Keterangan Usaha',
-            steps: [
-                'Datang ke Kantor Desa/Kelurahan.',
-                'Minta formulir Surat Keterangan Usaha.',
-                'Isi detail jenis usaha, lokasi, dan pemilik.',
-                'Surat diterbitkan dan ditandatangani.'
-            ],
-            docs: [
-                'Fotokopi KTP Pemilik Usaha.',
-                'Fotokopi Kartu Keluarga (KK).',
-                'Bukti kepemilikan tempat usaha.'
-            ]
-        }
-    };
-
+    // ===== DATA DARI CONTROLLER (DATABASE) =====
+    const layananDataDB = @json($layananList);
+    
     // ===== FUNGSI MODAL LAYANAN =====
-    function bukaDetailLayanan(key) {
-        const data = layananData[key];
+    function bukaDetailLayanan(id, source = 'db') {
+        let data;
+        
+        if (source === 'db') {
+            // Ambil dari database
+            data = layananDataDB.find(l => l.id == id);
+        }
+        
         if (!data) return;
 
-        document.getElementById('modalTitle').textContent = data.title;
+        // Set judul
+        document.getElementById('modalTitle').textContent = data.judul || data.title;
+        
+        // Set gambar jika ada (hanya untuk database)
+        const modalImg = document.getElementById('modalImage');
+        if (modalImg && data.foto_url) {
+            modalImg.src = data.foto_url;
+            modalImg.style.display = 'block';
+        } else if (modalImg) {
+            modalImg.style.display = 'none';
+        }
+        
+        // Set deskripsi
+        const deskripsiEl = document.getElementById('modalDeskripsi');
+        if (deskripsiEl) {
+            deskripsiEl.textContent = data.deskripsi_singkat || 'Tidak ada deskripsi tersedia.';
+        }
 
+        // Set steps (Cara Mengurus) - dari isi_panduan
         const stepsList = document.getElementById('modalSteps');
         stepsList.innerHTML = '';
-        data.steps.forEach(step => {
+        
+        if (data.isi_panduan) {
+            // Pisahkan berdasarkan baris baru
+            const steps = data.isi_panduan.split('\n');
+            steps.forEach(step => {
+                const trimmedStep = step.trim();
+                if (trimmedStep) {
+                    const li = document.createElement('li');
+                    li.textContent = trimmedStep;
+                    stepsList.appendChild(li);
+                }
+            });
+        } else {
             const li = document.createElement('li');
-            li.textContent = step;
+            li.textContent = 'Informasi cara mengurus belum tersedia.';
             stepsList.appendChild(li);
-        });
+        }
 
+        // ✅ SET DOCS (Dokumen Wajib Dibawa) - dari dokumen_wajib (TEXT, bukan JSON)
         const docsList = document.getElementById('modalDocs');
         docsList.innerHTML = '';
-        data.docs.forEach(doc => {
+        
+        if (data.dokumen_wajib && data.dokumen_wajib.trim() !== '') {
+            // Pisahkan berdasarkan baris baru
+            const docs = data.dokumen_wajib.split('\n');
+            docs.forEach(doc => {
+                const trimmedDoc = doc.trim();
+                if (trimmedDoc) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981; margin-right:5px;"></i> ${trimmedDoc}`;
+                    docsList.appendChild(li);
+                }
+            });
+        } else {
             const li = document.createElement('li');
-            li.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981; margin-right:5px;"></i> ${doc}`;
+            li.textContent = 'Informasi dokumen belum tersedia.';
             docsList.appendChild(li);
-        });
+        }
 
+        // Show modal
         const modal = document.getElementById('layananModal');
         modal.style.display = 'flex';
         setTimeout(() => {
@@ -433,7 +342,7 @@
     // ===== AUTO SCROLL LAYANAN SLIDER =====
     document.addEventListener('DOMContentLoaded', () => {
         const track = document.getElementById('layananTrack');
-        if (!track) return;
+        if (!track || track.children.length === 0) return;
 
         let autoInterval = null;
         let isHovering = false;

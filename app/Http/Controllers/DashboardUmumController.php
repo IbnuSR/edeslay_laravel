@@ -61,67 +61,43 @@ class DashboardUmumController extends Controller
         ];
 
         // =====================================================================
-        // 2. AMBIL DATA KEGIATAN (Limit 6 untuk slider)
+        // 2. AMBIL DATA LAYANAN SURAT (PANDUAN_SURAT)
         // =====================================================================
-        $kegiatanList = DB::table('kegiatan')
-            ->select('id', 'judul', 'deskripsi', 'tanggal', 'foto', 'foto_type')
-            ->orderBy('tanggal', 'desc')
-            ->limit(6)
+        $layananList = DB::table('panduan_surat')
+            ->select('id', 'judul', 'deskripsi_singkat', 'isi_panduan', 'dokumen_wajib', 'foto_pendukung', 'foto_type', 'isi')
+            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($item) {
-                if ($item->foto) {
-                    if ((strpos($item->foto, '/') !== false || strpos($item->foto, '.') !== false) 
-                        && !preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
-                        $item->image_url = Storage::url($item->foto);
-                    } 
-                    elseif ($item->foto_type) {
-                        if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
-                            $item->image_url = $item->foto_type . ';base64,' . $item->foto;
-                        } else {
-                            $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
-                        }
-                    } else {
-                        $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
-                    }
+                // Handle foto pendukung
+                if ($item->foto_pendukung) {
+                    $item->foto_url = asset('storage/' . $item->foto_pendukung);
                 } else {
-                    $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
+                    $item->foto_url = null;
                 }
+                
+                // Parse isi (JSON) untuk steps dan docs
+                $item->steps = [];
+                $item->docs = [];
+                
+                if ($item->isi) {
+                    $decoded = json_decode($item->isi, true);
+                    if ($decoded) {
+                        $item->steps = $decoded['steps'] ?? [];
+                        $item->docs = $decoded['docs'] ?? [];
+                    }
+                }
+                
+                // Fallback jika isi_panduan ada tapi isi kosong
+                if (empty($item->steps) && !empty($item->isi_panduan)) {
+                    $item->steps = explode("\n", $item->isi_panduan);
+                }
+                
                 return $item;
             });
 
         // =====================================================================
-        // 3. AMBIL DATA PRESTASI (Limit 6 untuk slider)
+        // 3. INFOGRAFIS - AMBIL DARI TABEL PENDUDUK
         // =====================================================================
-        $prestasiList = DB::table('prestasi')
-            ->select('id', 'judul', 'deskripsi', 'tanggal', 'foto', 'foto_type')
-            ->orderBy('tanggal', 'desc')
-            ->limit(6)
-            ->get()
-            ->map(function ($item) {
-                if ($item->foto) {
-                    if ((strpos($item->foto, '/') !== false || strpos($item->foto, '.') !== false) 
-                        && !preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
-                        $item->image_url = Storage::url($item->foto);
-                    } 
-                    elseif ($item->foto_type) {
-                        if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
-                            $item->image_url = $item->foto_type . ';base64,' . $item->foto;
-                        } else {
-                            $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
-                        }
-                    } else {
-                        $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
-                    }
-                } else {
-                    $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
-                }
-                return $item;
-            });
-
-        // =====================================================================
-        // 4. INFOGRAFIS - AMBIL DARI TABEL PENDUDUK
-        // =====================================================================
-        
         $getIcon = fn($name) => asset("assets/icons/{$name}.png");
         $q = Penduduk::query();
         
@@ -228,7 +204,65 @@ class DashboardUmumController extends Controller
         ];
 
         // =====================================================================
-        // 5. RETURN VIEW - TANPA strukturDesa (sudah dipisah)
+        // 4. AMBIL DATA KEGIATAN (Limit 6 untuk slider)
+        // =====================================================================
+        $kegiatanList = DB::table('kegiatan')
+            ->select('id', 'judul', 'deskripsi', 'tanggal', 'foto', 'foto_type')
+            ->orderBy('tanggal', 'desc')
+            ->limit(6)
+            ->get()
+            ->map(function ($item) {
+                if ($item->foto) {
+                    if ((strpos($item->foto, '/') !== false || strpos($item->foto, '.') !== false) 
+                        && !preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                        $item->image_url = Storage::url($item->foto);
+                    } 
+                    elseif ($item->foto_type) {
+                        if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                            $item->image_url = $item->foto_type . ';base64,' . $item->foto;
+                        } else {
+                            $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
+                        }
+                    } else {
+                        $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
+                    }
+                } else {
+                    $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
+                }
+                return $item;
+            });
+
+        // =====================================================================
+        // 5. AMBIL DATA PRESTASI (Limit 6 untuk slider)
+        // =====================================================================
+        $prestasiList = DB::table('prestasi')
+            ->select('id', 'judul', 'deskripsi', 'tanggal', 'foto', 'foto_type')
+            ->orderBy('tanggal', 'desc')
+            ->limit(6)
+            ->get()
+            ->map(function ($item) {
+                if ($item->foto) {
+                    if ((strpos($item->foto, '/') !== false || strpos($item->foto, '.') !== false) 
+                        && !preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                        $item->image_url = Storage::url($item->foto);
+                    } 
+                    elseif ($item->foto_type) {
+                        if (preg_match('/^[A-Za-z0-9+\/=\r\n]+$/', $item->foto)) {
+                            $item->image_url = $item->foto_type . ';base64,' . $item->foto;
+                        } else {
+                            $item->image_url = $item->foto_type . ';base64,' . base64_encode($item->foto);
+                        }
+                    } else {
+                        $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
+                    }
+                } else {
+                    $item->image_url = 'https://via.placeholder.com/400x300?text=No+Image';
+                }
+                return $item;
+            });
+
+        // =====================================================================
+        // 6. AMBIL DATA STRUKTUR DESA
         // =====================================================================
         $strukturDesa = DB::table('struktur_desa')
             ->select('id', 'nama', 'jabatan', 'nip', 'foto', 'urutan')
@@ -239,12 +273,16 @@ class DashboardUmumController extends Controller
                 return $item;
             });
 
+        // =====================================================================
+        // 7. RETURN VIEW - SESUAI URUTAN MENU NAVIGASI
+        // =====================================================================
         return view('dashboard_umum', compact(
-            'heroSlides',
-            'kegiatanList',
-            'prestasiList',
-            'strukturDesa', // ✅ PASTIKAN INI ADA
-            'infografis'
+            'heroSlides',         // Hero section
+            'layananList',        // Layanan (menu #2)
+            'infografis',         // Infografis (menu #3)
+            'kegiatanList',       // Kegiatan (menu #4)
+            'prestasiList',       // Prestasi (menu #5)
+            'strukturDesa'        // Struktur (menu #6)
         ));
     }
 }

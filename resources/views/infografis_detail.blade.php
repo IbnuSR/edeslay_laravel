@@ -6,7 +6,7 @@
     </div>
 
     <!-- BAGIAN 1: Berdasarkan Jumlah Penduduk Dan Kepala Keluarga -->
-    <div class="infografis-subtitle">Berdasarkan Jumlah Penduduk Dan Kepala Keluarga</div>
+    <h3 class="infografis-subtitle">Berdasarkan Jumlah Penduduk Dan Kepala Keluarga</h3>
     <div class="infografis-grid">
         
         <!-- Total Penduduk -->
@@ -229,30 +229,45 @@
     </div>
 </section>
 
-{{-- CSS KHUSUS INFOGRAFIS --}}
+{{-- CSS KHUSUS INFOGRAFIS - UPDATED --}}
 <style>
+    /* ===== INFOGRAFIS SUBTITLE (BOLD + SPACING) ===== */
+    .infografis-subtitle {
+        font-size: 1.3rem;
+        color: #1c3f9f;
+        font-weight: 700; /* ✅ BOLD */
+        margin: 2.5rem 0 1.5rem 0; /* ✅ SPACING LEBIH LONGGAR */
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid #667eea; /* ✅ GARIS BAWAH BIRU */
+        display: inline-block;
+    }
+
+    /* ===== INFOGRAFIS GRID ===== */
     .infografis-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
+        gap: 1.5rem; /* ✅ GAP LEBIH LONGGAR */
+        margin-top: 1rem;
     }
 
+    /* ===== INFO CARD - LEBIH MENONJOL ===== */
     .info-card {
         display: flex;
         align-items: center;
-        gap: 15px;
-        background: #f5f7fb;
-        padding: 20px;
+        gap: 1.25rem;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%); /* ✅ GRADIENT BACKGROUND */
+        padding: 1.5rem;
         border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* ✅ SHADOW LEBIH DALAM */
+        border: 2px solid #e3f2fd; /* ✅ BORDER BIRU MUDA */
         transition: all 0.3s ease;
         min-height: 110px;
     }
 
     .info-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        transform: translateY(-5px); /* ✅ HOVER EFFECT */
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+        border-color: #667eea; /* ✅ BORDER BERUBAH WARNA SAAT HOVER */
     }
 
     .info-left {
@@ -276,44 +291,49 @@
     }
 
     .info-content h3 {
-        font-size: 15px;
+        font-size: 1rem;
         font-weight: 600;
         color: #1c3f9f;
-        margin-bottom: 5px;
-        line-height: 1.3;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
     }
 
     .info-content .number {
-        font-size: 26px;
+        font-size: 1.8rem; /* ✅ UKURAN ANGKA LEBIH BESAR */
         font-weight: 700;
-        color: #5b6ee1;
+        color: #667eea;
         line-height: 1.2;
     }
 
     .info-content small {
-        font-size: 12px;
+        font-size: 0.85rem;
         color: #6b7280;
-        margin-top: 2px;
+        margin-top: 0.25rem;
+        font-weight: 500;
     }
 
+    /* ===== CHART CONTAINERS ===== */
     .pyramid-chart-container,
     .chart-container {
-        background: white;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
         padding: 2rem;
-        border-radius: 15px;
+        border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        margin-top: 30px;
-        margin-bottom: 20px;
+        border: 2px solid #e3f2fd;
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
     }
 
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
         .infografis-grid {
             grid-template-columns: 1fr;
+            gap: 1.25rem;
         }
         
         .info-card {
             min-height: 90px;
-            padding: 15px;
+            padding: 1.25rem;
         }
         
         .info-icon {
@@ -322,16 +342,21 @@
         }
         
         .info-content h3 {
-            font-size: 14px;
+            font-size: 0.95rem;
         }
         
         .info-content .number {
-            font-size: 22px;
+            font-size: 1.5rem;
+        }
+        
+        .infografis-subtitle {
+            font-size: 1.1rem;
+            margin: 2rem 0 1.25rem 0;
         }
     }
 </style>
 
-{{-- JAVASCRIPT KHUSUS INFOGRAFIS (CHARTS) --}}
+{{-- JAVASCRIPT KHUSUS INFOGRAFIS (CHARTS) - SAMA SEPERTI SEBELUMNYA --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Pyramid Chart (Kelompok Umur)

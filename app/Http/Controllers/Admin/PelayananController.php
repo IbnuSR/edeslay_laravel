@@ -74,10 +74,9 @@ class PelayananController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi_singkat' => 'required|string|max:500',
             'isi_panduan' => 'required|string',
-            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
+            'dokumen_wajib' => 'nullable|string', // ✅ VALIDASI FIELD BARU
             'foto_pendukung' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
         ], [
-            // ✅ Custom error message untuk ukuran file
             'foto_pendukung.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
             'foto_pendukung.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
             'foto_pendukung.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
@@ -89,15 +88,17 @@ class PelayananController extends Controller
         if ($request->hasFile('foto_pendukung')) {
             $file = $request->file('foto_pendukung');
             $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
-            $fotoPath = $file->storeAs('pelayanan', $filename, 'public'); // ✅ Simpan ke storage/app/public/pelayanan
+            $fotoPath = $file->storeAs('pelayanan', $filename, 'public');
             $fotoType = $file->getMimeType();
         }
 
+        // ✅ SIMPAN KE DATABASE TERMASUK dokumen_wajib
         DB::table('panduan_surat')->insert([
             'judul' => $request->judul,
             'deskripsi_singkat' => $request->deskripsi_singkat,
             'isi_panduan' => $request->isi_panduan,
-            'foto_pendukung' => $fotoPath, // ✅ Simpan PATH relatif: 'pelayanan/filename.jpg'
+            'dokumen_wajib' => $request->dokumen_wajib, // ✅ INI KUNCINYA!
+            'foto_pendukung' => $fotoPath,
             'foto_type' => $fotoType,
             'created_at' => now(),
             'updated_at' => now(),
@@ -112,19 +113,20 @@ class PelayananController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi_singkat' => 'required|string|max:500',
             'isi_panduan' => 'required|string',
-            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
+            'dokumen_wajib' => 'nullable|string', // ✅ VALIDASI FIELD BARU
             'foto_pendukung' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
         ], [
-            // ✅ Custom error message untuk ukuran file
             'foto_pendukung.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
             'foto_pendukung.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
             'foto_pendukung.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
         ]);
 
+        // ✅ UPDATE DATA TERMASUK dokumen_wajib
         $updateData = [
             'judul' => $request->judul,
             'deskripsi_singkat' => $request->deskripsi_singkat,
             'isi_panduan' => $request->isi_panduan,
+            'dokumen_wajib' => $request->dokumen_wajib, // ✅ INI KUNCINYA!
             'updated_at' => now(),
         ];
 
