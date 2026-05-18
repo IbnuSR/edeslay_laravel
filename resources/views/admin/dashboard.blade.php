@@ -189,18 +189,102 @@
         margin-bottom: 30px;
     }
     .stat-card {
-        background: white;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        transition: transform 0.2s;
-    }
-    .stat-card:hover {
-        transform: translateY(-3px);
-    }
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+/* Efek Hover Modern */
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(25, 118, 210, 0.15);
+    border-color: rgba(25, 118, 210, 0.2);
+}
+
+/* Gradient overlay saat hover */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(25, 118, 210, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+/* Icon Animation */
+.stat-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: #f0f4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1976d2;
+    font-size: 22px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.stat-card:hover .stat-icon-box {
+    transform: scale(1.15) rotate(-5deg);
+    background: linear-gradient(135deg, #1976d2 0%, #3b82f6 100%);
+    color: white;
+    box-shadow: 0 8px 20px rgba(25, 118, 210, 0.4);
+}
+
+/* Angka & Label Animation */
+.stat-card .stat-label,
+.stat-card .stat-value {
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-card:hover .stat-label {
+    color: #1976d2;
+    transform: translateX(5px);
+}
+
+.stat-card:hover .stat-value {
+    color: #1e40af;
+    transform: scale(1.05);
+}
+
+/* Ripple Effect */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: radial-gradient(circle, rgba(25, 118, 210, 0.1) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.5s ease;
+    pointer-events: none;
+}
+
+.stat-card:hover::after {
+    transform: scale(1.5);
+}
     .stat-icon-box {
         width: 52px;
         height: 52px;
@@ -270,6 +354,31 @@
         color: #4b5563;
         flex-shrink: 0;
     }
+
+/* ===== BACKGROUND PATTERN HALUS ===== */
+body {
+    background-color: #f0f4ff !important;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(25, 118, 210, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.03) 0%, transparent 50%);
+    background-attachment: fixed;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, rgba(25, 118, 210, 0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: -1; /* Agar di belakang semua konten */
+    opacity: 0.5;
+}
+
 </style>
 
 <div class="dashboard-content">
@@ -327,12 +436,12 @@
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon-box"><i class="fa-solid fa-chart-pie"></i></div>
-            <div>
-                <div class="stat-label">Infografis</div>
-                <div class="stat-value">{{ $total_infografis ?? 0 }}</div>
-            </div>
-        </div>
+    <div class="stat-icon-box"><i class="fa-solid fa-folder-open"></i></div>
+    <div>
+        <div class="stat-label">Pelayanan</div>
+        <div class="stat-value">{{ $total_panduan_surat ?? 0 }}</div>
+    </div>
+</div>
 
         <div class="stat-card">
             <div class="stat-icon-box"><i class="fa-solid fa-envelope"></i></div>

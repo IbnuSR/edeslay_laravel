@@ -1,262 +1,569 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reset Password</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - Desa Banjardowo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-<style>
-/* ===== BODY ===== */
-body {
-    min-height: 100vh;
-    margin: 0;
+        body.login-body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: url('assets/img/bg-login-main.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
 
-    background: url('assets/images/bg_login.svg') no-repeat center;
-    background-size: cover;
+        /* ===== HEADER LOGO ===== */
+        .login-header {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .login-header img {
+            width: 50px;
+            height: auto;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        .login-header h1 {
+            font-size: 20px;
+            color: #fff;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .login-header p {
+            font-size: 11px;
+            color: #e0e0e0;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+        }
 
-    font-family: 'Segoe UI', Arial, sans-serif;
+        /* ===== LOGIN CARD CONTAINER ===== */
+        .login-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 950px;
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            background: white;
+            min-height: 500px;
+        }
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        /* ===== LEFT SIDE - WELCOME ===== */
+        .login-welcome-section {
+            flex: 1;
+            background: url('assets/img/foto-desa.png') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            padding: 50px 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-/* ===== HEADER (SAMA SEMUA) ===== */
-.header-logo {
-    position: absolute;
-    top: 20px;
-    left: 25px;
+        .login-welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(125deg, rgba(8, 20, 70, 0.55) 0%, rgba(15, 40, 120, 0.50) 50%, rgba(10, 30, 100, 0.55) 100%),
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.02) 35px, rgba(255,255,255,.02) 70px);
+            z-index: 1;
+        }
 
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        .wave-top {
+            position: absolute;
+            top: -100px;
+            left: -50%;
+            width: 200%;
+            height: 300px;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: rotate(-5deg);
+            z-index: 2;
+            pointer-events: none;
+        }
 
-.header-logo img {
-    width: 45px;
-}
+        .wave-bottom {
+            position: absolute;
+            bottom: -80px;
+            right: -30%;
+            width: 160%;
+            height: 250px;
+            background: radial-gradient(ellipse at center, rgba(121, 166, 242, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: rotate(3deg);
+            z-index: 2;
+            pointer-events: none;
+        }
 
-.header-logo h1 {
-    font-size: 16px;
-    margin: 0;
-}
+        .corner-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, rgba(121, 166, 242, 0.4) 0%, transparent 100%);
+            border-radius: 0 0 100% 0;
+            z-index: 2;
+            pointer-events: none;
+        }
 
-.header-logo p {
-    font-size: 12px;
-    margin: 0;
-}
+        .corner-accent-2 {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(315deg, rgba(121, 166, 242, 0.3) 0%, transparent 100%);
+            border-radius: 100% 0 0 0;
+            z-index: 2;
+            pointer-events: none;
+        }
 
-/* ===== CARD ===== */
-.form-card {
-    width: 100%;
-    max-width: 360px;
+        .grid-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 2;
+            pointer-events: none;
+        }
 
-    background: rgba(255,255,255,0.7); /* 🔥 transparan */
-    border-radius: 16px;
+        .floating-circle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            border-radius: 50%;
+            z-index: 2;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        .circle-1 { top: 10%; right: 10%; width: 200px; height: 200px; }
+        .circle-2 { bottom: 20%; left: 5%; width: 120px; height: 120px; animation-delay: 1s; }
+        .circle-3 { top: 50%; right: 5%; width: 80px; height: 80px; animation-delay: 2s; }
 
-    padding: 30px 25px;
-    text-align: center;
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-20px) scale(1.05); opacity: 0.9; }
+        }
 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    backdrop-filter: blur(8px);
+        .welcome-content {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+        }
 
-    margin-top: 40px;
-}
+        .welcome-icon {
+            width: 65px;
+            height: 65px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .welcome-icon i { font-size: 30px; color: white; }
 
-/* ===== LOGO ===== */
-.logo-e-deslay {
-    height: 65px;
-    margin-bottom: 10px;
-}
+        .welcome-content h2 {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: inline-block;
+            border-right: 3px solid rgba(255,255,255,0.8);
+            animation: kedipKursor 0.8s step-end infinite;
+        }
 
-/* ===== TITLE ===== */
-.form-card h2 {
-    font-size: 22px;
-    color: #174087;
-    margin-bottom: 5px;
-}
+        @keyframes kedipKursor {
+            0%, 100% { border-color: rgba(255,255,255,0.8); }
+            50% { border-color: transparent; }
+        }
 
-.subtitle {
-    font-size: 13px;
-    color: #333;
-    margin-bottom: 20px;
-}
+        .welcome-content p {
+            font-size: 16px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        .welcome-content .brand-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .divider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            margin-bottom: 25px;
+            border-radius: 2px;
+        }
+        .tagline {
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.85;
+            font-style: italic;
+        }
 
-/* ===== FORM ===== */
-.form-group {
-    width: 100%;
-    margin-bottom: 10px;
-    text-align: left;
-    position: relative;
-}
+        /* ===== RIGHT SIDE - FORM ===== */
+        .login-form-section {
+            flex: 1;
+            padding: 50px 40px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .login-form-section h2 {
+            font-size: 30px;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        .login-form-section .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
 
-.form-group label {
-    font-size: 13px;
-    margin-bottom: 5px;
-    display: block;
-    font-weight: 500;
-}
+        /* ===== ALERT BOXES ===== */
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.form-group input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    box-sizing: border-box;
-    margin-bottom: 15px;
-}
+        /* ===== FORM GROUP ===== */
+        .form-group { 
+            margin-bottom: 22px; 
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .input-wrapper { position: relative; }
+        .input-wrapper i.input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 16px;
+            z-index: 2;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #f9fafb;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
 
-/* ===== EYE ICON ===== */
-.toggle-password {
-    position: absolute;
-    right: 12px;
-    top: 70%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
+        /* ===== TOGGLE PASSWORD (GAMBAR) ===== */
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+        }
+        .toggle-password img.eye-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .toggle-password:hover img.eye-icon {
+            opacity: 1;
+        }
 
-.eye-icon {
-    width: 20px;
-}
+        /* ===== BUTTON ===== */
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+        }
+        .btn-login:active { transform: translateY(0); }
 
-/* ===== BUTTON (SAMA KAYAK LOGIN) ===== */
-.btn-primary {
-    width: 50%;
-    padding: 7px;
+        /* ===== LINK ===== */
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .forgot-password a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .forgot-password a:hover {
+            color: #1e40af;
+            text-decoration: underline;
+        }
 
-    background: #79A6F2;
-    color: #fff;
+        /* ===== FOOTER ===== */
+        .login-footer {
+            position: relative;
+            z-index: 2;
+            margin-top: 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
 
-    border: none;
-    border-radius: 10px;
-
-    font-size: 12px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    box-shadow: 
-        0 1px 0 #000000,
-        0 5px 5px #79A6F2;
-
-    transition: 0.2s;
-
-    display: block;
-    margin: 10px auto 0;
-}
-
-.btn-primary:active {
-    transform: translateY(2px);
-    box-shadow: 
-        0 0px 0 #000000,
-        0 3px 3px #79A6F2;
-}
-
-.btn-primary:hover {
-    opacity: 0.9;
-}
-
-/* ===== LINK ===== */
-.back-link {
-    margin-top: 15px;
-    font-size: 12px;
-}
-
-.back-link a {
-    color: #0a77e4;
-    text-decoration: none;
-}
-
-/* ===== ALERT ===== */
-.alert {
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    font-size: 13px;
-}
-
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 480px) {
-    .form-card {
-        max-width: 300px;
-        padding: 25px 20px;
-    }
-}
-</style>
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .login-header h1 { font-size: 24px; }
+            .login-header img { width: 55px; height: 55px; }
+            .login-wrapper { max-width: 100%; margin: 0 10px; }
+            .login-welcome-section { display: none; }
+            .login-form-section {
+                padding: 35px 25px;
+                border-radius: 20px;
+            }
+            .login-form-section h2 { font-size: 26px; }
+        }
+    </style>
 </head>
+<body class="login-body">
 
-<body>
+    <!-- HEADER LOGO -->
+    <header class="login-header">
+        <img src="assets/images/logo-nganjuk.png" alt="Logo Desa Banjardowo">
+        <h1>DESA BANJARDOWO</h1>
+        <p>KECAMATAN LENGKONG, KABUPATEN NGANJUK</p>
+    </header>
 
-<!-- HEADER -->
-<div class="header-logo">
-    <img src="assets/images/logo-nganjuk.png">
-    <div>
-        <h1>Desa Banjardowo</h1>
-        <p>Kecamatan Lengkong, Kabupaten Nganjuk</p>
+    <!-- LOGIN CARD -->
+    <div class="login-wrapper">
+        
+        <!-- LEFT: WELCOME -->
+        <div class="login-welcome-section">
+            <!-- Dekorasi -->
+            <div class="wave-top"></div>
+            <div class="wave-bottom"></div>
+            <div class="corner-accent"></div>
+            <div class="corner-accent-2"></div>
+            <div class="grid-pattern"></div>
+            <div class="floating-circle circle-1"></div>
+            <div class="floating-circle circle-2"></div>
+            <div class="floating-circle circle-3"></div>
+            
+            <!-- Konten Welcome -->
+            <div class="welcome-content">
+                <div class="welcome-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2>Reset Password</h2>
+                <p>di Sistem Informasi</p>
+                <p class="brand-name">Desa Banjardowo</p>
+                <div class="divider"></div>
+                <p class="tagline">
+                    Buat password baru,<br>
+                    minimal 8 karakter.
+                </p>
+            </div>
+        </div>
+
+        <!-- RIGHT: FORM -->
+        <div class="login-form-section">
+            <h2>Password Baru</h2>
+            <p class="subtitle">Masukkan dan konfirmasi password Anda</p>
+
+            {{-- PHP ERROR MESSAGE (TETAP UTUH) --}}
+            <?php if ($message): ?>
+                <div class="alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <?= $message ?>
+                </div>
+            <?php endif; ?>
+
+            {{-- FORM (SEMUA NAME & FUNCTION TETAP) --}}
+            <form method="POST">
+                
+                <!-- Password Baru -->
+                <div class="form-group">
+                    <label for="password">Password Baru</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            name="password" 
+                            id="password" 
+                            placeholder="Minimal 8 karakter"
+                            required
+                        >
+                        <!-- Toggle Password (GAMBAR - TETAP UTUH) -->
+                        <span class="toggle-password" onclick="togglePassword('password', this)">
+                            <img src="assets/icons/mata_buka.png" class="eye-icon" alt="Lihat">
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Konfirmasi Password -->
+                <div class="form-group">
+                    <label for="confirm_password">Konfirmasi Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            name="confirm_password" 
+                            id="confirm_password" 
+                            placeholder="Ulangi password baru"
+                            required
+                        >
+                        <!-- Toggle Password (GAMBAR - TETAP UTUH) -->
+                        <span class="toggle-password" onclick="togglePassword('confirm_password', this)">
+                            <img src="assets/icons/mata_buka.png" class="eye-icon" alt="Lihat">
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Submit Button (name="reset" TETAP) -->
+                <button type="submit" name="reset" class="btn-login">
+                    SIMPAN PASSWORD
+                </button>
+
+                <!-- Link Kembali (TETAP) -->
+                <div class="forgot-password">
+                    <a href="lupa_password.php">← Kembali ke OTP</a>
+                </div>
+            </form>
+        </div>
+
     </div>
-</div>
 
-<!-- CARD -->
-<div class="form-card">
+    <!-- FOOTER -->
+    <footer class="login-footer">
+        <p>&copy; <?php echo date('Y'); ?> Desa Banjardowo. All rights reserved.</p>
+    </footer>
 
-    <img src="assets/images/logo-big.png" class="logo-e-deslay">
+    {{-- JAVASCRIPT TOGGLE PASSWORD (TETAP UTUH) --}}
+    <script>
+        // Fungsi toggle password dengan gambar (ASLI - TIDAK DIUBAH)
+        function togglePassword(id, el) {
+            const input = document.getElementById(id);
+            const img = el.querySelector("img");
 
-    <h2>RESET PASSWORD</h2>
-    <p class="subtitle">Password minimal 8 karakter</p>
+            if (input.type === "password") {
+                input.type = "text";
+                img.src = "assets/icons/mata_tutup.png";
+            } else {
+                input.type = "password";
+                img.src = "assets/icons/mata_buka.png";
+            }
+        }
 
-    <?php if ($message): ?>
-        <?= $message ?>
-    <?php endif; ?>
+        // Animasi mengetik untuk judul
+        const judulElemen = document.querySelector('.welcome-content h2');
+        if (judulElemen) {
+            const teksAsli = judulElemen.textContent.trim();
+            judulElemen.textContent = '';
 
-    <form method="POST">
+            let indeks = 0;
+            let isDeleting = false;
+            let waktuDelay = 80;
 
-        <div class="form-group">
-            <label>Password Baru</label>
-            <input type="password" name="password" id="password" required>
-            <span class="toggle-password" onclick="togglePassword('password', this)">
-                <img src="assets/icons/mata_buka.png" class="eye-icon">
-            </span>
-        </div>
+            function efekKetikLoop() {
+                if (!isDeleting) {
+                    if (indeks < teksAsli.length) {
+                        judulElemen.textContent = teksAsli.substring(0, indeks + 1);
+                        indeks++;
+                        waktuDelay = 80;
+                    } else {
+                        isDeleting = true;
+                        waktuDelay = 2000;
+                    }
+                } else {
+                    if (indeks > 0) {
+                        judulElemen.textContent = teksAsli.substring(0, indeks - 1);
+                        indeks--;
+                        waktuDelay = 50;
+                    } else {
+                        isDeleting = false;
+                        waktuDelay = 600;
+                    }
+                }
+                setTimeout(efekKetikLoop, waktuDelay);
+            }
 
-        <div class="form-group">
-            <label>Konfirmasi Password</label>
-            <input type="password" name="confirm_password" id="confirm_password" required>
-            <span class="toggle-password" onclick="togglePassword('confirm_password', this)">
-                <img src="assets/icons/mata_buka.png" class="eye-icon">
-            </span>
-        </div>
-
-        <button type="submit" name="reset" class="btn-primary">
-            SIMPAN
-        </button>
-
-        <div class="back-link">
-            <a href="lupa_password.php">← Kembali ke OTP</a>
-        </div>
-
-    </form>
-</div>
-
-<script>
-function togglePassword(id, el) {
-    const input = document.getElementById(id);
-    const img = el.querySelector("img");
-
-    if (input.type === "password") {
-        input.type = "text";
-        img.src = "assets/icons/mata_tutup.png";
-    } else {
-        input.type = "password";
-        img.src = "assets/icons/mata_buka.png";
-    }
-}
-</script>
-
+            setTimeout(efekKetikLoop, 800);
+        }
+    </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <section class="section" id="layanan">
     <div class="section-header">
         <div class="section-title">
-            <h2>Pengajuan Surat Online</h2>
+            <h2>Panduan Pengajuan Surat Desa</h2>
             <p>Layanan pembuatan surat administrasi desa secara digital.</p>
         </div>
         @if($layananList->count() > 0)
