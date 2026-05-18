@@ -3,6 +3,13 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PengajuanSuratApiController;
+use App\Http\Controllers\Api\PengajuanPenghasilanApiController;
+use App\Http\Controllers\Api\PengajuanKelahiranApiController;
+use App\Http\Controllers\Api\PengajuanKtpApiController;
+use App\Http\Controllers\Api\PengajuanKematianApiController;
+use App\Http\Controllers\Api\PengajuanIzinApiController;
+use App\Http\Controllers\Api\PengajuanNikahApiController;
+use App\Http\Controllers\Api\RiwayatApiController;
 
 // =========================================================
 // CONTROLLER API MOBILE
@@ -41,6 +48,11 @@ Route::post('/resend-otp', [AuthController::class, 'sendOtp']);
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+Route::post(
+    '/save-fcm-token',
+    [AuthController::class, 'saveFcmToken']
+);
 
 // =========================================================
 // USER PROFILE MOBILE
@@ -92,12 +104,156 @@ Route::get(
     [PengajuanSuratApiController::class, 'getSKTM']
 );
 
+Route::post(
+    '/update-sktm/{id}',
+    [PengajuanSuratApiController::class, 'updateSKTM']
+);
+// ================= DOMISILI =================
+
+Route::post(
+    '/pengajuan-domisili',
+    [PengajuanSuratApiController::class, 'storeDomisili']
+);
+
+Route::get(
+    '/pengajuan-domisili/user/{id}',
+    [PengajuanSuratApiController::class, 'getDomisiliByUser']
+);
+
+Route::post(
+    '/update-domisili/{id}',
+    [PengajuanSuratApiController::class, 'updateDomisili']
+);
+
+// ================= PENGHASILAN =================
+
+Route::post(
+    '/pengajuan-penghasilan',
+    [PengajuanPenghasilanApiController::class, 'store']
+);
+
+Route::get(
+    '/pengajuan-penghasilan',
+    [PengajuanPenghasilanApiController::class, 'getAll']
+);
+
+Route::get(
+    '/pengajuan-penghasilan/{id}',
+    [PengajuanPenghasilanApiController::class, 'detail']
+);
+
+Route::post(
+    '/penghasilan/update/{id}',
+    [PengajuanPenghasilanApiController::class, 'update']
+);
+
+// ================= KELAHIRAN =================
+Route::post(
+    '/pengajuan-kelahiran',
+    [PengajuanKelahiranApiController::class, 'store']
+);
+
+Route::get(
+    '/pengajuan-kelahiran/user/{id}',
+    [PengajuanKelahiranApiController::class, 'riwayat']
+);
+
+Route::post(
+    '/kelahiran/update/{id}',
+    [PengajuanKelahiranApiController::class, 'update']
+);
+
+
+// ================= PENGANTAR KTP =================
+Route::post(
+    '/pengajuan-ktp',
+    [PengajuanKtpApiController::class, 'store']
+);
+
+Route::get(
+    '/pengajuan-ktp/{userId}',
+    [PengajuanKtpApiController::class, 'getByUser']
+);
+
+Route::get(
+    '/pengajuan-ktp-detail/{id}',
+    [PengajuanKtpApiController::class, 'detail']
+);
+
+Route::post(
+    '/ktp/update/{id}',
+    [PengajuanKtpApiController::class, 'update']
+);
+
+// ================= KEMATIAN =================
+Route::post(
+    '/pengajuan-kematian',
+    [PengajuanKematianApiController::class, 'store']
+);
+
+Route::get(
+    '/pengajuan-kematian/user/{id}',
+    [PengajuanKematianApiController::class, 'riwayat']
+);
+
+Route::post(
+    '/kematian/update/{id}',
+    [PengajuanKematianApiController::class, 'update']
+);
+
+// ================= IZIN =================
+Route::post(
+    '/pengajuan-izin',
+    [PengajuanIzinApiController::class, 'store']
+);
+
+Route::get(
+    '/pengajuan-izin/user/{id}',
+    [PengajuanIzinApiController::class, 'riwayat']
+);
+
+Route::post(
+    '/izin/update/{id}',
+    [PengajuanIzinApiController::class, 'update']
+);
+
+
+// ================= NIKAH =================
+Route::post(
+    'pengajuan-nikah',
+    [PengajuanNikahApiController::class, 'store']
+);
+
+Route::get(
+    'pengajuan-nikah/user/{id}',
+    [PengajuanNikahApiController::class, 'riwayat']
+);
+
+Route::post(
+    '/nikah/update/{id}',
+    [PengajuanNikahApiController::class, 'update']
+);
+
 // ================= RIWAYAT USER =================
 
 Route::get(
-    '/pengajuan-sktm/user/{id}',
-    [PengajuanSuratApiController::class,
-    'getSKTMByUser']
+    '/riwayat/{userId}',
+    [RiwayatApiController::class, 'index']
+);
+
+Route::delete(
+    '/riwayat/{jenis}/{id}',
+    [RiwayatApiController::class, 'delete']
+);
+
+Route::get(
+    '/pengajuan-penghasilan/user/{id}',
+    [PengajuanPenghasilanApiController::class, 'getByUser']
+);
+
+Route::get(
+    '/riwayat/{jenis}/{id}',
+    [RiwayatApiController::class, 'detail']
 );
 
 // =========================================================

@@ -5,13 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use App\Services\FirebaseService;
 
 class PengajuanSuratController extends Controller
 {
-    // ================= MAPPING TABLE =================
+    // =========================================================
+    // MAPPING TABLE
+    // =========================================================
     private $tables = [
+
         'domisili'    => 'pengajuan_domisili',
         'sktm'        => 'pengajuan_sktm',
         'penghasilan' => 'pengajuan_penghasilan',
@@ -22,31 +27,34 @@ class PengajuanSuratController extends Controller
         'nikah'       => 'pengajuan_nikah',
     ];
 
-    // ================= LIST DATA =================
+    // =========================================================
+    // INDEX
+    // =========================================================
     public function index(Request $request)
     {
         $jenis = $request->jenis ?? 'domisili';
 
-        $table = 'pengajuan_' . $jenis;
+        $table = $this->tables[$jenis] ?? null;
 
-        // ================= CEK TABLE =================
-        if (!Schema::hasTable($table)) {
-
+        if (!$table || !Schema::hasTable($table)) {
             abort(404, 'Jenis surat tidak ditemukan');
-
         }
 
         $query = DB::table($table);
 
-        // ================= FILTER PERIODE =================
+        // =====================================================
+        // FILTER PERIODE
+        // =====================================================
+
         if ($request->filter == 'hari_ini') {
 
             $query->whereDate(
                 'tanggal_pengajuan',
                 now()->toDateString()
             );
+        }
 
-        } elseif ($request->filter == 'minggu') {
+        elseif ($request->filter == 'minggu') {
 
             $query->whereBetween(
                 'tanggal_pengajuan',
@@ -55,8 +63,9 @@ class PengajuanSuratController extends Controller
                     now()->endOfWeek()
                 ]
             );
+        }
 
-        } elseif ($request->filter == 'bulan') {
+        elseif ($request->filter == 'bulan') {
 
             $query->whereMonth(
                 'tanggal_pengajuan',
@@ -65,8 +74,9 @@ class PengajuanSuratController extends Controller
                 'tanggal_pengajuan',
                 now()->year
             );
+        }
 
-        } elseif ($request->filter == 'tahun') {
+        elseif ($request->filter == 'tahun') {
 
             $query->whereYear(
                 'tanggal_pengajuan',
@@ -74,21 +84,73 @@ class PengajuanSuratController extends Controller
             );
         }
 
-        // ================= DATA =================
+        // =====================================================
+        // SEARCH
+        // =====================================================
+
+        if ($request->search) {
+
+            $query->where(function ($q) use ($request) {
+
+                $q->where(
+                    'nama_lengkap',
+                    'like',
+                    '%' . $request->search . '%'
+                )
+
+                ->orWhere(
+                    'nik',
+                    'like',
+                    '%' . $request->search . '%'
+                );
+            });
+        }
+
+        // =====================================================
+        // DATA
+        // =====================================================
+
         $data = $query
-            ->orderBy('id', 'desc')
+            ->orderBy(
+                'tanggal_pengajuan',
+                'desc'
+            )
             ->get();
+
+        // =====================================================
+        // STATISTIK
+        // =====================================================
+
+        $proses = DB::table($table)
+            ->where('status', 'proses')
+            ->count();
+
+        $selesai = DB::table($table)
+            ->where('status', 'selesai')
+            ->count();
+
+        $ditolak = DB::table($table)
+            ->where('status', 'ditolak')
+            ->count();
+
+        $total = DB::table($table)->count();
 
         return view(
             'admin.surat.index',
-            [
-                'data' => $data,
-                'jenis' => $jenis,
-            ]
+            compact(
+                'data',
+                'jenis',
+                'proses',
+                'selesai',
+                'ditolak',
+                'total'
+            )
         );
     }
 
-    // ================= DETAIL =================
+    // =========================================================
+    // DETAIL
+    // =========================================================
     public function show($jenis, $id)
     {
         $table = $this->tables[$jenis] ?? abort(404);
@@ -98,9 +160,7 @@ class PengajuanSuratController extends Controller
             ->first();
 
         if (!$surat) {
-
             abort(404);
-
         }
 
         return view(
@@ -109,7 +169,9 @@ class PengajuanSuratController extends Controller
         );
     }
 
-    // ================= UPDATE STATUS =================
+    // =========================================================
+    // UPDATE STATUS
+    // =========================================================
     public function updateStatus(
         Request $request,
         $jenis,
@@ -118,16 +180,16 @@ class PengajuanSuratController extends Controller
 
         $table = $this->tables[$jenis] ?? abort(404);
 
-        // =================================================
+        // =====================================================
         // MULAI DIKERJAKAN
-        // =================================================
+        // =====================================================
+
         if ($request->action == 'start') {
 
             DB::table($table)
                 ->where('id', $id)
                 ->update([
 
-                    // PENANDA SUDAH DIKERJAKAN
                     'nomor_surat' =>
                         'PROCESS-' . time(),
 
@@ -149,74 +211,117 @@ class PengajuanSuratController extends Controller
             'updated_at' => now(),
         ];
 
-        // =================================================
+        // =====================================================
         // STATUS SELESAI
-        // =================================================
+        // =====================================================
+
         if ($status == 'selesai') {
 
             $updateData['nomor_surat'] =
                 $request->nomor_surat;
 
-            // =============================================
-            // CETAK ONLINE
-            // =============================================
-            if (
-                $request->hasFile('file_surat')
-            ) {
+            // =================================================
+            // UPLOAD PDF
+            // =================================================
 
-                $file =
-                    $request->file(
-                        'file_surat'
-                    );
+            if ($request->hasFile('file_surat')) {
+
+                $file = $request->file('file_surat');
 
                 $filename =
                     time() . '_' .
                     $file->getClientOriginalName();
 
-                $path =
-                    $file->storeAs(
-                        'surat_jadi',
-                        $filename,
-                        'public'
-                    );
+                $path = $file->storeAs(
+                    'surat_jadi',
+                    $filename,
+                    'public'
+                );
 
-                // FIX DATABASE COLUMN
-                $updateData[
-                    'file_surat_jadi'
-                ] = $path;
+                // FIX COLUMN DB
+                $updateData['file_surat_jadi']
+                    = $path;
             }
 
-            // =============================================
+            // =================================================
             // KETERANGAN ADMIN
-            // =============================================
-            if (
-                $request->keterangan_admin
-            ) {
+            // =================================================
 
-                $updateData[
-                    'keterangan_admin'
-                ] =
-                    $request->keterangan_admin;
+            if ($request->keterangan_admin) {
+
+                $updateData['keterangan_admin']
+                    = $request->keterangan_admin;
             }
         }
 
-        // =================================================
+        // =====================================================
         // STATUS DITOLAK
-        // =================================================
+        // =====================================================
+
         if ($status == 'ditolak') {
 
-            $updateData[
-                'alasan_tolak'
-            ] =
-                $request->alasan_tolak;
+            $updateData['alasan_tolak']
+                = $request->alasan_tolak;
         }
 
-        // =================================================
+        // =====================================================
         // UPDATE DATABASE
-        // =================================================
+        // =====================================================
+
         DB::table($table)
             ->where('id', $id)
             ->update($updateData);
+
+        // =====================================================
+        // KIRIM NOTIFIKASI FIREBASE
+        // =====================================================
+
+        $dataUser = DB::table($table)
+            ->where('id', $id)
+            ->first();
+
+        if ($dataUser) {
+
+            $user = User::find(
+                $dataUser->user_id
+            );
+
+            if ($user && $user->fcm_token) {
+
+                $firebase =
+                    app(FirebaseService::class);
+
+                // ================= SELESAI =================
+                if ($status == 'selesai') {
+
+                    $firebase->sendNotification(
+
+                        $user->fcm_token,
+
+                        'Pengajuan Disetujui ✅',
+
+                        'Surat ' .
+                        strtoupper($jenis) .
+                        ' sudah selesai'
+                    );
+                }
+
+                // ================= DITOLAK =================
+                if ($status == 'ditolak') {
+
+                    $firebase->sendNotification(
+
+                        $user->fcm_token,
+
+                        'Pengajuan Ditolak ❌',
+
+                        'Surat ' .
+                        strtoupper($jenis) .
+                        ' ditolak admin'
+                    );
+                }
+            }
+        }
 
         return back()->with(
             'success',
@@ -224,7 +329,9 @@ class PengajuanSuratController extends Controller
         );
     }
 
-    // ================= PRINT =================
+    // =========================================================
+    // PRINT
+    // =========================================================
     public function print($jenis)
     {
         $table =
@@ -232,7 +339,10 @@ class PengajuanSuratController extends Controller
             ?? abort(404);
 
         $data = DB::table($table)
-            ->latest()
+            ->orderBy(
+                'tanggal_pengajuan',
+                'desc'
+            )
             ->get();
 
         $stats = [

@@ -419,6 +419,36 @@ class AuthController extends Controller
             ]
         ]);
     }
+    // ================= SAVE FCM TOKEN =================
+    public function saveFcmToken(Request $request)
+    {
+        $request->validate([
+
+            'user_id' => 'required',
+            'fcm_token' => 'required',
+        ]);
+
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+
+            return response()->json([
+
+                'success' => false,
+                'message' => 'User tidak ditemukan'
+            ]);
+        }
+
+        $user->fcm_token = $request->fcm_token;
+
+        $user->save();
+
+        return response()->json([
+
+            'success' => true,
+            'message' => 'FCM token berhasil disimpan'
+        ]);
+    }
 }
 
 
