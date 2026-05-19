@@ -848,7 +848,7 @@
 
             <form method="POST" action="{{ route('admin.kegiatan.index') }}" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" name="action" value="{{ $action }}">
+                <input type="hidden" name="action" value="{{ $action === 'edit' ? 'update' : ($action === 'tambah' ? 'store' : $action) }}">
                 @if(isset($edit) && $edit)
                     <input type="hidden" name="id" value="{{ $edit->id ?? '' }}">
                 @endif

@@ -108,13 +108,13 @@ Route::middleware(['auth', 'prevent-back'])
         Route::post('/profile/upload-avatar', [ProfileController::class, 'uploadAvatar'])->name('profile.upload-avatar');
         Route::post('/profile/upload-cover', [ProfileController::class, 'uploadCover'])->name('profile.upload-cover');
 
-        // ================= KEGIATAN (ADMIN) =================
-        Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
-        Route::post('/kegiatan', [KegiatanController::class, 'store'])->name('kegiatan.store');
-        Route::get('/kegiatan/{id}', [KegiatanController::class, 'show'])->whereNumber('id')->name('kegiatan.show');
-        Route::get('/kegiatan/{id}/edit', [KegiatanController::class, 'edit'])->whereNumber('id')->name('kegiatan.edit');
-        Route::put('/kegiatan/{id}', [KegiatanController::class, 'update'])->whereNumber('id')->name('kegiatan.update');
-        Route::delete('/kegiatan/{id}', [KegiatanController::class, 'destroy'])->whereNumber('id')->name('kegiatan.destroy');
+        // ================= KEGIATAN (ADMIN) - ACTION BASED ✅
+        // Semua GET & POST ke /admin/kegiatan ditangani method index()
+        Route::match(['get', 'post'], '/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+        // Route preview detail (opsional)
+        Route::get('/kegiatan/{id}/preview', [KegiatanController::class, 'show'])
+            ->whereNumber('id')
+            ->name('kegiatan.preview');
 
         // ================= PRESTASI (ADMIN) =================
         Route::get('/prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');

@@ -10,69 +10,77 @@ use Illuminate\Support\Facades\Storage;
 
 class KegiatanController extends Controller
 {
-    // ================= MAIN HANDLER =================
+    // ================= MAIN HANDLER (SEMUA AKSI DI SINI) =================
     public function index(Request $request)
     {
         $user = Auth::user();
         if (!$user) return redirect()->route('login');
 
-        $action = $request->action ?? 'list';
-        $id = $request->id;
+        $action = $request->input('action', 'list');
+        $id = $request->input('id');
 
+        // 🔥 HANDLE POST REQUEST - INI KUNCINYA!
+        if ($request->isMethod('post')) {
+            
+            // CASE 1: Simpan data baru
+            if ($action === 'store' || $action === 'tambah') {
+                return $this->store($request);
+            }
+            
+            // CASE 2: Update data existing
+            if (($action === 'update' || $action === 'edit') && $id) {
+                return $this->update($request, $id);
+            }
+        }
+
+        // ================= HANDLE GET REQUEST (TAMPILAN) =================
         $data = [
             'action' => $action,
-            'namaAdmin' => $user->nama_lengkap,
-            'roleAdmin' => $user->role,
-            'inisialAdmin' => strtoupper(substr($user->nama_lengkap, 0, 1)),
+            'namaAdmin' => $user->nama_lengkap ?? 'Administrator',
+            'roleAdmin' => $user->role ?? 'admin',
+            'inisialAdmin' => strtoupper(substr($user->nama_lengkap ?? 'A', 0, 1)),
         ];
 
-        // ================= LIST =================
+        // LIST
         if ($action == 'list') {
-            $search = $request->search;
-
+            $search = $request->input('search');
             $query = DB::table('kegiatan');
-
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('judul', 'like', "%$search%")
                       ->orWhere('lokasi', 'like', "%$search%");
                 });
             }
-
             $data['kegiatanList'] = $query->orderBy('id', 'desc')->get();
             $data['search'] = $search;
-
             return view('admin.kegiatan', $data);
         }
 
-        // ================= TAMBAH =================
+        // TAMBAH FORM
         if ($action == 'tambah') {
             $data['page_title'] = 'Tambah Kegiatan';
             return view('admin.kegiatan', $data);
         }
 
-        // ================= VIEW =================
+        // VIEW DETAIL
         if ($action == 'view') {
             $data['detail'] = DB::table('kegiatan')->where('id', $id)->first();
             return view('admin.kegiatan', $data);
         }
 
-        // ================= EDIT =================
+        // EDIT FORM
         if ($action == 'edit') {
             $data['edit'] = DB::table('kegiatan')->where('id', $id)->first();
             return view('admin.kegiatan', $data);
         }
 
-        // ================= DELETE (GET) =================
-        if ($action == 'delete') {
-            // Hapus file foto jika ada
+        // DELETE
+        if ($action == 'delete' && $id) {
             $kegiatan = DB::table('kegiatan')->where('id', $id)->first();
             if ($kegiatan && $kegiatan->foto) {
                 Storage::disk('public')->delete($kegiatan->foto);
             }
-            
             DB::table('kegiatan')->where('id', $id)->delete();
-
             return redirect()->route('admin.kegiatan.index')
                 ->with('success', 'Kegiatan berhasil dihapus');
         }
@@ -80,7 +88,7 @@ class KegiatanController extends Controller
         return redirect()->route('admin.kegiatan.index', ['action' => 'list']);
     }
 
-    // ================= STORE =================
+    // ================= STORE (CREATE NEW) =================
     public function store(Request $request)
     {
         $request->validate([
@@ -88,13 +96,11 @@ class KegiatanController extends Controller
             'lokasi' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal' => 'required|date',
-            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480'
         ], [
-            // ✅ Custom error message untuk ukuran file
-            'foto.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
-            'foto.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
-            'foto.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
+            'foto.max' => 'Ukuran foto maksimal 20MB.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format gambar tidak didukung.',
         ]);
 
         $fotoPath = null;
@@ -102,11 +108,7 @@ class KegiatanController extends Controller
 
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
-            
-            // Generate unique filename
             $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
-            
-            // Simpan ke storage/app/public/kegiatan
             $fotoPath = $file->storeAs('kegiatan', $filename, 'public');
             $fotoType = $file->getMimeType();
         }
@@ -116,7 +118,7 @@ class KegiatanController extends Controller
             'lokasi' => $request->lokasi,
             'deskripsi' => $request->deskripsi,
             'tanggal' => $request->tanggal,
-            'foto' => $fotoPath,  // Simpan PATH saja
+            'foto' => $fotoPath,
             'foto_type' => $fotoType,
             'created_at' => now(),
             'updated_at' => now(),
@@ -126,8 +128,8 @@ class KegiatanController extends Controller
             ->with('success', 'Kegiatan berhasil ditambahkan');
     }
 
-    // ================= UPDATE =================
-    public function update(Request $request)
+    // ================= UPDATE (EDIT EXISTING) =================
+    public function update(Request $request, $id)
     {
         $request->validate([
             'id' => 'required|integer|exists:kegiatan,id',
@@ -135,14 +137,18 @@ class KegiatanController extends Controller
             'lokasi' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tanggal' => 'required|date',
-            // ✅ UBAH: max:5120 (5MB) → max:20480 (20MB)
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480'
         ], [
-            // ✅ Custom error message untuk ukuran file
-            'foto.max' => 'Ukuran foto maksimal 20MB. File Anda terlalu besar.',
-            'foto.image' => 'File harus berupa gambar (jpeg, png, jpg, gif, webp).',
-            'foto.mimes' => 'Format gambar tidak didukung. Gunakan: jpeg, png, jpg, gif, webp.',
+            'id.exists' => 'Data kegiatan tidak ditemukan.',
+            'foto.max' => 'Ukuran foto maksimal 20MB.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format gambar tidak didukung.',
         ]);
+
+        // Pastikan ID request cocok dengan parameter
+        if ($request->id != $id) {
+            return redirect()->back()->with('error', 'ID mismatch: Tidak bisa mengupdate data.');
+        }
 
         $data = [
             'judul' => $request->judul,
@@ -153,22 +159,36 @@ class KegiatanController extends Controller
         ];
 
         if ($request->hasFile('foto')) {
-            // Ambil data lama untuk hapus file lama
-            $old = DB::table('kegiatan')->where('id', $request->id)->first();
-            if ($old && $old->foto) {
+            $old = DB::table('kegiatan')->where('id', $id)->first();
+            if ($old && $old->foto && file_exists(storage_path('app/public/' . $old->foto))) {
                 Storage::disk('public')->delete($old->foto);
             }
-
             $file = $request->file('foto');
             $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9\.]/', '_', $file->getClientOriginalName());
-            
             $data['foto'] = $file->storeAs('kegiatan', $filename, 'public');
             $data['foto_type'] = $file->getMimeType();
         }
 
-        DB::table('kegiatan')->where('id', $request->id)->update($data);
+        $updated = DB::table('kegiatan')->where('id', $id)->update($data);
 
-        return redirect()->route('admin.kegiatan.index', ['action' => 'list'])
-            ->with('success', 'Kegiatan berhasil diupdate');
+        if ($updated) {
+            return redirect()->route('admin.kegiatan.index', ['action' => 'list'])
+                ->with('success', 'Kegiatan berhasil diupdate');
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengupdate data.');
+    }
+
+    // ================= SHOW (PREVIEW DETAIL) =================
+    public function show($id)
+    {
+        $detail = DB::table('kegiatan')->where('id', $id)->first();
+        return view('admin.kegiatan', [
+            'action' => 'view',
+            'detail' => $detail,
+            'namaAdmin' => Auth::user()->nama_lengkap ?? 'Administrator',
+            'roleAdmin' => Auth::user()->role ?? 'admin',
+            'inisialAdmin' => strtoupper(substr(Auth::user()->nama_lengkap ?? 'A', 0, 1)),
+        ]);
     }
 }
